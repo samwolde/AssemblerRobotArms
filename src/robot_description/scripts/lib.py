@@ -4,7 +4,7 @@ class Location:
         self.y = y
         self.z = z
     
-    def set_location(x, y, z):
+    def set_location(self, x, y, z):
         self.x = x
         self.y = y
         self.z = z
@@ -15,7 +15,7 @@ class Orientation:
         self.y = y
         self.z = z
     
-    def set_orientation(x, y, z):
+    def set_orientation(self, x, y, z):
         self.x = x
         self.y = y
         self.z = z
@@ -23,7 +23,11 @@ class Orientation:
 
 class RectLink:
 
-    def __init__(self, width, length, height, location=None, orientation=None):
+    def __init__(self, width, length, height, 
+                location=None, 
+                orientation=None,
+                mass=.1, 
+                inertial=0.0005):
         self.width = width
         self.length = length
         self.height = height
@@ -36,13 +40,17 @@ class RectLink:
         else:
             self.orientation = orientation
     
-    def get_xml():
+    def get_xml(self):
         return ""
 
 
 class CylinerLink:
 
-    def __init__(self, radius, height, location=None, orientation=None):
+    def __init__(self, radius, height, 
+                location=None, 
+                orientation=None,
+                mass=.1, 
+                inertial=0.0005):
         self.radius = radius
         self.height = height
         if location == None:
@@ -55,7 +63,7 @@ class CylinerLink:
             self.orientation = orientation
 
 
-        def get_xml():
-            return ""
+    def get_xml(self):
+        return ""
 
         
