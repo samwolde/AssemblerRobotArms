@@ -1,2 +1,4 @@
 build/*
 devel/*
+.vscode
+src/robot_description/scripts/__pycache__
