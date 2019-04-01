@@ -76,15 +76,20 @@ class Orientation:
         self.x = x
         self.y = y
         self.z = z
+class Pose:
+    def __init__(self, loc:Location, orie:Orientation):
+        self.loc = loc
+        self.orie = orie
+
 #Generic Link class
 class Link(DOM.Element):
-    def __init__(self,name:str, loc:Location, orie:Orientation,mass,inertial):
+    def __init__(self,name:str, pose:Pose,mass,inertial):
         super().__init__("link")
         
         self.name = name
-        self.loc:Location = loc
+        self.loc:Location = pose.loc
         self.sdf_doc = Sdf.createSdfDoc()
-        self.orie = orie
+        self.orie = pose.orie
         self.mass = mass
         self.inertial = inertial
         self.build_link()
@@ -103,8 +108,8 @@ class Link(DOM.Element):
 #Create A rectangular link.
 class RectangularLink(Link):
 
-    def __init__(self, name, loc:Location, orie:Orientation, mass,size, inertial):
-        super().__init__(name,loc, orie, mass, inertial)
+    def __init__(self, name, pose:Pose, mass,size, inertial):
+        super().__init__(name,pose, mass, inertial)
         self.col_vis = RectangularColVis(name, size)
         self.appendChild(self.col_vis.col_vis[0])
         self.appendChild(self.col_vis.col_vis[1])
@@ -113,8 +118,8 @@ class RectangularLink(Link):
 #Create A cylinderical link.
 class CylindericalLink(Link):
 
-    def __init__(self, name, loc:Location, orie:Orientation,leng,mass,rad, inertial):
-        super().__init__(name,loc, orie, mass, inertial)
+    def __init__(self, name, pose:Pose,leng,mass,rad, inertial):
+        super().__init__(name,pose, mass, inertial)
         self.col_vis = CylinderColVis(name, rad,leng)
         self.appendChild(self.col_vis.col_vis[0])
         self.appendChild(self.col_vis.col_vis[1])
@@ -210,8 +215,63 @@ class Inertial(DOM.Element):
 
 #Generic Joint 
 #TODO:
-class Joint:
-    pass
+class Joint(DOM.Element):
+    def __init__(self,name:str, type:str, child:str, parent:str, pose:Pose):
+        super().__init__("joint")
+        sdf_doc = Sdf.createSdfDoc()
+        self.loc = pose.loc
+        self.orie =pose.orie
+        self.pose = sdf_doc.createElement("pose")
+        self.child  = sdf_doc.createElement("child")        
+        self.parent  = sdf_doc.createElement("parent")        
+        text = "{0} {1} {2} {3} {4} {5}".format(self.loc.x,self.loc.y,self.loc.z,self.orie.x,self.orie.y,self.orie.z)
+        textNode = sdf_doc.createTextNode(text)
+        self.pose.appendChild(textNode)
+        self.child.appendChild(sdf_doc.createTextNode(child))
+        self.parent.appendChild(sdf_doc.createTextNode(parent))
+        
+        self.appendChild(self.pose)
+        self.appendChild(self.child)
+        self.appendChild(self.parent)
+        self.setAttributeNode(sdf_doc.createAttribute("name"))
+        self.setAttribute("name",name)
+
+class RevoluteJoint(Joint):
+    def __init__(self, name:str, pose:Pose,child:str, parent:str, upper, lower, axis_orie:Orientation):
+        super().__init__(name,"revolute", child, parent, pose)
+        self.axis = Axis("1", ".1", upper,lower, axis_orie)
+        self.appendChild(self.axis)
+
+
+class Axis(DOM.Element):
+    def __init__(self, friction, damping, upper_s, lower_s, axis_orie:Orientation):
+        super().__init__("axis")
+        sdf_doc = Sdf.createSdfDoc()
+        dynamics = sdf_doc.createElement("dynamics")
+        friction_node = sdf_doc.createElement("friction")
+        damping_node = sdf_doc.createElement("damping")
+        xyz = sdf_doc.createElement("xyz")
+        limit = sdf_doc.createElement("limit")
+        upper = sdf_doc.createElement("upper")
+        lower = sdf_doc.createElement("lower")
+
+        friction_node.appendChild(sdf_doc.createTextNode(str(friction)))
+        damping_node.appendChild(sdf_doc.createTextNode(str(damping)))
+        xyz_t = sdf_doc.createTextNode("{0} {1} {2}".format(axis_orie.x,axis_orie.y,axis_orie.z))
+        xyz.appendChild(xyz_t)
+        upper.appendChild(sdf_doc.createTextNode(str(upper_s)))
+        lower.appendChild(sdf_doc.createTextNode(str(lower_s)))
+    
+        dynamics.appendChild(friction_node)
+        dynamics.appendChild(damping_node)
+        limit.appendChild(upper)
+        limit.appendChild(lower)
+
+        self.appendChild(xyz)
+        self.appendChild(dynamics)
+        self.appendChild(limit)
+
+
 
 #Generic Collision with different geometries
 #TODO:

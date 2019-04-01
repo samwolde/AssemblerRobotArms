@@ -80,5 +80,21 @@
 				</geometry>
 			</collision>
 		</link>
+		<joint name="joint1">
+			<pose>1 2 3 1 2 3</pose>
+			<child>RectLink</child>
+			<parent>CyLlink</parent>
+			<axis>
+				<xyz>1 2 3</xyz>
+				<dynamics>
+					<friction>1</friction>
+					<damping>.1</damping>
+				</dynamics>
+				<limit>
+					<upper>1</upper>
+					<lower>1</lower>
+				</limit>
+			</axis>
+		</joint>
 	</model>
 </sdf>
