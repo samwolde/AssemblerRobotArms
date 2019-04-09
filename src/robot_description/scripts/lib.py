@@ -40,7 +40,7 @@ class Sdf():
     create an empty model and populate it later.
 '''
 class Model(DOM.Element):
-    def __init__(self,name:str, children):
+    def __init__(self,name:str, children=[]):
         super().__init__("model")
         self.sdf_doc = Sdf.createSdfDoc()
         self.name = name
@@ -103,7 +103,7 @@ class Link(DOM.Element):
         textNode = self.sdf_doc.createTextNode(text)
         pose.appendChild(textNode)
         self.appendChild(pose)
-        self.appendChild(Inertial(self.mass, self.inertial))
+        # self.appendChild(Inertial(self.mass, self.inertial))
 
 #Create A rectangular link.
 class RectangularLink(Link):
@@ -170,7 +170,7 @@ class RectangularColVis():
         vis = sdf.createElement("visual")
         geo = sdf.createElement("geometry")
         cyl = sdf.createElement("box")
-        siz = sdf.createElement("length")
+        siz = sdf.createElement("size")
 
         siz.appendChild(sdf.createTextNode("{0} {1} {2}".format(size[0], size[1], size[2])))
         
@@ -216,7 +216,7 @@ class Inertial(DOM.Element):
 #Generic Joint 
 #TODO:
 class Joint(DOM.Element):
-    def __init__(self,name:str, type:str, child:str, parent:str, pose:Pose):
+    def __init__(self,name:str, type:str,  pose:Pose, child:str, parent:str):
         super().__init__("joint")
         sdf_doc = Sdf.createSdfDoc()
         self.loc = pose.loc
@@ -234,12 +234,14 @@ class Joint(DOM.Element):
         self.appendChild(self.child)
         self.appendChild(self.parent)
         self.setAttributeNode(sdf_doc.createAttribute("name"))
+        self.setAttributeNode(sdf_doc.createAttribute("type"))
+        self.setAttribute("type",type)
         self.setAttribute("name",name)
 
 class RevoluteJoint(Joint):
     def __init__(self, name:str, pose:Pose,child:str, parent:str, upper, lower, axis_orie:Orientation):
-        super().__init__(name,"revolute", child, parent, pose)
-        self.axis = Axis("1", ".1", upper,lower, axis_orie)
+        super().__init__(name,"revolute", pose, child, parent)
+        self.axis = Axis("0.5", "0.3", upper,lower, axis_orie)
         self.appendChild(self.axis)
 
 
@@ -269,9 +271,23 @@ class Axis(DOM.Element):
 
         self.appendChild(xyz)
         self.appendChild(dynamics)
+        if(upper_s == None or lower_s == None):
+            return
         self.appendChild(limit)
 
+class Plugin(DOM.Element):
+    def __init__(self, name:str, filename:str,parameters:dict):
+        super().__init__("plugin")
+        sdf = Sdf.createSdfDoc()
+        self.setAttributeNode(sdf.createAttribute("filename"))
+        self.setAttributeNode(sdf.createAttribute("name"))
+        self.setAttribute("filename", filename)
+        self.setAttribute("name", name)
 
+        for p in parameters:
+            param = sdf.createElement(p)
+            param.appendChild(sdf.createTextNode(str(parameters[p])))
+            self.appendChild(param)
 
 #Generic Collision with different geometries
 #TODO:
