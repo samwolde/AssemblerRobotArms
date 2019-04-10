@@ -38,7 +38,7 @@
 			</collision>
 		</link>
 		<link name="wheel_1">
-			<pose>0.17984615384615385 -0.22499999999999998 0.075 0 1.5707 0</pose>
+			<pose>0.18125000000000002 -0.22499999999999998 0.075 0 1.5707963267948966 0</pose>
 			<visual name="wheel_1_vis">
 				<geometry>
 					<cylinder>
@@ -63,25 +63,29 @@
 			<axis>
 				<xyz>0 0 1</xyz>
 				<dynamics>
-					<friction>0.5</friction>
-					<damping>0.3</damping>
+					<friction>0.05</friction>
+					<damping>0.03</damping>
 				</dynamics>
 				<limit>
-					<upper>1.0471975511965976</upper>
-					<lower>-1.0471975511965976</lower>
+					<upper>0</upper>
+					<lower>0</lower>
 				</limit>
 			</axis>
 		</joint>
-		<joint name="susp_wheel_1" type="revolute">
-			<pose>0 0 0 0 0 0</pose>
-			<child>wheel_1</child>
+		<joint name="susp_axel_1" type="revolute">
+			<pose>0 0 -0.025 0 0 0</pose>
+			<child>axel_1</child>
 			<parent>susp_1</parent>
 			<axis>
 				<xyz>1 0 0</xyz>
 				<dynamics>
-					<friction>0.5</friction>
-					<damping>0.3</damping>
+					<friction>0.05</friction>
+					<damping>0.03</damping>
 				</dynamics>
+				<limit>
+					<upper>0</upper>
+					<lower>0</lower>
+				</limit>
 			</axis>
 		</joint>
 		<link name="susp_2">
@@ -104,7 +108,7 @@
 			</collision>
 		</link>
 		<link name="wheel_2">
-			<pose>0.17784615384615385 0.22499999999999998 0.075 0 1.5707 0</pose>
+			<pose>0.18125000000000002 0.22499999999999998 0.075 0 1.5707963267948966 0</pose>
 			<visual name="wheel_2_vis">
 				<geometry>
 					<cylinder>
@@ -129,8 +133,8 @@
 			<axis>
 				<xyz>0 0 1</xyz>
 				<dynamics>
-					<friction>0.5</friction>
-					<damping>0.3</damping>
+					<friction>0.05</friction>
+					<damping>0.03</damping>
 				</dynamics>
 				<limit>
 					<upper>1.0471975511965976</upper>
@@ -138,16 +142,20 @@
 				</limit>
 			</axis>
 		</joint>
-		<joint name="susp_wheel_2" type="revolute">
-			<pose>0 0 0 0 0 0</pose>
-			<child>wheel_2</child>
+		<joint name="susp_axel_2" type="revolute">
+			<pose>0 0 -0.025 0 0 0</pose>
+			<child>axel_2</child>
 			<parent>susp_2</parent>
 			<axis>
 				<xyz>1 0 0</xyz>
 				<dynamics>
-					<friction>0.5</friction>
-					<damping>0.3</damping>
+					<friction>0.05</friction>
+					<damping>0.03</damping>
 				</dynamics>
+				<limit>
+					<upper>0</upper>
+					<lower>0</lower>
+				</limit>
 			</axis>
 		</joint>
 		<link name="susp_4">
@@ -170,7 +178,7 @@
 			</collision>
 		</link>
 		<link name="wheel_4">
-			<pose>-0.17884615384615385 -0.22499999999999998 0.075 0 1.5707 0</pose>
+			<pose>-0.18125000000000002 -0.22499999999999998 0.075 0 1.5707963267948966 0</pose>
 			<visual name="wheel_4_vis">
 				<geometry>
 					<cylinder>
@@ -195,24 +203,152 @@
 			<axis>
 				<xyz>0 0 1</xyz>
 				<dynamics>
-					<friction>0.5</friction>
-					<damping>0.3</damping>
+					<friction>0.05</friction>
+					<damping>0.03</damping>
 				</dynamics>
 				<limit>
-					<upper>1.0471975511965976</upper>
-					<lower>-1.0471975511965976</lower>
+					<upper>0</upper>
+					<lower>0</lower>
 				</limit>
 			</axis>
 		</joint>
-		<joint name="susp_wheel_4" type="revolute">
-			<pose>0 0 0 0 0 0</pose>
-			<child>wheel_4</child>
+		<joint name="susp_axel_4" type="revolute">
+			<pose>0 0 0.025 0 0 0</pose>
+			<child>axel_4</child>
 			<parent>susp_4</parent>
 			<axis>
 				<xyz>1 0 0</xyz>
 				<dynamics>
-					<friction>0.5</friction>
-					<damping>0.3</damping>
+					<friction>0.05</friction>
+					<damping>0.03</damping>
+				</dynamics>
+				<limit>
+					<upper>0</upper>
+					<lower>0</lower>
+				</limit>
+			</axis>
+		</joint>
+		<link name="axel_1">
+			<pose>0.15625 -0.22499999999999998 0.075 0 1.5707963267948966 0</pose>
+			<visual name="axel_1_vis">
+				<geometry>
+					<cylinder>
+						<radius>0.012</radius>
+						<length>0.05</length>
+					</cylinder>
+				</geometry>
+			</visual>
+			<collision name="axel_1_col">
+				<geometry>
+					<cylinder>
+						<radius>0.012</radius>
+						<length>0.05</length>
+					</cylinder>
+				</geometry>
+			</collision>
+		</link>
+		<joint name="axel_wheel_1" type="revolute">
+			<pose>0 0 -0.028846153846153844 0 0 0</pose>
+			<child>wheel_1</child>
+			<parent>axel_1</parent>
+			<axis>
+				<xyz>1 0 0</xyz>
+				<dynamics>
+					<friction>0.05</friction>
+					<damping>0.03</damping>
+				</dynamics>
+			</axis>
+		</joint>
+		<link name="axel_2">
+			<pose>0.15625 0.22499999999999998 0.075 0 1.5707963267948966 0</pose>
+			<visual name="axel_2_vis">
+				<geometry>
+					<cylinder>
+						<radius>0.012</radius>
+						<length>0.05</length>
+					</cylinder>
+				</geometry>
+			</visual>
+			<collision name="axel_2_col">
+				<geometry>
+					<cylinder>
+						<radius>0.012</radius>
+						<length>0.05</length>
+					</cylinder>
+				</geometry>
+			</collision>
+		</link>
+		<joint name="axel_wheel_2" type="revolute">
+			<pose>0 0 -0.028846153846153844 0 0 0</pose>
+			<child>wheel_2</child>
+			<parent>axel_2</parent>
+			<axis>
+				<xyz>1 0 0</xyz>
+				<dynamics>
+					<friction>0.05</friction>
+					<damping>0.03</damping>
+				</dynamics>
+			</axis>
+		</joint>
+		<link name="axel_3">
+			<pose>-0.15625 0.22499999999999998 0.075 0 1.5707963267948966 0</pose>
+			<visual name="axel_3_vis">
+				<geometry>
+					<cylinder>
+						<radius>0.012</radius>
+						<length>0.05</length>
+					</cylinder>
+				</geometry>
+			</visual>
+			<collision name="axel_3_col">
+				<geometry>
+					<cylinder>
+						<radius>0.012</radius>
+						<length>0.05</length>
+					</cylinder>
+				</geometry>
+			</collision>
+		</link>
+		<joint name="axel_wheel_3" type="revolute">
+			<pose>0 0 0.028846153846153844 0 0 0</pose>
+			<child>wheel_3</child>
+			<parent>axel_3</parent>
+			<axis>
+				<xyz>1 0 0</xyz>
+				<dynamics>
+					<friction>0.05</friction>
+					<damping>0.03</damping>
+				</dynamics>
+			</axis>
+		</joint>
+		<link name="axel_4">
+			<pose>-0.15625 -0.22499999999999998 0.075 0 1.5707963267948966 0</pose>
+			<visual name="axel_4_vis">
+				<geometry>
+					<cylinder>
+						<radius>0.012</radius>
+						<length>0.05</length>
+					</cylinder>
+				</geometry>
+			</visual>
+			<collision name="axel_4_col">
+				<geometry>
+					<cylinder>
+						<radius>0.012</radius>
+						<length>0.05</length>
+					</cylinder>
+				</geometry>
+			</collision>
+		</link>
+		<joint name="axel_wheel_4" type="revolute">
+			<pose>0 0 0.028846153846153844 0 0 0</pose>
+			<child>wheel_4</child>
+			<parent>axel_4</parent>
+			<axis>
+				<xyz>1 0 0</xyz>
+				<dynamics>
+					<friction>0.05</friction>
+					<damping>0.03</damping>
 				</dynamics>
 			</axis>
 		</joint>
@@ -236,7 +372,7 @@
 			</collision>
 		</link>
 		<link name="wheel_3">
-			<pose>-0.17884615384615385 0.22499999999999998 0.075 0 1.5707 0</pose>
+			<pose>-0.18125000000000002 0.22499999999999998 0.075 0 1.5707963267948966 0</pose>
 			<visual name="wheel_3_vis">
 				<geometry>
 					<cylinder>
@@ -261,8 +397,8 @@
 			<axis>
 				<xyz>0 0 1</xyz>
 				<dynamics>
-					<friction>0.5</friction>
-					<damping>0.3</damping>
+					<friction>0.05</friction>
+					<damping>0.03</damping>
 				</dynamics>
 				<limit>
 					<upper>1.0471975511965976</upper>
@@ -270,23 +406,36 @@
 				</limit>
 			</axis>
 		</joint>
-		<joint name="susp_wheel_3" type="revolute">
-			<pose>0 0 0 0 0 0</pose>
-			<child>wheel_3</child>
+		<joint name="susp_axel_3" type="revolute">
+			<pose>0 0 0.025 0 0 0</pose>
+			<child>axel_3</child>
 			<parent>susp_3</parent>
 			<axis>
 				<xyz>1 0 0</xyz>
 				<dynamics>
-					<friction>0.5</friction>
-					<damping>0.3</damping>
+					<friction>0.05</friction>
+					<damping>0.03</damping>
 				</dynamics>
+				<limit>
+					<upper>0</upper>
+					<lower>0</lower>
+				</limit>
 			</axis>
 		</joint>
-		<plugin filename="libplugin_wheel.so" name="test_plug">
-			<proportional_pid>4.0</proportional_pid>
-			<integral_pid>1.8</integral_pid>
-			<derivative_pid>0.004</derivative_pid>
-			<velocity>5</velocity>
+		<plugin filename="libgazebo_ros_diff_drive.so" name="differential_drive_controller">
+			<alwaysOn>true</alwaysOn>
+			<updateRate>20</updateRate>
+			<leftJoint>axel_wheel_1</leftJoint>
+			<rightJoint>axel_wheel_4</rightJoint>
+			<wheelSeparation>0.21250000000000005</wheelSeparation>
+			<wheelDiameter>0.15</wheelDiameter>
+			<wheelTorque>20</wheelTorque>
+			<commandTopic>cmd_wheel</commandTopic>
+			<odometryTopic>wheel</odometryTopic>
+			<odometryFrame>odom</odometryFrame>
+			<robotBaseFrame>base_footprint</robotBaseFrame>
+			<rosDebugLevel>1</rosDebugLevel>
+			<wheelAcceleration>2</wheelAcceleration>
 		</plugin>
 	</model>
 </sdf>

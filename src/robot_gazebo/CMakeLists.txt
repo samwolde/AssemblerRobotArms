@@ -10,11 +10,25 @@ project(robot_gazebo)
 find_package(catkin REQUIRED COMPONENTS
   roscpp
   std_msgs
+  gazebo_ros
+  rospy
+  robot_lib
 )
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
 
+find_package(gazebo REQUIRED)
+
+link_directories(${GAZEBO_LIBRARY_DIRS})
+include_directories(${Boost_INCLUDE_DIR} 
+              ${catkin_INCLUDE_DIRS} 
+              ${GAZEBO_INCLUDE_DIRS} 
+              ${roscpp_INCLUDE_DIRS}
+              ${std_msgs_INCLUDE_DIRS})
+
+add_library(wheel_plugin SHARED plugins/wheel_controller.cc)
+target_link_libraries(wheel_plugin ${catkin_LIBRARIES} ${GAZEBO_LIBRARIES} ${roscpp_LIBRARIES})
 
 ## Uncomment this if the package has a setup.py. This macro ensures
 ## modules and global scripts declared therein get installed
@@ -106,7 +120,10 @@ catkin_package(
 #  LIBRARIES robot_gazebo
 #  CATKIN_DEPENDS roscpp std_msgs
 #  DEPENDS system_lib
+
+DEPENDS roscpp gazebo_ros delta3_lib
 )
+
 
 ###########
 ## Build ##

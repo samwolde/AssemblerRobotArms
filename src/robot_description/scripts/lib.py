@@ -1,4 +1,5 @@
 import xml.dom.minidom as DOM
+import math
 
 
 '''
@@ -241,7 +242,7 @@ class Joint(DOM.Element):
 class RevoluteJoint(Joint):
     def __init__(self, name:str, pose:Pose,child:str, parent:str, upper, lower, axis_orie:Orientation):
         super().__init__(name,"revolute", pose, child, parent)
-        self.axis = Axis("0.5", "0.3", upper,lower, axis_orie)
+        self.axis = Axis("0.05", "0.03", upper,lower, axis_orie)
         self.appendChild(self.axis)
 
 
@@ -304,3 +305,9 @@ class Visual(DOM.Element):
 #TODO:
 class Geometry(DOM.Element):
     pass
+
+def degree(rad):
+    return rad * 180.0 / math.pi
+
+def rad(degree):
+    return degree * math.pi / 180.0
