@@ -127,13 +127,13 @@ joint_axel4_wheel = RevoluteJoint("axel_wheel_4",pose_wheelj, "wheel_4","axel_4"
 ## create a plugin
 
 
-# plugin = Plugin("test_plug","libwheel_plugin.so", 
-# {
-#     "proportional_pid":p_pid,
-#     "integral_pid":i_pid,
-#     "derivative_pid":d_pid,
-#     "velocity"  :velocity
-# })
+steering_wheel_plugin = Plugin("steering_wheel","libwheel_plugin.so", 
+{
+    "proportional_pid":p_pid,
+    "integral_pid":i_pid,
+    "derivative_pid":d_pid,
+    "velocity"  :10
+})
 
 plugin = Plugin("differential_drive_controller", "libgazebo_ros_diff_drive.so", 
 {
@@ -157,7 +157,7 @@ root = Sdf.getRootElement()
 links_joints = [body_link,susp_1, wheel_1, joint_sup1_body,joint_sup1_axel,susp_2,wheel_2,joint_sup2_body,
 joint_sup2_axel,susp_4,wheel_4,joint_sup4_body,joint_sup4_axel,
 wheel_axel_1, joint_axel1_wheel, wheel_axel_2,joint_axel2_wheel,wheel_axel_3,joint_axel3_wheel,wheel_axel_4,joint_axel4_wheel,
-susp_3,wheel_3,joint_sup3_body,joint_sup3_axel,plugin]
+susp_3,wheel_3,joint_sup3_body,joint_sup3_axel,plugin,steering_wheel_plugin]
 model = Model("robot",links_joints)
 
 #Append to root element and create sdf File.

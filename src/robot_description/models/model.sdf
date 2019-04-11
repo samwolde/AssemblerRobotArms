@@ -437,5 +437,11 @@
 			<rosDebugLevel>1</rosDebugLevel>
 			<wheelAcceleration>2</wheelAcceleration>
 		</plugin>
+		<plugin filename="libwheel_plugin.so" name="steering_wheel">
+			<proportional_pid>2.0</proportional_pid>
+			<integral_pid>1.8</integral_pid>
+			<derivative_pid>0</derivative_pid>
+			<velocity>10</velocity>
+		</plugin>
 	</model>
 </sdf>

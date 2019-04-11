@@ -22,13 +22,13 @@ class WheelPlugin : public ModelPlugin
 		ignition::math::Vector3d pose = this->model->WorldPose().Pos();
 		printf("The position is %f %f %f : \n", pose.X(), pose.Y(), pose.Z());
 
-		this->front_left_wheel = this->model->GetJoint("axel_wheel_4");
-		this->front_right_wheel = this->model->GetJoint("axel_wheel_1");
-		this->back_right_wheel = this->model->GetJoint("axel_wheel_2");
-		this->back_left_wheel = this->model->GetJoint("axel_wheel_3");
+		// this->front_left_wheel = this->model->GetJoint("axel_wheel_4");
+		// this->front_right_wheel = this->model->GetJoint("axel_wheel_1");
+		// this->back_right_wheel = this->model->GetJoint("axel_wheel_2");
+		// this->back_left_wheel = this->model->GetJoint("axel_wheel_3");
 
-		this->front_right_steer = this->model->GetJoint("susp1_body");
-		this->front_left_steer = this->model->GetJoint("susp4_body");
+		// this->front_right_steer = this->model->GetJoint("susp1_body");
+		// this->front_left_steer = this->model->GetJoint("susp4_body");
 		this->back_right_steer = this->model->GetJoint("susp2_body");
 		this->back_left_steer = this->model->GetJoint("susp3_body");
 
@@ -48,24 +48,24 @@ class WheelPlugin : public ModelPlugin
 		this->con = event::Events::ConnectWorldUpdateBegin(std::bind(&WheelPlugin::OnUpdate, this));
 	};
 	void OnUpdate(){
-		// this->MoveForward(this->velocity);
+		this->TurnRight(this->velocity);
 	};
 	void MoveForward(double vel)
 	{
 
-		std::string name_fr = this->model->GetJoint("axel_wheel_1")->GetScopedName();
-		std::string name_fl = this->model->GetJoint("axel_wheel_4")->GetScopedName();
+		// std::string name_fr = this->model->GetJoint("axel_wheel_1")->GetScopedName();
+		// std::string name_fl = this->model->GetJoint("axel_wheel_4")->GetScopedName();
 		std::string name_br = this->model->GetJoint("axel_wheel_2")->GetScopedName();
 		std::string name_bl = this->model->GetJoint("axel_wheel_3")->GetScopedName();
-		this->jointController->SetVelocityPID(name_fr, this->pid);
-		this->jointController->SetVelocityPID(name_fl, this->pid);
-		this->jointController->SetVelocityPID(name_br, this->pid);
-		this->jointController->SetVelocityPID(name_bl, this->pid);
+		// this->jointController->SetVelocityPID(name_fr, this->pid);
+		// this->jointController->SetVelocityPID(name_fl, this->pid);
+		this->jointController->SetPositionPID(name_br, this->pid);
+		this->jointController->SetPositionPID(name_bl, this->pid);
 
-		this->jointController->SetVelocityTarget(name_fr, vel);
-		this->jointController->SetVelocityTarget(name_fl, vel);
-		this->jointController->SetVelocityTarget(name_br, vel);
-		this->jointController->SetVelocityTarget(name_bl, vel);
+		// this->jointController->SetVelocityTarget(name_fr, vel);
+		// this->jointController->SetVelocityTarget(name_fl, vel);
+		this->jointController->SetPositionTarget(name_br, vel);
+		this->jointController->SetPositionTarget(name_bl, vel);
 
 		this->jointController->Update();
 
@@ -77,10 +77,11 @@ class WheelPlugin : public ModelPlugin
 	};
 	void TurnRight(double angle)
 	{
+		// std::cout << "Turn" << endl;
 		double rad = M_PI * angle / 180;
 
-		std::string name_fr = this->model->GetJoint("susp1_body")->GetScopedName();
-		std::string name_fl = this->model->GetJoint("susp4_body")->GetScopedName();
+		std::string name_fr = this->model->GetJoint("susp2_body")->GetScopedName();
+		std::string name_fl = this->model->GetJoint("susp3_body")->GetScopedName();
 
 		this->jointController->SetPositionPID(name_fr, this->pid);
 		this->jointController->SetPositionPID(name_fl, this->pid);
