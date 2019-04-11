@@ -48,10 +48,10 @@ wheel_1 = CylindericalLink("wheel_1",pose_wheel_1, wheel_length, default_mass, w
 wheel_axel_1 = CylindericalLink("axel_1",pose_axel_1,axel_length, default_mass, wheel_axel_radius, default_inertial)
 ## Fixed Joint between body and suspension 1
 j_body_susp1_pose = Pose(Location(0, 0,suspension_depth/2 ),Orientation(0,0,0))
-joint_sup1_body = RevoluteJoint("susp1_body",j_body_susp1_pose,"susp_1","body_link",0, 0,Orientation(0,0,1))
+joint_sup1_body = Joint("susp1_body","fixed",j_body_susp1_pose,"susp_1","body_link")
 ## Fixed join between axel1 and susp1
 pose_axelj = Pose(Location(0,0, -axel_length/2), Orientation(0,0,0))
-joint_sup1_axel = RevoluteJoint("susp_axel_1",pose_axelj, "axel_1","susp_1",0,0,Orientation(1,0,0))
+joint_sup1_axel = Joint("susp_axel_1","fixed",pose_axelj, "axel_1","susp_1")
 ## Revolute Joint between wheel1 and suspension 1
 pose_wheelj = Pose(Location(0,0, -wheel_length/2), Orientation(0,0,0))
 joint_axel1_wheel = RevoluteJoint("axel_wheel_1",pose_wheelj, "wheel_1","axel_1",wheel_upper_limit,wheel_lower_limit,Orientation(1,0,0))
@@ -68,11 +68,11 @@ wheel_2 = CylindericalLink("wheel_2",pose_wheel_2, wheel_length, default_mass, w
 wheel_axel_2 = CylindericalLink("axel_2",pose_axel_2,axel_length, default_mass, wheel_axel_radius, default_inertial)
 ## Fixed Joint between suspension2 and body
 j_body_susp2_pose =  Pose(Location(0, 0,suspension_depth/2 ),Orientation(0,0,0))
-joint_sup2_body = RevoluteJoint("susp2_body",j_body_susp2_pose,"susp_2","body_link",suspension_upper, suspension_lower,Orientation(0,0,1))
+joint_sup2_body = Joint("susp2_body","fixed",j_body_susp2_pose,"susp_2","body_link")
 
 ## Fixed join between axel1 and susp1
 pose_axelj = Pose(Location(0,0, -axel_length/2), Orientation(0,0,0))
-joint_sup2_axel = RevoluteJoint("susp_axel_2",pose_axelj, "axel_2","susp_2",0,0,Orientation(1,0,0))
+joint_sup2_axel = Joint("susp_axel_2","fixed",pose_axelj, "axel_2","susp_2")
 ## Revolute Joint between wheel1 and suspension 1
 pose_wheelj = Pose(Location(0,0, -wheel_length/2), Orientation(0,0,0))
 joint_axel2_wheel = RevoluteJoint("axel_wheel_2",pose_wheelj, "wheel_2","axel_2",wheel_upper_limit,wheel_lower_limit,Orientation(1,0,0))
@@ -92,10 +92,10 @@ wheel_axel_3 = CylindericalLink("axel_3",pose_axel_3,axel_length, default_mass, 
 
 ## Fixed Joint between body and suspension 4
 j_body_susp3_pose = Pose(Location(0, 0,suspension_depth/2 ),Orientation(0,0,0))
-joint_sup3_body = RevoluteJoint("susp3_body",j_body_susp3_pose,"susp_3","body_link",suspension_upper, suspension_lower,Orientation(0,0,1))
+joint_sup3_body = Joint("susp3_body","fixed",j_body_susp3_pose,"susp_3","body_link")
 ## Fixed join between axel1 and susp1
 pose_axelj = Pose(Location(0,0, axel_length/2), Orientation(0,0,0))
-joint_sup3_axel = RevoluteJoint("susp_axel_3",pose_axelj, "axel_3","susp_3",0,0,Orientation(1,0,0))
+joint_sup3_axel = Joint("susp_axel_3","fixed",pose_axelj, "axel_3","susp_3")
 ## Revolute Joint between wheel1 and suspension 1
 pose_wheelj = Pose(Location(0,0, wheel_length/2), Orientation(0,0,0))
 joint_axel3_wheel = RevoluteJoint("axel_wheel_3",pose_wheelj, "wheel_3","axel_3",wheel_upper_limit,wheel_lower_limit,Orientation(1,0,0))
@@ -115,10 +115,10 @@ wheel_axel_4 = CylindericalLink("axel_4",pose_axel_4,axel_length, default_mass, 
 
 ## Fixed Joint between body and suspension 4
 j_body_susp4_pose = Pose(Location(0, 0,suspension_depth/2),Orientation(0,0,0))
-joint_sup4_body = RevoluteJoint("susp4_body",j_body_susp4_pose,"susp_4","body_link",0, 0,Orientation(0,0,1))
+joint_sup4_body = Joint("susp4_body","fixed",j_body_susp4_pose,"susp_4","body_link")
 ## Revolute Joint between wheel4 and suspension 4
 pose_axelj = Pose(Location(0,0, axel_length/2), Orientation(0,0,0))
-joint_sup4_axel = RevoluteJoint("susp_axel_4",pose_axelj, "axel_4","susp_4",0,0,Orientation(1,0,0))
+joint_sup4_axel = Joint("susp_axel_4","fixed",pose_axelj, "axel_4","susp_4")
 ## Revolute Joint between wheel1 and suspension 1
 pose_wheelj = Pose(Location(0,0, wheel_length/2), Orientation(0,0,0))
 joint_axel4_wheel = RevoluteJoint("axel_wheel_4",pose_wheelj, "wheel_4","axel_4",wheel_upper_limit,wheel_lower_limit,Orientation(1,0,0))

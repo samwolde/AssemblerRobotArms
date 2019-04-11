@@ -56,37 +56,15 @@
 				</geometry>
 			</collision>
 		</link>
-		<joint name="susp1_body" type="revolute">
+		<joint name="susp1_body" type="fixed">
 			<pose>0 0 0.04875 0 0 0</pose>
 			<child>susp_1</child>
 			<parent>body_link</parent>
-			<axis>
-				<xyz>0 0 1</xyz>
-				<dynamics>
-					<friction>0.05</friction>
-					<damping>0.03</damping>
-				</dynamics>
-				<limit>
-					<upper>0</upper>
-					<lower>0</lower>
-				</limit>
-			</axis>
 		</joint>
-		<joint name="susp_axel_1" type="revolute">
+		<joint name="susp_axel_1" type="fixed">
 			<pose>0 0 -0.025 0 0 0</pose>
 			<child>axel_1</child>
 			<parent>susp_1</parent>
-			<axis>
-				<xyz>1 0 0</xyz>
-				<dynamics>
-					<friction>0.05</friction>
-					<damping>0.03</damping>
-				</dynamics>
-				<limit>
-					<upper>0</upper>
-					<lower>0</lower>
-				</limit>
-			</axis>
 		</joint>
 		<link name="susp_2">
 			<pose>0.13125 0.22499999999999998 0.12375 0 0 0</pose>
@@ -126,37 +104,15 @@
 				</geometry>
 			</collision>
 		</link>
-		<joint name="susp2_body" type="revolute">
+		<joint name="susp2_body" type="fixed">
 			<pose>0 0 0.04875 0 0 0</pose>
 			<child>susp_2</child>
 			<parent>body_link</parent>
-			<axis>
-				<xyz>0 0 1</xyz>
-				<dynamics>
-					<friction>0.05</friction>
-					<damping>0.03</damping>
-				</dynamics>
-				<limit>
-					<upper>1.0471975511965976</upper>
-					<lower>-1.0471975511965976</lower>
-				</limit>
-			</axis>
 		</joint>
-		<joint name="susp_axel_2" type="revolute">
+		<joint name="susp_axel_2" type="fixed">
 			<pose>0 0 -0.025 0 0 0</pose>
 			<child>axel_2</child>
 			<parent>susp_2</parent>
-			<axis>
-				<xyz>1 0 0</xyz>
-				<dynamics>
-					<friction>0.05</friction>
-					<damping>0.03</damping>
-				</dynamics>
-				<limit>
-					<upper>0</upper>
-					<lower>0</lower>
-				</limit>
-			</axis>
 		</joint>
 		<link name="susp_4">
 			<pose>-0.13125 -0.22499999999999998 0.12375 0 0 0</pose>
@@ -196,37 +152,15 @@
 				</geometry>
 			</collision>
 		</link>
-		<joint name="susp4_body" type="revolute">
+		<joint name="susp4_body" type="fixed">
 			<pose>0 0 0.04875 0 0 0</pose>
 			<child>susp_4</child>
 			<parent>body_link</parent>
-			<axis>
-				<xyz>0 0 1</xyz>
-				<dynamics>
-					<friction>0.05</friction>
-					<damping>0.03</damping>
-				</dynamics>
-				<limit>
-					<upper>0</upper>
-					<lower>0</lower>
-				</limit>
-			</axis>
 		</joint>
-		<joint name="susp_axel_4" type="revolute">
+		<joint name="susp_axel_4" type="fixed">
 			<pose>0 0 0.025 0 0 0</pose>
 			<child>axel_4</child>
 			<parent>susp_4</parent>
-			<axis>
-				<xyz>1 0 0</xyz>
-				<dynamics>
-					<friction>0.05</friction>
-					<damping>0.03</damping>
-				</dynamics>
-				<limit>
-					<upper>0</upper>
-					<lower>0</lower>
-				</limit>
-			</axis>
 		</joint>
 		<link name="axel_1">
 			<pose>0.15625 -0.22499999999999998 0.075 0 1.5707963267948966 0</pose>
@@ -390,37 +324,15 @@
 				</geometry>
 			</collision>
 		</link>
-		<joint name="susp3_body" type="revolute">
+		<joint name="susp3_body" type="fixed">
 			<pose>0 0 0.04875 0 0 0</pose>
 			<child>susp_3</child>
 			<parent>body_link</parent>
-			<axis>
-				<xyz>0 0 1</xyz>
-				<dynamics>
-					<friction>0.05</friction>
-					<damping>0.03</damping>
-				</dynamics>
-				<limit>
-					<upper>1.0471975511965976</upper>
-					<lower>-1.0471975511965976</lower>
-				</limit>
-			</axis>
 		</joint>
-		<joint name="susp_axel_3" type="revolute">
+		<joint name="susp_axel_3" type="fixed">
 			<pose>0 0 0.025 0 0 0</pose>
 			<child>axel_3</child>
 			<parent>susp_3</parent>
-			<axis>
-				<xyz>1 0 0</xyz>
-				<dynamics>
-					<friction>0.05</friction>
-					<damping>0.03</damping>
-				</dynamics>
-				<limit>
-					<upper>0</upper>
-					<lower>0</lower>
-				</limit>
-			</axis>
 		</joint>
 		<plugin filename="libgazebo_ros_diff_drive.so" name="differential_drive_controller">
 			<alwaysOn>true</alwaysOn>
