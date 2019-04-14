@@ -3,6 +3,14 @@
 	<model name="robot">
 		<link name="body_link">
 			<pose>0 0 0.19649999999999998 0 0 0</pose>
+			<inertial>
+				<inertia>
+					<ixx>0.0005</ixx>
+					<iyy>0.0005</iyy>
+					<izz>0.0005</izz>
+				</inertia>
+				<mass>10</mass>
+			</inertial>
 			<visual name="body_link_vis">
 				<geometry>
 					<box>
@@ -20,6 +28,14 @@
 		</link>
 		<link name="susp_1">
 			<pose>0.13125 -0.22499999999999998 0.12375 0 0 0</pose>
+			<inertial>
+				<inertia>
+					<ixx>0.0005</ixx>
+					<iyy>0.0005</iyy>
+					<izz>0.0005</izz>
+				</inertia>
+				<mass>2</mass>
+			</inertial>
 			<visual name="susp_1_vis">
 				<geometry>
 					<cylinder>
@@ -39,6 +55,14 @@
 		</link>
 		<link name="wheel_1">
 			<pose>0.18125000000000002 -0.22499999999999998 0.075 0 1.5707963267948966 0</pose>
+			<inertial>
+				<inertia>
+					<ixx>0.0005</ixx>
+					<iyy>0.0005</iyy>
+					<izz>0.0005</izz>
+				</inertia>
+				<mass>2</mass>
+			</inertial>
 			<visual name="wheel_1_vis">
 				<geometry>
 					<cylinder>
@@ -90,6 +114,14 @@
 		</joint>
 		<link name="susp_2">
 			<pose>0.13125 0.22499999999999998 0.12375 0 0 0</pose>
+			<inertial>
+				<inertia>
+					<ixx>0.0005</ixx>
+					<iyy>0.0005</iyy>
+					<izz>0.0005</izz>
+				</inertia>
+				<mass>2</mass>
+			</inertial>
 			<visual name="susp_2_vis">
 				<geometry>
 					<cylinder>
@@ -109,6 +141,14 @@
 		</link>
 		<link name="wheel_2">
 			<pose>0.18125000000000002 0.22499999999999998 0.075 0 1.5707963267948966 0</pose>
+			<inertial>
+				<inertia>
+					<ixx>0.0005</ixx>
+					<iyy>0.0005</iyy>
+					<izz>0.0005</izz>
+				</inertia>
+				<mass>2</mass>
+			</inertial>
 			<visual name="wheel_2_vis">
 				<geometry>
 					<cylinder>
@@ -160,6 +200,14 @@
 		</joint>
 		<link name="susp_4">
 			<pose>-0.13125 -0.22499999999999998 0.12375 0 0 0</pose>
+			<inertial>
+				<inertia>
+					<ixx>0.0005</ixx>
+					<iyy>0.0005</iyy>
+					<izz>0.0005</izz>
+				</inertia>
+				<mass>2</mass>
+			</inertial>
 			<visual name="susp_4_vis">
 				<geometry>
 					<cylinder>
@@ -179,6 +227,14 @@
 		</link>
 		<link name="wheel_4">
 			<pose>-0.18125000000000002 -0.22499999999999998 0.075 0 1.5707963267948966 0</pose>
+			<inertial>
+				<inertia>
+					<ixx>0.0005</ixx>
+					<iyy>0.0005</iyy>
+					<izz>0.0005</izz>
+				</inertia>
+				<mass>2</mass>
+			</inertial>
 			<visual name="wheel_4_vis">
 				<geometry>
 					<cylinder>
@@ -230,6 +286,14 @@
 		</joint>
 		<link name="axel_1">
 			<pose>0.15625 -0.22499999999999998 0.075 0 1.5707963267948966 0</pose>
+			<inertial>
+				<inertia>
+					<ixx>0.0005</ixx>
+					<iyy>0.0005</iyy>
+					<izz>0.0005</izz>
+				</inertia>
+				<mass>2</mass>
+			</inertial>
 			<visual name="axel_1_vis">
 				<geometry>
 					<cylinder>
@@ -261,6 +325,14 @@
 		</joint>
 		<link name="axel_2">
 			<pose>0.15625 0.22499999999999998 0.075 0 1.5707963267948966 0</pose>
+			<inertial>
+				<inertia>
+					<ixx>0.0005</ixx>
+					<iyy>0.0005</iyy>
+					<izz>0.0005</izz>
+				</inertia>
+				<mass>2</mass>
+			</inertial>
 			<visual name="axel_2_vis">
 				<geometry>
 					<cylinder>
@@ -292,6 +364,14 @@
 		</joint>
 		<link name="axel_3">
 			<pose>-0.15625 0.22499999999999998 0.075 0 1.5707963267948966 0</pose>
+			<inertial>
+				<inertia>
+					<ixx>0.0005</ixx>
+					<iyy>0.0005</iyy>
+					<izz>0.0005</izz>
+				</inertia>
+				<mass>2</mass>
+			</inertial>
 			<visual name="axel_3_vis">
 				<geometry>
 					<cylinder>
@@ -323,6 +403,14 @@
 		</joint>
 		<link name="axel_4">
 			<pose>-0.15625 -0.22499999999999998 0.075 0 1.5707963267948966 0</pose>
+			<inertial>
+				<inertia>
+					<ixx>0.0005</ixx>
+					<iyy>0.0005</iyy>
+					<izz>0.0005</izz>
+				</inertia>
+				<mass>2</mass>
+			</inertial>
 			<visual name="axel_4_vis">
 				<geometry>
 					<cylinder>
@@ -354,6 +442,14 @@
 		</joint>
 		<link name="susp_3">
 			<pose>-0.13125 0.22499999999999998 0.12375 0 0 0</pose>
+			<inertial>
+				<inertia>
+					<ixx>0.0005</ixx>
+					<iyy>0.0005</iyy>
+					<izz>0.0005</izz>
+				</inertia>
+				<mass>2</mass>
+			</inertial>
 			<visual name="susp_3_vis">
 				<geometry>
 					<cylinder>
@@ -373,6 +469,14 @@
 		</link>
 		<link name="wheel_3">
 			<pose>-0.18125000000000002 0.22499999999999998 0.075 0 1.5707963267948966 0</pose>
+			<inertial>
+				<inertia>
+					<ixx>0.0005</ixx>
+					<iyy>0.0005</iyy>
+					<izz>0.0005</izz>
+				</inertia>
+				<mass>2</mass>
+			</inertial>
 			<visual name="wheel_3_vis">
 				<geometry>
 					<cylinder>
@@ -422,6 +526,204 @@
 				</limit>
 			</axis>
 		</joint>
+		<link name="arm_base">
+			<pose>0 0.27 0.22149999999999997 0 0 0</pose>
+			<inertial>
+				<inertia>
+					<ixx>0.0005</ixx>
+					<iyy>0.0005</iyy>
+					<izz>0.0005</izz>
+				</inertia>
+				<mass>0.1</mass>
+			</inertial>
+			<visual name="arm_base_vis">
+				<geometry>
+					<cylinder>
+						<radius>0.03</radius>
+						<length>0.015</length>
+					</cylinder>
+				</geometry>
+			</visual>
+			<collision name="arm_base_col">
+				<geometry>
+					<cylinder>
+						<radius>0.03</radius>
+						<length>0.015</length>
+					</cylinder>
+				</geometry>
+			</collision>
+		</link>
+		<joint name="bodyLink_armBase" type="fixed">
+			<pose>0 0 0 0 0 0</pose>
+			<child>arm_base</child>
+			<parent>body_link</parent>
+		</joint>
+		<link name="arm_base_top">
+			<pose>0 0.27 0.244 0 0 0</pose>
+			<inertial>
+				<inertia>
+					<ixx>0.0005</ixx>
+					<iyy>0.0005</iyy>
+					<izz>0.0005</izz>
+				</inertia>
+				<mass>0.1</mass>
+			</inertial>
+			<visual name="arm_base_top_vis">
+				<geometry>
+					<cylinder>
+						<radius>0.01</radius>
+						<length>0.03</length>
+					</cylinder>
+				</geometry>
+			</visual>
+			<collision name="arm_base_top_col">
+				<geometry>
+					<cylinder>
+						<radius>0.01</radius>
+						<length>0.03</length>
+					</cylinder>
+				</geometry>
+			</collision>
+		</link>
+		<joint name="armBase_armBaseTop" type="revolute">
+			<pose>0 0 -0.015 0 0 0</pose>
+			<child>arm_base_top</child>
+			<parent>arm_base</parent>
+			<axis>
+				<xyz>0 0 1</xyz>
+				<dynamics>
+					<friction>0.05</friction>
+					<damping>0.03</damping>
+				</dynamics>
+			</axis>
+		</joint>
+		<link name="arm1">
+			<pose>0 0.27 0.334 0 0 0</pose>
+			<inertial>
+				<inertia>
+					<ixx>0.0005</ixx>
+					<iyy>0.0005</iyy>
+					<izz>0.0005</izz>
+				</inertia>
+				<mass>0.1</mass>
+			</inertial>
+			<visual name="arm1_vis">
+				<geometry>
+					<cylinder>
+						<radius>0.01</radius>
+						<length>0.15</length>
+					</cylinder>
+				</geometry>
+			</visual>
+			<collision name="arm1_col">
+				<geometry>
+					<cylinder>
+						<radius>0.01</radius>
+						<length>0.15</length>
+					</cylinder>
+				</geometry>
+			</collision>
+		</link>
+		<joint name="armBaseTop_arm1" type="revolute">
+			<pose>0 0 -0.075 0 0 0</pose>
+			<child>arm1</child>
+			<parent>arm_base_top</parent>
+			<axis>
+				<xyz>1 0 0</xyz>
+				<dynamics>
+					<friction>0.05</friction>
+					<damping>0.03</damping>
+				</dynamics>
+				<limit>
+					<upper>3.141592653589793</upper>
+					<lower>-3.141592653589793</lower>
+				</limit>
+			</axis>
+		</joint>
+		<link name="arm2">
+			<pose>0 0.27 0.48400000000000004 0 0 0</pose>
+			<inertial>
+				<inertia>
+					<ixx>0.0005</ixx>
+					<iyy>0.0005</iyy>
+					<izz>0.0005</izz>
+				</inertia>
+				<mass>0.1</mass>
+			</inertial>
+			<visual name="arm2_vis">
+				<geometry>
+					<cylinder>
+						<radius>0.01</radius>
+						<length>0.15</length>
+					</cylinder>
+				</geometry>
+			</visual>
+			<collision name="arm2_col">
+				<geometry>
+					<cylinder>
+						<radius>0.01</radius>
+						<length>0.15</length>
+					</cylinder>
+				</geometry>
+			</collision>
+		</link>
+		<joint name="arm1_arm2" type="revolute">
+			<pose>0 0 -0.075 0 0 0</pose>
+			<child>arm2</child>
+			<parent>arm1</parent>
+			<axis>
+				<xyz>1 0 0</xyz>
+				<dynamics>
+					<friction>0.05</friction>
+					<damping>0.03</damping>
+				</dynamics>
+				<limit>
+					<upper>3.141592653589793</upper>
+					<lower>-3.141592653589793</lower>
+				</limit>
+			</axis>
+		</joint>
+		<link name="gripperBase">
+			<pose>0 0.27 0.5640000000000001 0 0 0</pose>
+			<inertial>
+				<inertia>
+					<ixx>0.0005</ixx>
+					<iyy>0.0005</iyy>
+					<izz>0.0005</izz>
+				</inertia>
+				<mass>0.1</mass>
+			</inertial>
+			<visual name="gripperBase_vis">
+				<geometry>
+					<box>
+						<size>0.04285714285714286 0.01 0.01</size>
+					</box>
+				</geometry>
+			</visual>
+			<collision name="gripperBase_col">
+				<geometry>
+					<box>
+						<size>0.04285714285714286 0.01 0.01</size>
+					</box>
+				</geometry>
+			</collision>
+		</link>
+		<joint name="arm2_gripperBase" type="revolute">
+			<pose>0 0 0.075 0 0 0</pose>
+			<child>arm2</child>
+			<parent>gripperBase</parent>
+			<axis>
+				<xyz>1 0 0</xyz>
+				<dynamics>
+					<friction>0.05</friction>
+					<damping>0.03</damping>
+				</dynamics>
+				<limit>
+					<upper>3.141592653589793</upper>
+					<lower>-3.141592653589793</lower>
+				</limit>
+			</axis>
+		</joint>
 		<plugin filename="libgazebo_ros_diff_drive.so" name="differential_drive_controller">
 			<alwaysOn>true</alwaysOn>
 			<updateRate>20</updateRate>
@@ -437,11 +739,6 @@
 			<rosDebugLevel>1</rosDebugLevel>
 			<wheelAcceleration>2</wheelAcceleration>
 		</plugin>
-		<plugin filename="libwheel_plugin.so" name="steering_wheel">
-			<proportional_pid>2.0</proportional_pid>
-			<integral_pid>1.8</integral_pid>
-			<derivative_pid>0</derivative_pid>
-			<velocity>10</velocity>
-		</plugin>
+		<plugin filename="libarm_controller.so" name="arm_controller"/>
 	</model>
 </sdf>

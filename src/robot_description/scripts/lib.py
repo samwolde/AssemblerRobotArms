@@ -78,7 +78,13 @@ class Orientation:
         self.y = y
         self.z = z
 class Pose:
-    def __init__(self, loc:Location, orie:Orientation):
+    def __init__(self, loc:Location=None, orie:Orientation=None):
+        if loc is None:
+            loc = Location(0,0,0)
+        
+        if orie is None:
+            orie = Orientation(0, 0, 0)
+
         self.loc = loc
         self.orie = orie
 
@@ -104,7 +110,7 @@ class Link(DOM.Element):
         textNode = self.sdf_doc.createTextNode(text)
         pose.appendChild(textNode)
         self.appendChild(pose)
-        # self.appendChild(Inertial(self.mass, self.inertial))
+        self.appendChild(Inertial(self.mass, self.inertial))
 
 #Create A rectangular link.
 class RectangularLink(Link):
