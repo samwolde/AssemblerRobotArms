@@ -1,0 +1,161 @@
+<?xml version="1.0" ?>
+<sdf version="1.4">
+	<model name="boxes">
+	<static>true</static>
+		<link name="box1">
+			<pose>6.0 -4.6 0.4 0 0 0</pose>
+			<inertial>
+				<inertia>
+					<ixx>0.0005</ixx>
+					<iyy>0.0005</iyy>
+					<izz>0.0005</izz>
+				</inertia>
+				<mass>0.1</mass>
+			</inertial>
+			<visual name="box1_vis">
+				<geometry>
+					<box>
+						<size>0.1 0.1 0.1</size>
+					</box>
+				</geometry>
+				<material>
+					<ambient> 1 0 0 1</ambient>
+					<diffuse>1 0 0  1</diffuse>
+					<specular> 0.1 0.1 0.1 1</specular>
+					<emissive>0 0 0 0</emissive>
+				</material>
+			</visual>
+			<collision name="box1_col">
+				<geometry>
+					<box>
+						<size>0.1 0.1 0.1</size>
+					</box>
+				</geometry>
+			</collision>
+		</link>
+		<link name="box2">
+			<pose>4.7 -7.5 1 0 0 0</pose>
+			<inertial>
+				<inertia>
+					<ixx>0.0005</ixx>
+					<iyy>0.0005</iyy>
+					<izz>0.0005</izz>
+				</inertia>
+				<mass>0.1</mass>
+			</inertial>
+			<visual name="box2_vis">
+				<geometry>
+					<box>
+						<size>0.1 0.1 0.1</size>
+					</box>
+				</geometry>
+				<material>
+					<ambient> 1 0 0 1</ambient>
+					<diffuse>1 0 0  1</diffuse>
+					<specular> 0.1 0.1 0.1 1</specular>
+					<emissive>0 0 0 0</emissive>
+				</material>
+			</visual>
+			<collision name="box2_col">
+				<geometry>
+					<box>
+						<size>0.1 0.1 0.1</size>
+					</box>
+				</geometry>
+			</collision>
+		</link>
+		<link name="box3">
+			<pose>5.3 6.1 0 0 0 0</pose>
+			<inertial>
+				<inertia>
+					<ixx>0.0005</ixx>
+					<iyy>0.0005</iyy>
+					<izz>0.0005</izz>
+				</inertia>
+				<mass>0.1</mass>
+			</inertial>
+			<visual name="box3_vis">
+				<geometry>
+					<box>
+						<size>0.1 0.1 0.1</size>
+					</box>
+				</geometry>
+				<material>
+					<ambient> 1 0 0 1</ambient>
+					<diffuse>1 0 0  1</diffuse>
+					<specular> 0.1 0.1 0.1 1</specular>
+					<emissive>0 0 0 0</emissive>
+				</material>
+			</visual>
+			<collision name="box3_col">
+				<geometry>
+					<box>
+						<size>0.1 0.1 0.1</size>
+					</box>
+				</geometry>
+			</collision>
+		</link>
+		<link name="box5">
+			<pose>-5.7 -4.0 0.2 0 0 0</pose>
+			<inertial>
+				<inertia>
+					<ixx>0.0005</ixx>
+					<iyy>0.0005</iyy>
+					<izz>0.0005</izz>
+				</inertia>
+				<mass>0.1</mass>
+			</inertial>
+			<visual name="box5_vis">
+				<geometry>
+					<box>
+						<size>0.1 0.1 0.1</size>
+					</box>
+				</geometry>
+				<material>
+					<ambient> 1 0 0 1</ambient>
+					<diffuse>1 0 0  1</diffuse>
+					<specular> 0.1 0.1 0.1 1</specular>
+					<emissive>0 0 0 0</emissive>
+				</material>
+			</visual>
+			<collision name="box5_col">
+				<geometry>
+					<box>
+						<size>0.1 0.1 0.1</size>
+					</box>
+				</geometry>
+			</collision>
+		</link>
+		<link name="box4">
+			<pose>-3.2 5.2 0.1 0 0 0</pose>
+			<inertial>
+				<inertia>
+					<ixx>0.0005</ixx>
+					<iyy>0.0005</iyy>
+					<izz>0.0005</izz>
+				</inertia>
+				<mass>0.1</mass>
+			</inertial>
+			<visual name="box4_vis">
+				<geometry>
+					<box>
+						<size>0.1 0.1 0.1</size>
+					</box>
+				</geometry>
+				<material>
+					<ambient> 1 0 0 1</ambient>
+					<diffuse>1 0 0  1</diffuse>
+					<specular> 0.1 0.1 0.1 1</specular>
+					<emissive>0 0 0 0</emissive>
+				</material>
+			</visual>
+			<collision name="box4_col">
+				<geometry>
+					<box>
+						<size>0.1 0.1 0.1</size>
+					</box>
+				</geometry>
+			</collision>
+		</link>
+	</model>
+</sdf>
