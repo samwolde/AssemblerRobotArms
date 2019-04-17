@@ -334,20 +334,30 @@
 			<child>axel_3</child>
 			<parent>susp_3</parent>
 		</joint>
-		<plugin filename="libgazebo_ros_diff_drive.so" name="differential_drive_controller">
+		<plugin filename="libgazebo_ros_skid_steer_drive.so" name="skid_steer_controller">
 			<alwaysOn>true</alwaysOn>
-			<updateRate>20</updateRate>
-			<leftJoint>axel_wheel_1</leftJoint>
-			<rightJoint>axel_wheel_4</rightJoint>
-			<wheelSeparation>0.21250000000000005</wheelSeparation>
+			<updateRate>1200</updateRate>
+			<robotNamespace>wheely</robotNamespace>
+			<leftFrontJoint>axel_wheel_4</leftFrontJoint>
+			<rightFrontJoint>axel_wheel_1</rightFrontJoint>
+			<leftRearJoint>axel_wheel_3</leftRearJoint>
+			<rightRearJoint>axel_wheel_2</rightRearJoint>
+			<wheelSeparation>0.891</wheelSeparation>
 			<wheelDiameter>0.15</wheelDiameter>
-			<wheelTorque>20</wheelTorque>
+			<torque>600</torque>
 			<commandTopic>cmd_wheel</commandTopic>
-			<odometryTopic>wheel</odometryTopic>
+			<odometryTopic>odom</odometryTopic>
 			<odometryFrame>odom</odometryFrame>
-			<robotBaseFrame>base_footprint</robotBaseFrame>
-			<rosDebugLevel>1</rosDebugLevel>
-			<wheelAcceleration>2</wheelAcceleration>
+			<broadcastTF>1</broadcastTF>
+			<robotBaseFrame>body_link</robotBaseFrame>
+		</plugin>
+		<plugin filename="libwheel_plugin.so" name="test_plug">
+			<robotNamespace>wheely</robotNamespace>
+			<velPubTopic>cmd_wheel</velPubTopic>
+			<odometrySubTopic>odom</odometrySubTopic>
+			<velocity>0.2</velocity>
+			<angularVelocity>10</angularVelocity>
+			<kp>0.06</kp>
 		</plugin>
 	</model>
 </sdf>

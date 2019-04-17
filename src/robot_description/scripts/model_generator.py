@@ -24,12 +24,6 @@ axel_length = .05
 
 body_depth = suspension_depth + wheel_radius + depth/2 - 0.001
 
-#The PID parameters
-p_pid = 4.0
-i_pid = 1.8
-d_pid = 0.004
-velocity = 4
-
 #Positions and Link of respective links
 
 ##Body LInk
@@ -127,37 +121,43 @@ joint_axel4_wheel = RevoluteJoint("axel_wheel_4",pose_wheelj, "wheel_4","axel_4"
 ## create a plugin
 
 
-# plugin = Plugin("test_plug","libwheel_plugin.so", 
-# {
-#     "proportional_pid":p_pid,
-#     "integral_pid":i_pid,
-#     "derivative_pid":d_pid,
-#     "velocity"  :velocity
-# })
+plugin_wc = Plugin("test_plug","libwheel_plugin.so", 
+{
+    "robotNamespace":"wheely",
+    "velPubTopic":"cmd_wheel",
+    "odometrySubTopic":"odom",
+    "velocity":0.2,
+    #Tweak the below two parameteres if the turning angle overshoots.
+    "angularVelocity":10,
+    "kp":0.06
+})
 
-plugin = Plugin("differential_drive_controller", "libgazebo_ros_diff_drive.so", 
+plugin = Plugin("skid_steer_controller", "libgazebo_ros_skid_steer_drive.so", 
 {
     "alwaysOn": "true",
-    "updateRate":20,
-    "leftJoint": "axel_wheel_1",
-    "rightJoint": "axel_wheel_4",
-    "wheelSeparation": (susp_1_pose[0] + axel_length - wheel_radius)*2,
+    "updateRate":1200,
+    "robotNamespace":"wheely",
+    "leftFrontJoint": "axel_wheel_4",
+    "rightFrontJoint": "axel_wheel_1",
+    "leftRearJoint":"axel_wheel_3",
+    "rightRearJoint":"axel_wheel_2",
+    "wheelSeparation": 0.891,#( (susp_1_pose[0]+axel_length) - (susp_4_pose[0]-axel_length) ) -wheel_length,
     "wheelDiameter": wheel_radius*2,
-    "wheelTorque": 20,
+    "torque": 600,
     "commandTopic": "cmd_wheel",
-    "odometryTopic": "wheel",
-    "odometryFrame": "odom",
-    "robotBaseFrame": "base_footprint",
-    "rosDebugLevel": 1,
-    "wheelAcceleration": 2,
+    "odometryTopic":"odom",
+    "odometryFrame":"odom",
+    "broadcastTF":1,
+    "robotBaseFrame": "body_link",
 })
+
 #Build The model
 sdf = Sdf.createSdfDoc()
 root = Sdf.getRootElement()
 links_joints = [body_link,susp_1, wheel_1, joint_sup1_body,joint_sup1_axel,susp_2,wheel_2,joint_sup2_body,
 joint_sup2_axel,susp_4,wheel_4,joint_sup4_body,joint_sup4_axel,
 wheel_axel_1, joint_axel1_wheel, wheel_axel_2,joint_axel2_wheel,wheel_axel_3,joint_axel3_wheel,wheel_axel_4,joint_axel4_wheel,
-susp_3,wheel_3,joint_sup3_body,joint_sup3_axel,plugin]
+susp_3,wheel_3,joint_sup3_body,joint_sup3_axel,plugin,plugin_wc]
 model = Model("robot",links_joints)
 
 #Append to root element and create sdf File.
