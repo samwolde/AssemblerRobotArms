@@ -11,7 +11,7 @@ class Sdf():
         raise Exception("Don't Use Constructor explicitly, Use createSdfDoc()!")
     
     @classmethod
-    def createSdfDoc(cls,ver:str ="1.4" ) -> DOM.Document:
+    def createSdfDoc(cls,ver:str ="1.6" ) -> DOM.Document:
         if hasattr(cls, "_sdf_doc"):
             return cls._sdf_doc
         
@@ -132,6 +132,47 @@ class CylindericalLink(Link):
         self.appendChild(self.col_vis.col_vis[1])
 
 
+
+class CylindericalLinkWithSensor(CylindericalLink):
+
+    def __init__(self, name, pose:Pose,leng,mass,rad, inertial):
+        super().__init__(name, pose, leng, mass, rad, inertial)
+        self.sensor = Sensor(name)
+        self.appendChild(self.sensor)
+
+class Sensor(DOM.Element):
+    
+    def __init__(self, name):
+        super().__init__("sensor")
+        sdf_doc = Sdf.createSdfDoc()
+
+        always_on = sdf_doc.createElement("always_on")
+        always_on.appendChild(sdf_doc.createTextNode(str("1")))
+        contact = sdf_doc.createElement("contact")
+        collision = sdf_doc.createElement("collision")
+        collision.appendChild(sdf_doc.createTextNode(str("{0}_col".format(name))))
+        update_rate = sdf_doc.createElement("update_rate")
+        update_rate.appendChild(sdf_doc.createTextNode(str("30")))
+        visualize = sdf_doc.createElement("visualize")
+        visualize.appendChild(sdf_doc.createTextNode(str("true")))
+
+        plugin = sdf_doc.createElement("plugin")
+        plugin.setAttributeNode(sdf_doc.createAttribute("name"))
+        plugin.setAttributeNode(sdf_doc.createAttribute("filename"))
+        plugin.setAttribute("name", "my_plugin")
+        plugin.setAttribute("filename", "libcontact_plugin.so")
+
+        contact.appendChild(collision)
+        self.appendChild(contact)
+        self.appendChild(always_on)
+        self.appendChild(update_rate)
+        self.appendChild(visualize)
+        self.appendChild(plugin)
+
+        self.setAttributeNode(sdf_doc.createAttribute("name"))
+        self.setAttributeNode(sdf_doc.createAttribute("type"))
+        self.setAttribute("name","{0}_sensor".format(name))
+        self.setAttribute("type","contact")
 '''
     Create A Cylinderical Collision and Visual xml tags
     returns [collision, visual]
@@ -210,10 +251,12 @@ class Inertial(DOM.Element):
 
     def build_inertial(self,mass , inertial):
         sdf = self.sdf
-        self.mass.appendChild(sdf.createTextNode(str(mass)))
-        self.ixx.appendChild(sdf.createTextNode(str(inertial[0])))
-        self.iyy.appendChild(sdf.createTextNode(str(inertial[1])))
-        self.izz.appendChild(sdf.createTextNode(str(inertial[2])))
+        self.mass.appendChild(sdf.createTextNode(str(format(mass, '.8f'))))
+
+        self.ixx.appendChild(sdf.createTextNode(str(format(inertial[0], '.8f'))))
+        self.iyy.appendChild(sdf.createTextNode(str(format(inertial[1], '.8f'))))
+        self.izz.appendChild(sdf.createTextNode(str(format(inertial[2], '.8f'))))
+
         self.inertia.appendChild(self.ixx)
         self.inertia.appendChild(self.iyy)
         self.inertia.appendChild(self.izz)
@@ -295,6 +338,30 @@ class Plugin(DOM.Element):
             param = sdf.createElement(p)
             param.appendChild(sdf.createTextNode(str(parameters[p])))
             self.appendChild(param)
+
+class math_helper():
+    def __init__(self, orie:Orientation):
+        self.orie = orie
+
+    def inertial_cylinderical(self, mass:int, height:int, radius:int): 
+
+        if(self.orie.y == 0):
+            x = 1/12 * (mass * ( (3*(radius**2)) + (height**2))) 
+            z = 1/2 * (mass * (radius**2))
+            return [x, x, z]
+        else:
+            x = 1/2 * (mass * (radius**2))
+            y = 1/12 * (mass * ( (3*(radius**2)) + (height**2))) 
+            return [x, y, y]
+
+    def inertial_rectangular(self, mass:int, width:int, height:int, depth:int):
+        
+        w = 1/12 * (mass * ( (height**2) + (depth**2))) 
+        h = 1/12 * (mass * ( (width**2)  + (depth**2)))
+        d = 1/12 * (mass * ( (height**2) + (width**2)))
+        
+        return [w, h, d]
+
 
 #Generic Collision with different geometries
 #TODO:

@@ -92,7 +92,6 @@ public:
       this->model->GetJoint("armBase_armBaseTop")->SetParam("fmax", 0, 0);
       this->model->GetJoint("armBaseTop_arm1")->SetParam("fmax", 0, 0);
       this->model->GetJoint("arm1_arm2")->SetParam("fmax", 0, 0);
-      this->model->GetJoint("arm2_gripperBase")->SetParam("fmax", 0, 0);
     }
 
     updateNum++;
@@ -107,7 +106,6 @@ public:
     this->SetAngle("armBase_armBaseTop", msg->armBase_armBaseTop, 0.9, 0, 1.25, false);
     this->SetAngle("armBaseTop_arm1", msg->armBaseTop_arm1, 18, 0, 3.5, false);
     this->SetAngle("arm1_arm2", msg->arm1_arm2, msg->P, msg->I, msg->D, false);
-    this->SetAngle("arm2_gripperBase", msg->arm2_gripper, msg->P, msg->I, msg->D);
   }
 
 private:

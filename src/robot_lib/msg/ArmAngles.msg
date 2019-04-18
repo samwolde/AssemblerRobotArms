@@ -4,4 +4,3 @@ float32 D
 float32 armBase_armBaseTop
 float32 armBaseTop_arm1
 float32 arm1_arm2
-float32 arm2_gripper
