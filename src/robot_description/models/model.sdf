@@ -356,8 +356,10 @@
 			<velPubTopic>cmd_wheel</velPubTopic>
 			<odometrySubTopic>odom</odometrySubTopic>
 			<velocity>0.2</velocity>
-			<angularVelocity>10</angularVelocity>
-			<kp>0.06</kp>
+			<angularVelocity>4</angularVelocity>
+			<kp>0.3</kp>
+			<turnMargin>0.0025</turnMargin>
+			<turnAccuracy>0.0005</turnAccuracy>
 		</plugin>
 	</model>
 </sdf>

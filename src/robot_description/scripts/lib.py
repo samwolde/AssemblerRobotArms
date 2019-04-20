@@ -290,6 +290,29 @@ class Plugin(DOM.Element):
             param.appendChild(sdf.createTextNode(str(parameters[p])))
             self.appendChild(param)
 
+class math_helper():
+    def __init__(self, orie:Orientation):
+        self.orie = orie
+
+    def inertial_cylinderical(self, mass:int, height:int, radius:int): 
+
+        if(self.orie.y == 0):
+            x = 1/12 * (mass * ( (3*(radius**2)) + (height**2))) 
+            z = 1/2 * (mass * (radius**2))
+            return [x, x, z]
+        else:
+            x = 1/2 * (mass * (radius**2))
+            y = 1/12 * (mass * ( (3*(radius**2)) + (height**2))) 
+            return [x, y, y]
+
+    def inertial_rectangular(self, mass:int, width:int, height:int, depth:int):
+        
+        w = 1/12 * (mass * ( (height**2) + (depth**2))) 
+        h = 1/12 * (mass * ( (width**2)  + (depth**2)))
+        d = 1/12 * (mass * ( (height**2) + (width**2)))
+        
+        return [w, h, d]
+
 #Generic Collision with different geometries
 #TODO:
 class Collision(DOM.Element):

@@ -2,12 +2,18 @@ from lib import *
 import math
 
 PI = math.pi
-default_inertial = [0.0005,0.0005,0.0005]
-default_mass = 0.1
+default_mass = 10
+
+# masses (in kg)
+body_mass   = default_mass
+susp_mass   = default_mass/10
+axel_mass   = default_mass/20
+wheel_mass  = default_mass/10
 zero_pose = Pose(Location(0,0,0), Orientation(0,0,0))
 width = 0.3
 height = 2 * width
 depth =  width/6
+
 
 # The limit of the joint between Wheel and suspension
 wheel_upper_limit,wheel_lower_limit = None, None
@@ -24,11 +30,17 @@ axel_length = .05
 
 body_depth = suspension_depth + wheel_radius + depth/2 - 0.001
 
+body_inertial   = math_helper(Orientation(0,0,0)).inertial_rectangular(body_mass, width, height, depth)
+susp_inertial   = math_helper(Orientation(0,0,0)).inertial_cylinderical(susp_mass, suspension_depth, suspension_rad)
+axel_inertial   = math_helper(Orientation(0,rad(90),0)).inertial_cylinderical(axel_mass, axel_length, wheel_axel_radius)
+wheel_inertial  = math_helper(Orientation(0,rad(90),0)).inertial_cylinderical(wheel_mass, wheel_length, wheel_radius)
+
+
 #Positions and Link of respective links
 
 ##Body LInk
 pose_body = Pose(Location(0,0,body_depth),Orientation(0,0,0) )
-body_link = RectangularLink("body_link",pose_body,default_mass,[width, height, depth],default_inertial )
+body_link = RectangularLink("body_link",pose_body,default_mass,[width, height, depth],body_inertial )
 
 ##the front left suspension and wheel
 susp_1_pose = [(width/2 - suspension_rad) , -(width-wheel_radius), wheel_radius + suspension_depth/2]
@@ -37,9 +49,9 @@ pose_susp_1 = Pose(Location(susp_1_pose[0],susp_1_pose[1],susp_1_pose[2]), Orien
 pose_wheel_1 = Pose(Location(susp_1_pose[0]+axel_length , susp_1_pose[1], wheel_radius), Orientation(0,rad(90),0))
 pose_axel_1 = Pose(Location(susp_1_pose[0]+axel_length/2, susp_1_pose[1], wheel_radius), Orientation(0,rad(90),0))
 
-susp_1 = CylindericalLink("susp_1",pose_susp_1,suspension_depth, default_mass, suspension_rad, default_inertial)
-wheel_1 = CylindericalLink("wheel_1",pose_wheel_1, wheel_length, default_mass, wheel_radius, default_inertial)
-wheel_axel_1 = CylindericalLink("axel_1",pose_axel_1,axel_length, default_mass, wheel_axel_radius, default_inertial)
+susp_1 = CylindericalLink("susp_1",pose_susp_1,suspension_depth, default_mass, suspension_rad, susp_inertial)
+wheel_1 = CylindericalLink("wheel_1",pose_wheel_1, wheel_length, default_mass, wheel_radius, wheel_inertial)
+wheel_axel_1 = CylindericalLink("axel_1",pose_axel_1,axel_length, default_mass, wheel_axel_radius, axel_inertial)
 ## Fixed Joint between body and suspension 1
 j_body_susp1_pose = Pose(Location(0, 0,suspension_depth/2 ),Orientation(0,0,0))
 joint_sup1_body = Joint("susp1_body","fixed",j_body_susp1_pose,"susp_1","body_link")
@@ -57,9 +69,9 @@ pose_susp_2 = Pose(Location(susp_1_pose[0],-susp_1_pose[1],susp_1_pose[2]), Orie
 pose_wheel_2 = Pose(Location(susp_1_pose[0]+axel_length , -susp_1_pose[1], wheel_radius), Orientation(0,rad(90),0))
 pose_axel_2 = Pose(Location(susp_1_pose[0]+axel_length/2, -susp_1_pose[1], wheel_radius), Orientation(0,rad(90),0))
 
-susp_2 = CylindericalLink("susp_2",pose_susp_2,suspension_depth, default_mass, suspension_rad, default_inertial)
-wheel_2 = CylindericalLink("wheel_2",pose_wheel_2, wheel_length, default_mass, wheel_radius, default_inertial)
-wheel_axel_2 = CylindericalLink("axel_2",pose_axel_2,axel_length, default_mass, wheel_axel_radius, default_inertial)
+susp_2 = CylindericalLink("susp_2",pose_susp_2,suspension_depth, default_mass, suspension_rad, susp_inertial)
+wheel_2 = CylindericalLink("wheel_2",pose_wheel_2, wheel_length, default_mass, wheel_radius, wheel_inertial)
+wheel_axel_2 = CylindericalLink("axel_2",pose_axel_2,axel_length, default_mass, wheel_axel_radius, axel_inertial)
 ## Fixed Joint between suspension2 and body
 j_body_susp2_pose =  Pose(Location(0, 0,suspension_depth/2 ),Orientation(0,0,0))
 joint_sup2_body = Joint("susp2_body","fixed",j_body_susp2_pose,"susp_2","body_link")
@@ -80,9 +92,9 @@ pose_susp_3 = Pose(Location(susp_3_pose[0],susp_3_pose[1],susp_3_pose[2]), Orien
 pose_wheel_3 = Pose(Location(susp_3_pose[0]-axel_length , susp_3_pose[1], wheel_radius), Orientation(0,rad(90),0))
 pose_axel_3 = Pose(Location(susp_3_pose[0]-axel_length/2, susp_3_pose[1], wheel_radius), Orientation(0,rad(90),0))
 
-susp_3 = CylindericalLink("susp_3",pose_susp_3,suspension_depth, default_mass, suspension_rad, default_inertial)
-wheel_3 = CylindericalLink("wheel_3",pose_wheel_3, wheel_length, default_mass, wheel_radius, default_inertial)
-wheel_axel_3 = CylindericalLink("axel_3",pose_axel_3,axel_length, default_mass, wheel_axel_radius, default_inertial)
+susp_3 = CylindericalLink("susp_3",pose_susp_3,suspension_depth, default_mass, suspension_rad, susp_inertial)
+wheel_3 = CylindericalLink("wheel_3",pose_wheel_3, wheel_length, default_mass, wheel_radius, wheel_inertial)
+wheel_axel_3 = CylindericalLink("axel_3",pose_axel_3,axel_length, default_mass, wheel_axel_radius, axel_inertial)
 
 ## Fixed Joint between body and suspension 4
 j_body_susp3_pose = Pose(Location(0, 0,suspension_depth/2 ),Orientation(0,0,0))
@@ -103,9 +115,9 @@ pose_susp_4 = Pose(Location(susp_4_pose[0],susp_4_pose[1],susp_4_pose[2]), Orien
 pose_wheel_4 = Pose(Location(susp_4_pose[0]-axel_length , susp_4_pose[1], wheel_radius), Orientation(0,rad(90),0))
 pose_axel_4 = Pose(Location(susp_4_pose[0]-axel_length/2, susp_4_pose[1], wheel_radius), Orientation(0,rad(90),0))
 
-susp_4 = CylindericalLink("susp_4",pose_susp_4,suspension_depth, default_mass, suspension_rad, default_inertial)
-wheel_4 = CylindericalLink("wheel_4",pose_wheel_4, wheel_length, default_mass, wheel_radius, default_inertial)
-wheel_axel_4 = CylindericalLink("axel_4",pose_axel_4,axel_length, default_mass, wheel_axel_radius, default_inertial)
+susp_4 = CylindericalLink("susp_4",pose_susp_4,suspension_depth, default_mass, suspension_rad, susp_inertial)
+wheel_4 = CylindericalLink("wheel_4",pose_wheel_4, wheel_length, default_mass, wheel_radius, wheel_inertial)
+wheel_axel_4 = CylindericalLink("axel_4",pose_axel_4,axel_length, default_mass, wheel_axel_radius, axel_inertial)
 
 ## Fixed Joint between body and suspension 4
 j_body_susp4_pose = Pose(Location(0, 0,suspension_depth/2),Orientation(0,0,0))
@@ -127,9 +139,12 @@ plugin_wc = Plugin("test_plug","libwheel_plugin.so",
     "velPubTopic":"cmd_wheel",
     "odometrySubTopic":"odom",
     "velocity":0.2,
+    "angularVelocity":4,
     #Tweak the below two parameteres if the turning angle overshoots.
-    "angularVelocity":10,
-    "kp":0.06
+    #Or the car is slowly turning.
+    "kp":0.3,                   #Increase kp is car turn is slow, decrease if turning angle overshoots
+    "turnMargin":0.0025,        #Increase if turning angle overshoots
+    "turnAccuracy":0.0005       # >>
 })
 
 plugin = Plugin("skid_steer_controller", "libgazebo_ros_skid_steer_drive.so", 

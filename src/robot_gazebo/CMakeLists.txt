@@ -21,13 +21,15 @@ find_package(catkin REQUIRED COMPONENTS
 find_package(gazebo REQUIRED)
 
 link_directories(${GAZEBO_LIBRARY_DIRS})
-include_directories(${Boost_INCLUDE_DIR} 
+include_directories(
+              include ${PROJECT_NAME}
+              ${Boost_INCLUDE_DIR} 
               ${catkin_INCLUDE_DIRS} 
               ${GAZEBO_INCLUDE_DIRS} 
               ${roscpp_INCLUDE_DIRS}
               ${std_msgs_INCLUDE_DIRS})
 
-add_library(wheel_plugin SHARED plugins/wheel_controller.cc)
+add_library(wheel_plugin SHARED plugins/wheel_controller.cc plugins/wheel_ctrl_helper.cpp)
 target_link_libraries(wheel_plugin ${catkin_LIBRARIES} ${GAZEBO_LIBRARIES} ${roscpp_LIBRARIES})
 
 ## Uncomment this if the package has a setup.py. This macro ensures
