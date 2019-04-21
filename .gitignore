@@ -2,3 +2,6 @@ build/*
 devel/*
 .vscode
 src/robot_description/scripts/__pycache__
+._.DS_Store
+*.pyc
+__pycache__/*

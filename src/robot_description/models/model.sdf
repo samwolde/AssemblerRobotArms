@@ -1,8 +1,16 @@
 <?xml version="1.0" ?>
-<sdf version="1.4">
+<sdf version="1.6">
 	<model name="robot">
 		<link name="body_link">
 			<pose>0 0 0.19649999999999998 0 0 0</pose>
+			<inertial>
+				<inertia>
+					<ixx>0.30208333</ixx>
+					<iyy>0.07708333</iyy>
+					<izz>0.37500000</izz>
+				</inertia>
+				<mass>10.00000000</mass>
+			</inertial>
 			<visual name="body_link_vis">
 				<geometry>
 					<box>
@@ -20,6 +28,14 @@
 		</link>
 		<link name="susp_1">
 			<pose>0.13125 -0.22499999999999998 0.12375 0 0 0</pose>
+			<inertial>
+				<inertia>
+					<ixx>0.00088008</ixx>
+					<iyy>0.00088008</iyy>
+					<izz>0.00017578</izz>
+				</inertia>
+				<mass>1.00000000</mass>
+			</inertial>
 			<visual name="susp_1_vis">
 				<geometry>
 					<cylinder>
@@ -39,6 +55,14 @@
 		</link>
 		<link name="wheel_1">
 			<pose>0.18125000000000002 -0.22499999999999998 0.075 0 1.5707963267948966 0</pose>
+			<inertial>
+				<inertia>
+					<ixx>0.00281250</ixx>
+					<iyy>0.00168362</iyy>
+					<izz>0.00168362</izz>
+				</inertia>
+				<mass>1.00000000</mass>
+			</inertial>
 			<visual name="wheel_1_vis">
 				<geometry>
 					<cylinder>
@@ -68,6 +92,14 @@
 		</joint>
 		<link name="susp_2">
 			<pose>0.13125 0.22499999999999998 0.12375 0 0 0</pose>
+			<inertial>
+				<inertia>
+					<ixx>0.00088008</ixx>
+					<iyy>0.00088008</iyy>
+					<izz>0.00017578</izz>
+				</inertia>
+				<mass>1.00000000</mass>
+			</inertial>
 			<visual name="susp_2_vis">
 				<geometry>
 					<cylinder>
@@ -87,6 +119,14 @@
 		</link>
 		<link name="wheel_2">
 			<pose>0.18125000000000002 0.22499999999999998 0.075 0 1.5707963267948966 0</pose>
+			<inertial>
+				<inertia>
+					<ixx>0.00281250</ixx>
+					<iyy>0.00168362</iyy>
+					<izz>0.00168362</izz>
+				</inertia>
+				<mass>1.00000000</mass>
+			</inertial>
 			<visual name="wheel_2_vis">
 				<geometry>
 					<cylinder>
@@ -116,6 +156,14 @@
 		</joint>
 		<link name="susp_4">
 			<pose>-0.13125 -0.22499999999999998 0.12375 0 0 0</pose>
+			<inertial>
+				<inertia>
+					<ixx>0.00088008</ixx>
+					<iyy>0.00088008</iyy>
+					<izz>0.00017578</izz>
+				</inertia>
+				<mass>1.00000000</mass>
+			</inertial>
 			<visual name="susp_4_vis">
 				<geometry>
 					<cylinder>
@@ -135,6 +183,14 @@
 		</link>
 		<link name="wheel_4">
 			<pose>-0.18125000000000002 -0.22499999999999998 0.075 0 1.5707963267948966 0</pose>
+			<inertial>
+				<inertia>
+					<ixx>0.00281250</ixx>
+					<iyy>0.00168362</iyy>
+					<izz>0.00168362</izz>
+				</inertia>
+				<mass>1.00000000</mass>
+			</inertial>
 			<visual name="wheel_4_vis">
 				<geometry>
 					<cylinder>
@@ -164,6 +220,14 @@
 		</joint>
 		<link name="axel_1">
 			<pose>0.15625 -0.22499999999999998 0.075 0 1.5707963267948966 0</pose>
+			<inertial>
+				<inertia>
+					<ixx>0.00003600</ixx>
+					<iyy>0.00012217</iyy>
+					<izz>0.00012217</izz>
+				</inertia>
+				<mass>0.50000000</mass>
+			</inertial>
 			<visual name="axel_1_vis">
 				<geometry>
 					<cylinder>
@@ -182,7 +246,7 @@
 			</collision>
 		</link>
 		<joint name="axel_wheel_1" type="revolute">
-			<pose>0 0 -0.028846153846153844 0 0 0</pose>
+			<pose>0 0 -0.028846153846153844 0 -1.5707963267948966 0</pose>
 			<child>wheel_1</child>
 			<parent>axel_1</parent>
 			<axis>
@@ -195,6 +259,14 @@
 		</joint>
 		<link name="axel_2">
 			<pose>0.15625 0.22499999999999998 0.075 0 1.5707963267948966 0</pose>
+			<inertial>
+				<inertia>
+					<ixx>0.00003600</ixx>
+					<iyy>0.00012217</iyy>
+					<izz>0.00012217</izz>
+				</inertia>
+				<mass>0.50000000</mass>
+			</inertial>
 			<visual name="axel_2_vis">
 				<geometry>
 					<cylinder>
@@ -213,7 +285,7 @@
 			</collision>
 		</link>
 		<joint name="axel_wheel_2" type="revolute">
-			<pose>0 0 -0.028846153846153844 0 0 0</pose>
+			<pose>0 0 -0.028846153846153844 0 -1.5707963267948966 0</pose>
 			<child>wheel_2</child>
 			<parent>axel_2</parent>
 			<axis>
@@ -226,6 +298,14 @@
 		</joint>
 		<link name="axel_3">
 			<pose>-0.15625 0.22499999999999998 0.075 0 1.5707963267948966 0</pose>
+			<inertial>
+				<inertia>
+					<ixx>0.00003600</ixx>
+					<iyy>0.00012217</iyy>
+					<izz>0.00012217</izz>
+				</inertia>
+				<mass>0.50000000</mass>
+			</inertial>
 			<visual name="axel_3_vis">
 				<geometry>
 					<cylinder>
@@ -244,7 +324,7 @@
 			</collision>
 		</link>
 		<joint name="axel_wheel_3" type="revolute">
-			<pose>0 0 0.028846153846153844 0 0 0</pose>
+			<pose>0 0 0.028846153846153844 0 -1.5707963267948966 0</pose>
 			<child>wheel_3</child>
 			<parent>axel_3</parent>
 			<axis>
@@ -257,6 +337,14 @@
 		</joint>
 		<link name="axel_4">
 			<pose>-0.15625 -0.22499999999999998 0.075 0 1.5707963267948966 0</pose>
+			<inertial>
+				<inertia>
+					<ixx>0.00003600</ixx>
+					<iyy>0.00012217</iyy>
+					<izz>0.00012217</izz>
+				</inertia>
+				<mass>0.50000000</mass>
+			</inertial>
 			<visual name="axel_4_vis">
 				<geometry>
 					<cylinder>
@@ -275,7 +363,7 @@
 			</collision>
 		</link>
 		<joint name="axel_wheel_4" type="revolute">
-			<pose>0 0 0.028846153846153844 0 0 0</pose>
+			<pose>0 0 0.028846153846153844 0 -1.5707963267948966 0</pose>
 			<child>wheel_4</child>
 			<parent>axel_4</parent>
 			<axis>
@@ -288,6 +376,14 @@
 		</joint>
 		<link name="susp_3">
 			<pose>-0.13125 0.22499999999999998 0.12375 0 0 0</pose>
+			<inertial>
+				<inertia>
+					<ixx>0.00088008</ixx>
+					<iyy>0.00088008</iyy>
+					<izz>0.00017578</izz>
+				</inertia>
+				<mass>1.00000000</mass>
+			</inertial>
 			<visual name="susp_3_vis">
 				<geometry>
 					<cylinder>
@@ -307,6 +403,14 @@
 		</link>
 		<link name="wheel_3">
 			<pose>-0.18125000000000002 0.22499999999999998 0.075 0 1.5707963267948966 0</pose>
+			<inertial>
+				<inertia>
+					<ixx>0.00281250</ixx>
+					<iyy>0.00168362</iyy>
+					<izz>0.00168362</izz>
+				</inertia>
+				<mass>1.00000000</mass>
+			</inertial>
 			<visual name="wheel_3_vis">
 				<geometry>
 					<cylinder>
@@ -334,10 +438,177 @@
 			<child>axel_3</child>
 			<parent>susp_3</parent>
 		</joint>
+		<link name="arm_base">
+			<pose>0 0.27 0.22149999999999997 0 0 0</pose>
+			<inertial>
+				<inertia>
+					<ixx>0.00024375</ixx>
+					<iyy>0.00024375</iyy>
+					<izz>0.00045000</izz>
+				</inertia>
+				<mass>1.00000000</mass>
+			</inertial>
+			<visual name="arm_base_vis">
+				<geometry>
+					<cylinder>
+						<radius>0.03</radius>
+						<length>0.015</length>
+					</cylinder>
+				</geometry>
+			</visual>
+			<collision name="arm_base_col">
+				<geometry>
+					<cylinder>
+						<radius>0.03</radius>
+						<length>0.015</length>
+					</cylinder>
+				</geometry>
+			</collision>
+		</link>
+		<joint name="bodyLink_armBase" type="fixed">
+			<pose>0 0 0 0 0 0</pose>
+			<child>arm_base</child>
+			<parent>body_link</parent>
+		</joint>
+		<link name="arm_base_top">
+			<pose>0 0.27 0.244 0 0 0</pose>
+			<inertial>
+				<inertia>
+					<ixx>0.00005000</ixx>
+					<iyy>0.00005000</iyy>
+					<izz>0.00002500</izz>
+				</inertia>
+				<mass>0.50000000</mass>
+			</inertial>
+			<visual name="arm_base_top_vis">
+				<geometry>
+					<cylinder>
+						<radius>0.01</radius>
+						<length>0.03</length>
+					</cylinder>
+				</geometry>
+			</visual>
+			<collision name="arm_base_top_col">
+				<geometry>
+					<cylinder>
+						<radius>0.01</radius>
+						<length>0.03</length>
+					</cylinder>
+				</geometry>
+			</collision>
+		</link>
+		<joint name="armBase_armBaseTop" type="revolute">
+			<pose>0 0 -0.015 0 0 0</pose>
+			<child>arm_base_top</child>
+			<parent>arm_base</parent>
+			<axis>
+				<xyz>0 0 1</xyz>
+				<dynamics>
+					<friction>0.05</friction>
+					<damping>0.03</damping>
+				</dynamics>
+			</axis>
+		</joint>
+		<link name="arm1">
+			<pose>0 0.27 0.334 0 0 0</pose>
+			<inertial>
+				<inertia>
+					<ixx>0.00190000</ixx>
+					<iyy>0.00190000</iyy>
+					<izz>0.00005000</izz>
+				</inertia>
+				<mass>1.00000000</mass>
+			</inertial>
+			<visual name="arm1_vis">
+				<geometry>
+					<cylinder>
+						<radius>0.01</radius>
+						<length>0.15</length>
+					</cylinder>
+				</geometry>
+			</visual>
+			<collision name="arm1_col">
+				<geometry>
+					<cylinder>
+						<radius>0.01</radius>
+						<length>0.15</length>
+					</cylinder>
+				</geometry>
+			</collision>
+		</link>
+		<joint name="armBaseTop_arm1" type="revolute">
+			<pose>0 0 -0.075 0 0 0</pose>
+			<child>arm1</child>
+			<parent>arm_base_top</parent>
+			<axis>
+				<xyz>1 0 0</xyz>
+				<dynamics>
+					<friction>0.05</friction>
+					<damping>0.03</damping>
+				</dynamics>
+				<limit>
+					<upper>3.141592653589793</upper>
+					<lower>-3.141592653589793</lower>
+				</limit>
+			</axis>
+		</joint>
+		<link name="arm2">
+			<pose>0 0.27 0.48400000000000004 0 0 0</pose>
+			<inertial>
+				<inertia>
+					<ixx>0.00190000</ixx>
+					<iyy>0.00190000</iyy>
+					<izz>0.00005000</izz>
+				</inertia>
+				<mass>1.00000000</mass>
+			</inertial>
+			<visual name="arm2_vis">
+				<geometry>
+					<cylinder>
+						<radius>0.01</radius>
+						<length>0.15</length>
+					</cylinder>
+				</geometry>
+			</visual>
+			<collision name="arm2_col">
+				<geometry>
+					<cylinder>
+						<radius>0.01</radius>
+						<length>0.15</length>
+					</cylinder>
+				</geometry>
+			</collision>
+		</link>
+		<joint name="arm1_arm2" type="revolute">
+			<pose>0 0 -0.075 0 0 0</pose>
+			<child>arm2</child>
+			<parent>arm1</parent>
+			<axis>
+				<xyz>1 0 0</xyz>
+				<dynamics>
+					<friction>0.05</friction>
+					<damping>0.03</damping>
+				</dynamics>
+				<limit>
+					<upper>3.141592653589793</upper>
+					<lower>-3.141592653589793</lower>
+				</limit>
+			</axis>
+		</joint>
+		<plugin filename="libwheel_plugin.so" name="test_plug">
+			<prefix>wheely/steering</prefix>
+			<velPubTopic>cmd_wheel</velPubTopic>
+			<odometrySubTopic>odom</odometrySubTopic>
+			<velocity>0.2</velocity>
+			<angularVelocity>3.14</angularVelocity>
+			<kp>0.2</kp>
+			<turnMargin>0.004</turnMargin>
+			<turnAccuracy>0.0015</turnAccuracy>
+		</plugin>
 		<plugin filename="libgazebo_ros_skid_steer_drive.so" name="skid_steer_controller">
 			<alwaysOn>true</alwaysOn>
 			<updateRate>1200</updateRate>
-			<robotNamespace>wheely</robotNamespace>
+			<robotNamespace>wheely/steering</robotNamespace>
 			<leftFrontJoint>axel_wheel_4</leftFrontJoint>
 			<rightFrontJoint>axel_wheel_1</rightFrontJoint>
 			<leftRearJoint>axel_wheel_3</leftRearJoint>
@@ -351,15 +622,430 @@
 			<broadcastTF>1</broadcastTF>
 			<robotBaseFrame>body_link</robotBaseFrame>
 		</plugin>
-		<plugin filename="libwheel_plugin.so" name="test_plug">
-			<robotNamespace>wheely</robotNamespace>
-			<velPubTopic>cmd_wheel</velPubTopic>
-			<odometrySubTopic>odom</odometrySubTopic>
-			<velocity>0.2</velocity>
-			<angularVelocity>4</angularVelocity>
-			<kp>0.3</kp>
-			<turnMargin>0.0025</turnMargin>
-			<turnAccuracy>0.0005</turnAccuracy>
-		</plugin>
+		<plugin filename="libarm_controller.so" name="arm_controller"/>
+		<link name="palm">
+			<pose>0 0.27 0.5665 0 0 0</pose>
+			<inertial>
+				<inertia>
+					<ixx>0.00002500</ixx>
+					<iyy>0.00002500</iyy>
+					<izz>0.00003750</izz>
+				</inertia>
+				<mass>0.33333333</mass>
+			</inertial>
+			<visual name="palm_vis">
+				<geometry>
+					<cylinder>
+						<radius>0.015</radius>
+						<length>0.015</length>
+					</cylinder>
+				</geometry>
+			</visual>
+			<collision name="palm_col">
+				<geometry>
+					<cylinder>
+						<radius>0.015</radius>
+						<length>0.015</length>
+					</cylinder>
+				</geometry>
+			</collision>
+		</link>
+		<joint name="palm_joint" type="revolute">
+			<pose>0 0 -0.0075 0 0 0</pose>
+			<child>palm</child>
+			<parent>arm2</parent>
+			<axis>
+				<xyz>0 0 1</xyz>
+				<dynamics>
+					<friction>0.05</friction>
+					<damping>0.03</damping>
+				</dynamics>
+				<limit>
+					<upper>3.141592653589793</upper>
+					<lower>-3.141592653589793</lower>
+				</limit>
+			</axis>
+		</joint>
+		<link name="finger_one">
+			<pose>0 0.2775 0.599 0 0 0</pose>
+			<inertial>
+				<inertia>
+					<ixx>0.00005296</ixx>
+					<iyy>0.00005296</iyy>
+					<izz>0.00000176</izz>
+				</inertia>
+				<mass>0.25000000</mass>
+			</inertial>
+			<visual name="finger_one_vis">
+				<geometry>
+					<cylinder>
+						<radius>0.00375</radius>
+						<length>0.049999999999999996</length>
+					</cylinder>
+				</geometry>
+			</visual>
+			<collision name="finger_one_col">
+				<geometry>
+					<cylinder>
+						<radius>0.00375</radius>
+						<length>0.049999999999999996</length>
+					</cylinder>
+				</geometry>
+			</collision>
+		</link>
+		<joint name="finger_one_joint" type="revolute">
+			<pose>0 0 -0.024999999999999998 0 0 0</pose>
+			<child>finger_one</child>
+			<parent>palm</parent>
+			<axis>
+				<xyz>1 0 0</xyz>
+				<dynamics>
+					<friction>0.05</friction>
+					<damping>0.03</damping>
+				</dynamics>
+				<limit>
+					<upper>0.7853981633974483</upper>
+					<lower>0</lower>
+				</limit>
+			</axis>
+		</joint>
+		<link name="finger_two">
+			<pose>0 0.2625 0.599 0 0 0</pose>
+			<inertial>
+				<inertia>
+					<ixx>0.00005296</ixx>
+					<iyy>0.00005296</iyy>
+					<izz>0.00000176</izz>
+				</inertia>
+				<mass>0.25000000</mass>
+			</inertial>
+			<visual name="finger_two_vis">
+				<geometry>
+					<cylinder>
+						<radius>0.00375</radius>
+						<length>0.049999999999999996</length>
+					</cylinder>
+				</geometry>
+			</visual>
+			<collision name="finger_two_col">
+				<geometry>
+					<cylinder>
+						<radius>0.00375</radius>
+						<length>0.049999999999999996</length>
+					</cylinder>
+				</geometry>
+			</collision>
+		</link>
+		<joint name="finger_two_joint" type="revolute">
+			<pose>0 0 -0.024999999999999998 0 0 0</pose>
+			<child>finger_two</child>
+			<parent>palm</parent>
+			<axis>
+				<xyz>1 0 0</xyz>
+				<dynamics>
+					<friction>0.05</friction>
+					<damping>0.03</damping>
+				</dynamics>
+				<limit>
+					<upper>0</upper>
+					<lower>-0.7853981633974483</lower>
+				</limit>
+			</axis>
+		</joint>
+		<link name="finger_three">
+			<pose>0.0075 0.27 0.599 0 0 0</pose>
+			<inertial>
+				<inertia>
+					<ixx>0.00005296</ixx>
+					<iyy>0.00005296</iyy>
+					<izz>0.00000176</izz>
+				</inertia>
+				<mass>0.25000000</mass>
+			</inertial>
+			<visual name="finger_three_vis">
+				<geometry>
+					<cylinder>
+						<radius>0.00375</radius>
+						<length>0.049999999999999996</length>
+					</cylinder>
+				</geometry>
+			</visual>
+			<collision name="finger_three_col">
+				<geometry>
+					<cylinder>
+						<radius>0.00375</radius>
+						<length>0.049999999999999996</length>
+					</cylinder>
+				</geometry>
+			</collision>
+		</link>
+		<joint name="finger_three_joint" type="revolute">
+			<pose>0 0 -0.024999999999999998 0 0 0</pose>
+			<child>finger_three</child>
+			<parent>palm</parent>
+			<axis>
+				<xyz>0 1 0</xyz>
+				<dynamics>
+					<friction>0.05</friction>
+					<damping>0.03</damping>
+				</dynamics>
+				<limit>
+					<upper>0.7853981633974483</upper>
+					<lower>0</lower>
+				</limit>
+			</axis>
+		</joint>
+		<link name="finger_four">
+			<pose>-0.0075 0.27 0.599 0 0 0</pose>
+			<inertial>
+				<inertia>
+					<ixx>0.00005296</ixx>
+					<iyy>0.00005296</iyy>
+					<izz>0.00000176</izz>
+				</inertia>
+				<mass>0.25000000</mass>
+			</inertial>
+			<visual name="finger_four_vis">
+				<geometry>
+					<cylinder>
+						<radius>0.00375</radius>
+						<length>0.049999999999999996</length>
+					</cylinder>
+				</geometry>
+			</visual>
+			<collision name="finger_four_col">
+				<geometry>
+					<cylinder>
+						<radius>0.00375</radius>
+						<length>0.049999999999999996</length>
+					</cylinder>
+				</geometry>
+			</collision>
+		</link>
+		<joint name="finger_four_joint" type="revolute">
+			<pose>0 0 -0.024999999999999998 0 0 0</pose>
+			<child>finger_four</child>
+			<parent>palm</parent>
+			<axis>
+				<xyz>0 1 0</xyz>
+				<dynamics>
+					<friction>0.05</friction>
+					<damping>0.03</damping>
+				</dynamics>
+				<limit>
+					<upper>0</upper>
+					<lower>-0.7853981633974483</lower>
+				</limit>
+			</axis>
+		</joint>
+		<link name="finger_one_tip">
+			<pose>0 0.2775 0.6489999999999999 0 0 0</pose>
+			<inertial>
+				<inertia>
+					<ixx>0.00005296</ixx>
+					<iyy>0.00005296</iyy>
+					<izz>0.00000176</izz>
+				</inertia>
+				<mass>0.25000000</mass>
+			</inertial>
+			<visual name="finger_one_tip_vis">
+				<geometry>
+					<cylinder>
+						<radius>0.00375</radius>
+						<length>0.049999999999999996</length>
+					</cylinder>
+				</geometry>
+			</visual>
+			<collision name="finger_one_tip_col">
+				<geometry>
+					<cylinder>
+						<radius>0.00375</radius>
+						<length>0.049999999999999996</length>
+					</cylinder>
+				</geometry>
+			</collision>
+			<sensor name="finger_one_tip_sensor" type="contact">
+				<contact>
+					<collision>finger_one_tip_col</collision>
+				</contact>
+				<always_on>1</always_on>
+				<update_rate>30</update_rate>
+				<visualize>true</visualize>
+				<plugin filename="libcontact_plugin.so" name="my_plugin"/>
+			</sensor>
+		</link>
+		<joint name="finger_one_tip_joint" type="revolute">
+			<pose>0 0 -0.024999999999999998 0 0 0</pose>
+			<child>finger_one_tip</child>
+			<parent>finger_one</parent>
+			<axis>
+				<xyz>1 0 0</xyz>
+				<dynamics>
+					<friction>0.05</friction>
+					<damping>0.03</damping>
+				</dynamics>
+				<limit>
+					<upper>0</upper>
+					<lower>-0.7853981633974483</lower>
+				</limit>
+			</axis>
+		</joint>
+		<link name="finger_two_tip">
+			<pose>0 0.2625 0.6489999999999999 0 0 0</pose>
+			<inertial>
+				<inertia>
+					<ixx>0.00005296</ixx>
+					<iyy>0.00005296</iyy>
+					<izz>0.00000176</izz>
+				</inertia>
+				<mass>0.25000000</mass>
+			</inertial>
+			<visual name="finger_two_tip_vis">
+				<geometry>
+					<cylinder>
+						<radius>0.00375</radius>
+						<length>0.049999999999999996</length>
+					</cylinder>
+				</geometry>
+			</visual>
+			<collision name="finger_two_tip_col">
+				<geometry>
+					<cylinder>
+						<radius>0.00375</radius>
+						<length>0.049999999999999996</length>
+					</cylinder>
+				</geometry>
+			</collision>
+			<sensor name="finger_two_tip_sensor" type="contact">
+				<contact>
+					<collision>finger_two_tip_col</collision>
+				</contact>
+				<always_on>1</always_on>
+				<update_rate>30</update_rate>
+				<visualize>true</visualize>
+				<plugin filename="libcontact_plugin.so" name="my_plugin"/>
+			</sensor>
+		</link>
+		<joint name="finger_two_tip_joint" type="revolute">
+			<pose>0 0 -0.024999999999999998 0 0 0</pose>
+			<child>finger_two_tip</child>
+			<parent>finger_two</parent>
+			<axis>
+				<xyz>1 0 0</xyz>
+				<dynamics>
+					<friction>0.05</friction>
+					<damping>0.03</damping>
+				</dynamics>
+				<limit>
+					<upper>0.7853981633974483</upper>
+					<lower>0</lower>
+				</limit>
+			</axis>
+		</joint>
+		<link name="finger_three_tip">
+			<pose>0.0075 0.27 0.6489999999999999 0 0 0</pose>
+			<inertial>
+				<inertia>
+					<ixx>0.00005296</ixx>
+					<iyy>0.00005296</iyy>
+					<izz>0.00000176</izz>
+				</inertia>
+				<mass>0.25000000</mass>
+			</inertial>
+			<visual name="finger_three_tip_vis">
+				<geometry>
+					<cylinder>
+						<radius>0.00375</radius>
+						<length>0.049999999999999996</length>
+					</cylinder>
+				</geometry>
+			</visual>
+			<collision name="finger_three_tip_col">
+				<geometry>
+					<cylinder>
+						<radius>0.00375</radius>
+						<length>0.049999999999999996</length>
+					</cylinder>
+				</geometry>
+			</collision>
+			<sensor name="finger_three_tip_sensor" type="contact">
+				<contact>
+					<collision>finger_three_tip_col</collision>
+				</contact>
+				<always_on>1</always_on>
+				<update_rate>30</update_rate>
+				<visualize>true</visualize>
+				<plugin filename="libcontact_plugin.so" name="my_plugin"/>
+			</sensor>
+		</link>
+		<joint name="finger_three_tip_joint" type="revolute">
+			<pose>0 0 -0.024999999999999998 0 0 0</pose>
+			<child>finger_three_tip</child>
+			<parent>finger_three</parent>
+			<axis>
+				<xyz>0 1 0</xyz>
+				<dynamics>
+					<friction>0.05</friction>
+					<damping>0.03</damping>
+				</dynamics>
+				<limit>
+					<upper>0</upper>
+					<lower>-0.7853981633974483</lower>
+				</limit>
+			</axis>
+		</joint>
+		<link name="finger_four_tip">
+			<pose>-0.0075 0.27 0.6489999999999999 0 0 0</pose>
+			<inertial>
+				<inertia>
+					<ixx>0.00005296</ixx>
+					<iyy>0.00005296</iyy>
+					<izz>0.00000176</izz>
+				</inertia>
+				<mass>0.25000000</mass>
+			</inertial>
+			<visual name="finger_four_tip_vis">
+				<geometry>
+					<cylinder>
+						<radius>0.00375</radius>
+						<length>0.049999999999999996</length>
+					</cylinder>
+				</geometry>
+			</visual>
+			<collision name="finger_four_tip_col">
+				<geometry>
+					<cylinder>
+						<radius>0.00375</radius>
+						<length>0.049999999999999996</length>
+					</cylinder>
+				</geometry>
+			</collision>
+			<sensor name="finger_four_tip_sensor" type="contact">
+				<contact>
+					<collision>finger_four_tip_col</collision>
+				</contact>
+				<always_on>1</always_on>
+				<update_rate>30</update_rate>
+				<visualize>true</visualize>
+				<plugin filename="libcontact_plugin.so" name="my_plugin"/>
+			</sensor>
+		</link>
+		<joint name="finger_four_tip_joint" type="revolute">
+			<pose>0 0 -0.024999999999999998 0 0 0</pose>
+			<child>finger_four_tip</child>
+			<parent>finger_four</parent>
+			<axis>
+				<xyz>0 1 0</xyz>
+				<dynamics>
+					<friction>0.05</friction>
+					<damping>0.03</damping>
+				</dynamics>
+				<limit>
+					<upper>0.7853981633974483</upper>
+					<lower>0</lower>
+				</limit>
+			</axis>
+		</joint>
+		<plugin filename="libgripper_plugin.so" name="gripper_plugin"/>
 	</model>
 </sdf>

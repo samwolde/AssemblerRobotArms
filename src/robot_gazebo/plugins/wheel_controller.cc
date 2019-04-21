@@ -7,7 +7,7 @@ namespace gazebo
 	void WheelPlugin::Load(physics::ModelPtr parent, sdf::ElementPtr sdf_ptr)
 	{
 		this->model = parent;
-		ROS_INFO("\n\nPlugin Loaded Model Name : %s\n\n", this->model->GetName().c_str());
+		ROS_INFO("Wheel Plugin Loaded");
 
 		if(!ros::isInitialized()){
 			ROS_INFO("Ros not initialiazed");
@@ -57,13 +57,14 @@ namespace gazebo
 			/*Yaw and angular velocity opposite signs*/
 			velocity.angular.z = right ? this->angularVel : -1 *  this->angularVel;
 			double rad_ang =  M_PI * angle/180;
-			ROS_INFO("Publishing to topic %s\n\n", this->pubTopic.c_str());
+			ROS_INFO("Publishing to topic %s", this->pubTopic.c_str());
 			//save the current Orientation
 			double  goal_yaw=GetGoalRad(rad_ang, this->yaw,right);
 			double init_yaw = this->yaw, prev_yaw = this->yaw;
 			double err=GetError(prev_yaw, goal_yaw, right);
 			double temp_goal= GetGoalRad(right ? -1 * this->kp*err:this->kp*err , prev_yaw,right);
 			double temp_err,kp= this->kp;
+			ros::Rate r(20);
 			ROS_INFO("Goal Yaw is %f,Temp Goal is %f, this yaw is %f\n",goal_yaw, temp_goal, this->yaw);
 			//Publish velocity continously then examine odometry to know when to stop
 			while(true){
@@ -73,20 +74,17 @@ namespace gazebo
 				// ROS_INFO("temp_err : %f", temp_err);
 				if( temp_err <= turnMargin){	
 					Brake();
+					r.sleep();
 					// ROS_INFO("kp=%f\n",kp);		
 					// prev_yaw = this->yaw;
 					err  =GetError(this->yaw, goal_yaw, right);
 					if( err <= turnAccuracy){
 						ROS_INFO("Done! Goal Yaw is %f,this yaw is %f\n",goal_yaw, this->yaw);
 						Brake();
-						break;
+						velocity.angular.z = 0;
+						ROS_INFO("DONE 2 checking %f", this->odometry.twist.twist.angular.z);
+						return;
 					}
-					//Adjust kp based on the error remaining so that the car can
-					//turn much faster for smaller angles
-					//The function kp is growing at is kp = (err - 3.14)^2 / 2^10 *err + this->kp
-					//kp boundend below 0.3
-					kp = std::pow( err -3.14, 2)/(err * 1024) + this->kp;					
-					kp = kp < 0.8 ? kp : 0.8;
 					temp_goal = GetGoalRad(right ? -1 * kp*err:kp*err, this->yaw,right);
 				}
 				if ( this->Overshoot(init_yaw, goal_yaw,right)){
@@ -97,13 +95,12 @@ namespace gazebo
 					right = !right;
 					err  =GetError(this->yaw, goal_yaw, right);
 					temp_goal = GetGoalRad(right ? -1 * kp*err:kp*err, this->yaw,right);
-					kp = std::pow(err-3.14,2)/(err * 1024) + this->kp;					
-					kp = kp < 0.45 ? kp : 0.45;
 					ROS_INFO("Turning Back Vel %f, err %f, kp %f \n", velocity.angular.z, err, kp);
 				}
 				rosPub.publish(velocity);
 			}
 			ROS_INFO("Finished Turning an angle of %f\n\n",rad_ang);
+			Brake();
 	};
 	//is Called back when odometry messages are available.
 	void WheelPlugin::odometryMsg(nav_msgs::OdometryConstPtr odom){
@@ -114,13 +111,19 @@ namespace gazebo
 		// ROS_INFO("(%f, %f, %f) \n", this->roll, this->pitch, this->yaw);
 	};	
 	void WheelPlugin::Brake(){
+			ROS_INFO("Breaking...");
+			ros::Rate r(300);
 			geometry_msgs::Twist velocity;
 			geometry_msgs::Twist current_vel = this->odometry.twist.twist;
 
-			velocity.linear.x = velocity.linear.y = velocity.linear.z = velocity.angular.z = 0;
+			velocity.linear.x = velocity.linear.y = velocity.linear.z = 
+			velocity.angular.x = velocity.angular.y = velocity.angular.z = 0;
 			while( !this->HasStoped()){
 				this->rosPub.publish(velocity);
+				r.sleep();
 			}
+			ROS_INFO("Just Broke...");
+
 	};
 GZ_REGISTER_MODEL_PLUGIN(WheelPlugin)
 }

@@ -21,7 +21,6 @@ class WheelPlugin : public ModelPlugin
 		void Load(physics::ModelPtr parent, sdf::ElementPtr sdf_ptr);
 		void OnUpdate(){
 		};
-		// void Turn(const std_msgs::Float32ConstPtr msg);
 		/*Go Forward with the given velocity*/
 		void MoveForward(const std_msgs::Float32ConstPtr vel);
 		/*Go back wards with the given velocity*/

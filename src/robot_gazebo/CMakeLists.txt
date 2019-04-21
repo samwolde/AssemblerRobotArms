@@ -32,6 +32,15 @@ include_directories(
 add_library(wheel_plugin SHARED plugins/wheel_controller.cc plugins/wheel_ctrl_helper.cpp)
 target_link_libraries(wheel_plugin ${catkin_LIBRARIES} ${GAZEBO_LIBRARIES} ${roscpp_LIBRARIES})
 
+add_library(arm_controller SHARED plugins/arm_controller.cpp)
+target_link_libraries(arm_controller ${catkin_LIBRARIES} ${GAZEBO_LIBRARIES} ${roscpp_LIBRARIES})
+
+add_library(gripper_plugin plugins/gripper_plugin.cpp)
+target_link_libraries(gripper_plugin ${catkin_LIBRARIES} ${GAZEBO_LIBRARIES} ${roscpp_LIBRARIES})
+
+add_library(contact_plugin plugins/contact_plugin.cpp)
+target_link_libraries(contact_plugin ${catkin_LIBRARIES} ${GAZEBO_LIBRARIES} ${roscpp_LIBRARIES})
+
 ## Uncomment this if the package has a setup.py. This macro ensures
 ## modules and global scripts declared therein get installed
 ## See http://ros.org/doc/api/catkin/html/user_guide/setup_dot_py.html
@@ -123,7 +132,7 @@ catkin_package(
 #  CATKIN_DEPENDS roscpp std_msgs
 #  DEPENDS system_lib
 
-DEPENDS roscpp gazebo_ros delta3_lib
+DEPENDS roscpp gazebo_ros robot_lib
 )
 
 

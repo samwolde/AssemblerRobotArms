@@ -4,16 +4,17 @@ namespace gazebo
 {
     bool WheelPlugin::HasStoped(){
             geometry_msgs::Twist current_vel = this->odometry.twist.twist;
-            current_vel.linear.x=trunc(current_vel.linear.x*10000);
-            current_vel.linear.y=trunc(current_vel.linear.y*10000);
-            current_vel.linear.z=trunc(current_vel.linear.z*10000);
-            current_vel.angular.z=trunc(current_vel.angular.z*10000);			
+            current_vel.linear.x=trunc(current_vel.linear.x*1000);
+            current_vel.linear.y=trunc(current_vel.linear.y*1000);
+            current_vel.linear.z=trunc(current_vel.linear.z*1000);
+            current_vel.angular.z=trunc(current_vel.angular.z*1000);			
             bool stoped = 
             (current_vel.linear.x == 0 && current_vel.linear.y == 0 && current_vel.linear.z == 0 && current_vel.angular.z == 0);
             return stoped;
     }
     bool WheelPlugin::Overshoot(double init_yaw, double goal_yaw,bool right){
 		if ( GetError(init_yaw, goal_yaw, right) < GetError(this->yaw, goal_yaw,right)- 0.001){
+			ROS_INFO("Overshooted init_yaw %f, goal_yaw %f, this->yaw %f", init_yaw, goal_yaw,this->yaw);
 			return true;
 		}
 		return false;
@@ -48,31 +49,31 @@ namespace gazebo
     //Create the Subscribers and Publishers
 	void WheelPlugin::InitNode(){
 		ros::SubscribeOptions turnSo = ros::SubscribeOptions::create<std_msgs::Float32>(
-      "/TurnRight",
+      robotNS + "/cmd_turnRight",
       10,
       boost::bind(&WheelPlugin::TurnRight, this, _1),
       ros::VoidPtr(), &this->rosQueue);
 
 	  ros::SubscribeOptions turnLSo = ros::SubscribeOptions::create<std_msgs::Float32>(
-      "/TurnLeft",
+      robotNS + "/cmd_turnLeft",
       10,
       boost::bind(&WheelPlugin::TurnLeft, this, _1),
       ros::VoidPtr(), &this->rosQueue);
 
 	  ros::SubscribeOptions turnF = ros::SubscribeOptions::create<std_msgs::Float32>(
-      "/MoveForward",
+      robotNS + "/cmd_moveForward",
       10,
       boost::bind(&WheelPlugin::MoveForward, this, _1),
       ros::VoidPtr(), &this->rosQueue);
 
 		ros::SubscribeOptions turnB = ros::SubscribeOptions::create<std_msgs::Float32>(
-      "/MoveBack",
+      robotNS + "/cmd_moveBack",
       10,
       boost::bind(&WheelPlugin::MoveBackward, this, _1),
       ros::VoidPtr(), &this->rosQueue);
 
 	  ros::SubscribeOptions bso = ros::SubscribeOptions::create<std_msgs::Float32>(
-      "/Brake",
+      robotNS + "/cmd_brake",
       10,
       boost::bind(&WheelPlugin::Brake, this, _1),
       ros::VoidPtr(), &this->rosQueue);
@@ -97,10 +98,9 @@ namespace gazebo
 	 * Get the neccessary plugin parameters from sdf file.
 	 */
 	void WheelPlugin::GetParams(sdf::ElementPtr sdf_ptr){
-		std::string prefix = "";
 		rosNode.reset(new ros::NodeHandle("gazebo_client"));
-		if(sdf_ptr->HasElement("robotNamespace")){
-			robotNS = "/"+ sdf_ptr->GetElement("robotNamespace")->GetValue()->GetAsString();
+		if(sdf_ptr->HasElement("prefix")){
+			robotNS = "/"+ sdf_ptr->GetElement("prefix")->GetValue()->GetAsString();
 			ROS_INFO("Using Topic %s For robots name space\n", this->robotNS.c_str());
 		}
 
