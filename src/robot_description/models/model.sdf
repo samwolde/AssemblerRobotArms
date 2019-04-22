@@ -601,9 +601,9 @@
 			<odometrySubTopic>odom</odometrySubTopic>
 			<velocity>0.2</velocity>
 			<angularVelocity>3.14</angularVelocity>
-			<kp>0.2</kp>
-			<turnMargin>0.004</turnMargin>
-			<turnAccuracy>0.0015</turnAccuracy>
+			<kp>2</kp>
+			<turnMargin>0.003</turnMargin>
+			<turnAccuracy>0.003</turnAccuracy>
 		</plugin>
 		<plugin filename="libgazebo_ros_skid_steer_drive.so" name="skid_steer_controller">
 			<alwaysOn>true</alwaysOn>

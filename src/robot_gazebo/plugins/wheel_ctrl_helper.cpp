@@ -13,8 +13,7 @@ namespace gazebo
             return stoped;
     }
     bool WheelPlugin::Overshoot(double init_yaw, double goal_yaw,bool right){
-		if ( GetError(init_yaw, goal_yaw, right) < GetError(this->yaw, goal_yaw,right)- 0.001){
-			ROS_INFO("Overshooted init_yaw %f, goal_yaw %f, this->yaw %f", init_yaw, goal_yaw,this->yaw);
+		if ( GetError(init_yaw, goal_yaw, right) < GetError(this->yaw, goal_yaw,right)- turnAccuracy * 1.2){
 			return true;
 		}
 		return false;
@@ -125,6 +124,7 @@ namespace gazebo
 		}
 		if(sdf_ptr->HasElement("kp")){
 			kp = atof(sdf_ptr->GetElement("kp")->GetValue()->GetAsString().c_str());
+			kp = kp/10.0;
 			ROS_INFO("Using KP %f.\n", this->kp);
 		}
 		if(sdf_ptr->HasElement("turnMargin")){

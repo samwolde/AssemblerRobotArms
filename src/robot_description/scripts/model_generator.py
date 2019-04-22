@@ -143,9 +143,10 @@ wheel_ctrl = Plugin("test_plug","libwheel_plugin.so",
     "angularVelocity":3.14,
     #Tweak the below two parameteres if the turning angle overshoots.
     #Or the car is slowly turning.
-    "kp":0.2,                   #Increase kp if car turn rate is slow, decrease if turning angle overshoots too often
-    "turnMargin":0.004,        #Increase if turning angle overshoots often, but speed becomes slower.
-    "turnAccuracy":0.0015       # turns within goal_radian +- turn_accuracy, 
+    "kp":2,                   #Increase kp if car turn rate is slow, decrease if turning angle overshoots too often
+    "turnMargin":0.003,        #Increase if turning angle overshoots often, but speed becomes slower.
+    # turns within goal_radian +- turn_accuracy,  better results when turnMargin == turnAccuracy
+    "turnAccuracy":0.003       
 })
 
 skid_steer_ctrl = Plugin("skid_steer_controller", "libgazebo_ros_skid_steer_drive.so", 

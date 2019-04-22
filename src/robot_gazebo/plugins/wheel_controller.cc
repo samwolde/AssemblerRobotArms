@@ -64,25 +64,20 @@ namespace gazebo
 			double err=GetError(prev_yaw, goal_yaw, right);
 			double temp_goal= GetGoalRad(right ? -1 * this->kp*err:this->kp*err , prev_yaw,right);
 			double temp_err,kp= this->kp;
-			ros::Rate r(20);
-			ROS_INFO("Goal Yaw is %f,Temp Goal is %f, this yaw is %f\n",goal_yaw, temp_goal, this->yaw);
+			ros::Rate r(30);
+			ROS_INFO("Goal Yaw is %f,Temp Goal is %f, this yaw is %f",goal_yaw, temp_goal, this->yaw);
 			//Publish velocity continously then examine odometry to know when to stop
 			while(true){
-				// err  = this->GetError(prev_yaw, goal_yaw, right);
 				 //Implements a proportional controller
 				temp_err = GetError(this->yaw,temp_goal, right);
-				// ROS_INFO("temp_err : %f", temp_err);
 				if( temp_err <= turnMargin){	
 					Brake();
-					r.sleep();
-					// ROS_INFO("kp=%f\n",kp);		
-					// prev_yaw = this->yaw;
+					r.sleep();		
 					err  =GetError(this->yaw, goal_yaw, right);
 					if( err <= turnAccuracy){
 						ROS_INFO("Done! Goal Yaw is %f,this yaw is %f\n",goal_yaw, this->yaw);
 						Brake();
 						velocity.angular.z = 0;
-						ROS_INFO("DONE 2 checking %f", this->odometry.twist.twist.angular.z);
 						return;
 					}
 					temp_goal = GetGoalRad(right ? -1 * kp*err:kp*err, this->yaw,right);
@@ -94,8 +89,9 @@ namespace gazebo
 					velocity.angular.z *= -1;
 					right = !right;
 					err  =GetError(this->yaw, goal_yaw, right);
+					//So that it eventually gets closer to the goal yaw.
+					kp = kp > 0.05 ? kp * 0.9: 0.05;
 					temp_goal = GetGoalRad(right ? -1 * kp*err:kp*err, this->yaw,right);
-					ROS_INFO("Turning Back Vel %f, err %f, kp %f \n", velocity.angular.z, err, kp);
 				}
 				rosPub.publish(velocity);
 			}
@@ -108,11 +104,9 @@ namespace gazebo
 		geometry_msgs::Quaternion q = odom->pose.pose.orientation;
 		tf::Quaternion tf_qut(q.x, q.y, q.z, q.w); 
 		tf::Matrix3x3(tf_qut).getRPY(this->roll, this->pitch, this->yaw);
-		// ROS_INFO("(%f, %f, %f) \n", this->roll, this->pitch, this->yaw);
 	};	
 	void WheelPlugin::Brake(){
-			ROS_INFO("Breaking...");
-			ros::Rate r(300);
+			ros::Rate r(400);
 			geometry_msgs::Twist velocity;
 			geometry_msgs::Twist current_vel = this->odometry.twist.twist;
 
@@ -120,10 +114,8 @@ namespace gazebo
 			velocity.angular.x = velocity.angular.y = velocity.angular.z = 0;
 			while( !this->HasStoped()){
 				this->rosPub.publish(velocity);
-				r.sleep();
+				r.sleep();	
 			}
-			ROS_INFO("Just Broke...");
-
 	};
 GZ_REGISTER_MODEL_PLUGIN(WheelPlugin)
 }

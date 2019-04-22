@@ -56,13 +56,10 @@ class WheelPlugin : public ModelPlugin
 
 		std::thread callBackThread; 
 		std::thread cbThreadOdom;
-		bool stopTurning=false;
-		ros::Timer timer;
-		int update_num=0;
 		nav_msgs::Odometry odometry;
 		
-		double turnAccuracy=0.0005, turnMargin=0.0025;
-		double roll,pitch, yaw,kp=0.1;
+		double turnAccuracy=0.003, turnMargin=0.003;
+		double roll,pitch, yaw,kp=0.2;
 		double velocity=0.2,angularVel=3.14;
 		physics::ModelPtr model;
 		event::ConnectionPtr con;
