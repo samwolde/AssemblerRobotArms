@@ -32,6 +32,9 @@ include_directories(
 add_library(wheel_plugin SHARED plugins/wheel_controller.cc plugins/wheel_ctrl_helper.cpp)
 target_link_libraries(wheel_plugin ${catkin_LIBRARIES} ${GAZEBO_LIBRARIES} ${roscpp_LIBRARIES})
 
+add_library(tsp_plugin SHARED plugins/test_tsp.cpp)
+target_link_libraries(tsp_plugin ${catkin_LIBRARIES} ${GAZEBO_LIBRARIES} ${roscpp_LIBRARIES})
+
 add_library(arm_controller SHARED plugins/arm_controller.cpp)
 target_link_libraries(arm_controller ${catkin_LIBRARIES} ${GAZEBO_LIBRARIES} ${roscpp_LIBRARIES})
 

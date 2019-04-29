@@ -15,11 +15,12 @@ namespace gazebo
 			char **argv = NULL;
 			ros::init(argc, argv, "gazebo_client",ros::init_options::NoSigintHandler);
 		}
-		GetParams(sdf_ptr);
-		InitNode();
-		
+		rosNode.reset(new ros::NodeHandle("Wheel_Ctrlr"));
 		this->callBackThread = std::thread(std::bind(&WheelPlugin::QueueThread, this));
 		this->cbThreadOdom = std::thread(std::bind(&WheelPlugin::QueeThreadOdom, this));
+		
+		GetParams(sdf_ptr);
+		InitNode();
 		this->con = event::Events::ConnectWorldUpdateBegin(std::bind(&WheelPlugin::OnUpdate, this));
 	};
 
@@ -51,6 +52,7 @@ namespace gazebo
 		Turn(1 * msg->data, false);
 	}
 	void WheelPlugin::Turn(double angle,bool right){
+			Brake();
 			geometry_msgs::Twist velocity;
 			velocity.linear.x = velocity.linear.y = velocity.linear.z = 0;
 			
@@ -64,36 +66,32 @@ namespace gazebo
 			double err=GetError(prev_yaw, goal_yaw, right);
 			double temp_goal= GetGoalRad(right ? -1 * this->kp*err:this->kp*err , prev_yaw,right);
 			double temp_err,kp= this->kp;
-			ros::Rate r(30);
+			ros::Rate r(200);
 			ROS_INFO("Goal Yaw is %f,Temp Goal is %f, this yaw is %f",goal_yaw, temp_goal, this->yaw);
 			//Publish velocity continously then examine odometry to know when to stop
 			while(true){
-				 //Implements a proportional controller
-				temp_err = GetError(this->yaw,temp_goal, right);
-				if( temp_err <= turnMargin){	
+				err  =GetError(this->yaw, goal_yaw, right);
+				//Preserve the sign, make magnitude 1
+				velocity.angular.z /= fabsf64(velocity.angular.z);
+				velocity.angular.z *= this->kp * err;
+				if( err <= turnAccuracy){
+					ROS_INFO("Done! Goal Yaw is %f,this yaw is %f\n",goal_yaw, this->yaw);
 					Brake();
-					r.sleep();		
-					err  =GetError(this->yaw, goal_yaw, right);
-					if( err <= turnAccuracy){
-						ROS_INFO("Done! Goal Yaw is %f,this yaw is %f\n",goal_yaw, this->yaw);
-						Brake();
-						velocity.angular.z = 0;
-						return;
-					}
-					temp_goal = GetGoalRad(right ? -1 * kp*err:kp*err, this->yaw,right);
+					velocity.angular.z = 0;
+					return;
 				}
 				if ( this->Overshoot(init_yaw, goal_yaw,right)){
-					//Reversse back to the goal yaw
 					Brake();
 					init_yaw = this->yaw;
-					velocity.angular.z *= -1;
 					right = !right;
 					err  =GetError(this->yaw, goal_yaw, right);
-					//So that it eventually gets closer to the goal yaw.
-					kp = kp > 0.05 ? kp * 0.9: 0.05;
-					temp_goal = GetGoalRad(right ? -1 * kp*err:kp*err, this->yaw,right);
+					//Preserve the sign, make magnitude 1
+					velocity.angular.z /= fabsf64(velocity.angular.z);
+					//Reversse back to the goal yaw
+					velocity.angular.z *= -1 *this->kp * err;
 				}
 				rosPub.publish(velocity);
+				r.sleep();
 			}
 			ROS_INFO("Finished Turning an angle of %f\n\n",rad_ang);
 			Brake();

@@ -13,7 +13,10 @@ namespace gazebo
             return stoped;
     }
     bool WheelPlugin::Overshoot(double init_yaw, double goal_yaw,bool right){
-		if ( GetError(init_yaw, goal_yaw, right) < GetError(this->yaw, goal_yaw,right)- turnAccuracy * 1.2){
+		if ( GetError(init_yaw, goal_yaw, right) < GetError(this->yaw, goal_yaw,right)- turnAccuracy * 2){
+			ROS_INFO("Overshoot init_yaw %f, this->yaw %f", init_yaw, this->yaw);
+			ROS_INFO("Overshoot init_yaw_err %f, this->yaw_err %f",GetError(init_yaw, goal_yaw, right),
+			GetError(this->yaw, goal_yaw,right)- turnAccuracy * 1.5);
 			return true;
 		}
 		return false;
@@ -97,7 +100,6 @@ namespace gazebo
 	 * Get the neccessary plugin parameters from sdf file.
 	 */
 	void WheelPlugin::GetParams(sdf::ElementPtr sdf_ptr){
-		rosNode.reset(new ros::NodeHandle("gazebo_client"));
 		if(sdf_ptr->HasElement("prefix")){
 			robotNS = "/"+ sdf_ptr->GetElement("prefix")->GetValue()->GetAsString();
 			ROS_INFO("Using Topic %s For robots name space\n", this->robotNS.c_str());
@@ -124,7 +126,7 @@ namespace gazebo
 		}
 		if(sdf_ptr->HasElement("kp")){
 			kp = atof(sdf_ptr->GetElement("kp")->GetValue()->GetAsString().c_str());
-			kp = kp/10.0;
+			kp = kp;
 			ROS_INFO("Using KP %f.\n", this->kp);
 		}
 		if(sdf_ptr->HasElement("turnMargin")){
