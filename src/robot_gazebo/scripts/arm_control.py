@@ -4,19 +4,19 @@ import rospy
 from robot_lib.msg import ArmAngles
 from geometry_msgs.msg import Vector3
 
+from robot_lib.srv import MoveArm, MoveArmResponse
+
 import constants as Constant
 import math
 
-
 class ArmControl:
     def changeArmPosition(self, desiredPose):
-        print(desiredPose)
         finArmAngles = self.moveArm(desiredPose)
 
-        if finArmAngles is None:
-            return ArmAngles()
-        else:
+        if finArmAngles:
             finArmAngles = self.getBestAngles(desiredPose, finArmAngles)
+        else:
+            return False
 
         finalArmAngles = ArmAngles()
         finalArmAngles.armBase_armBaseTop = self.radToDeg(finArmAngles[0])
@@ -24,11 +24,7 @@ class ArmControl:
         finalArmAngles.arm1_arm2 = self.radToDeg(finArmAngles[2])
         finalArmAngles.arm2_gripper = self.radToDeg(finArmAngles[3])
 
-        finalArmAngles.P = Constant.P
-        finalArmAngles.I = Constant.I
-        finalArmAngles.D = Constant.D
-
-        print(finalArmAngles)
+        print finalArmAngles
         return finalArmAngles
 
     def getBestAngles(self, finalPose, candidateAngles):
@@ -36,13 +32,8 @@ class ArmControl:
             minBase = candidateAngles[0][1]
         else:
             minBase = candidateAngles[0][0]
-        print(candidateAngles[0], " = ", minBase)
-        return (
-            minBase,
-            (math.pi / 2) - candidateAngles[1][1][0],
-            candidateAngles[1][1][1],
-            -(candidateAngles[1][1][2]),
-        )
+
+        return (minBase, (math.pi/2)-candidateAngles[1][1][0], candidateAngles[1][1][1], -(math.sqrt(candidateAngles[1][1][2]**2)))
 
     def getCurrentArmAngles(self):
         ang = ArmAngles()
@@ -55,7 +46,7 @@ class ArmControl:
 
     def isPositionReachable(self, finalPose):
         totArmLength = Constant.ARM_1 + Constant.ARM_2
-
+        
         if finalPose.z > totArmLength - Constant.ARM_BASE_TOP:
             return False
 
@@ -69,7 +60,7 @@ class ArmControl:
     def getInitHeight(self):
         x = Constant.MAIN_LENGTH
 
-        return x / 10 + x / 6 + x / 6 + x / 20 + x / 16
+        return x/10 + x/6 + x/6 + x/20 + x/16 
 
     def getBestBaseAng(self, finalPose, finalBaseAngle):
         if finalPose.x >= 0 and finalPose.y >= 0:
@@ -93,87 +84,86 @@ class ArmControl:
             armBaseAng = self.getArmBaseAng(finalPose)
 
             ny = float(finalPose.z)
-            nx = math.sqrt(finalPose.x ** 2 + finalPose.y ** 2)
+            nx = math.sqrt(finalPose.x**2 + finalPose.y**2)
 
-            beta = math.acos(
-                ((Constant.ARM_1 ** 2) + (Constant.ARM_2 ** 2) - (nx ** 2) - (ny ** 2))
-                / (2.0 * Constant.ARM_1 * Constant.ARM_2)
-            )
-            alpha = math.acos(
-                ((nx ** 2) + (ny ** 2) + (Constant.ARM_1 ** 2) - (Constant.ARM_2 ** 2))
-                / (2.0 * Constant.ARM_1 * math.sqrt((nx ** 2) + (ny ** 2)))
-            )
+            beta = math.acos(((Constant.ARM_1 ** 2) + (Constant.ARM_2 ** 2) - (nx ** 2) - (ny**2))/(2.0 * Constant.ARM_1 * Constant.ARM_2))
+            alpha = math.acos(((nx**2) + (ny**2) + (Constant.ARM_1**2) - (Constant.ARM_2**2))/(2.0 * Constant.ARM_1 * math.sqrt((nx**2) + (ny**2))))
             gamma = math.atan2(ny, nx)
 
             if armBaseAng < 0:
-                baseAngles = [armBaseAng + (2 * math.pi), armBaseAng]
+                baseAngles = [armBaseAng + (2*math.pi), armBaseAng]
             else:
-                baseAngles = [armBaseAng, armBaseAng - (2 * math.pi)]
+                baseAngles = [armBaseAng, armBaseAng - (2*math.pi)]
+            
+            armAngles = [(gamma-alpha, beta-math.pi, (gamma-alpha+beta-math.pi)), (gamma+alpha, math.pi-beta, (math.pi-beta- math.pi/2 - (gamma-alpha)))]
 
-            armAngles = [
-                (gamma - alpha, beta - math.pi, (gamma - alpha + beta - math.pi)),
-                (gamma + alpha, math.pi - beta, (math.pi - beta - gamma - alpha)),
-            ]
-            print(armAngles)
             return (baseAngles, armAngles)
-
+        
         else:
-            print("Position unreachable")
-            return None
+            print "Position unreachable"
+            return False
 
     def radToDeg(self, rad):
         return rad * 180 / math.pi
 
-
 armControl = ArmControl()
 pub = None
 
-
 def main():
     global pub
-    # p = Vector3(2.0/3, 2.0/3, 0)
-    # callback(p)
-    rospy.init_node("IK")
-
-    sub = rospy.Subscriber("/my_car/arm_effector/pose", Vector3, callback)
-    pub = rospy.Publisher("/my_car/joint/angles", ArmAngles, queue_size=10)
+    rospy.init_node('IK')
+    
+    service = rospy.Service('move_arm', MoveArm, moveArm)
+    # sub = rospy.Subscriber('/my_car/arm_effector/pose', Vector3, callback)
+    pub = rospy.Publisher('/my_car/joint/angles', ArmAngles, queue_size=10)
 
     rospy.spin()
-
-
+    
 def callback(desiredPose):
     global pub
 
     pub.publish(armControl.changeArmPosition(desiredPose))
-    # armControl.changeArmPosition(desiredPose)
 
-
-if __name__ == "__main__":
-    main()
-
-
-armControl = ArmControl()
-pub = None
-
-
-def main():
-    global pub
-    # p = Vector3(2.0/3, 2.0/3, 0)
-    # callback(p)
-    rospy.init_node("IK")
-
-    sub = rospy.Subscriber("/my_car/arm_effector/pose", Vector3, callback)
-    pub = rospy.Publisher("/my_car/joint/angles", ArmAngles, queue_size=10)
-
-    rospy.spin()
-
-
-def callback(desiredPose):
+def moveArm(request):
+    import time
     global pub
 
-    pub.publish(armControl.changeArmPosition(desiredPose))
-    # armControl.changeArmPosition(desiredPose)
+    desiredPose = Vector3(request.x,request.y,request.z)
+    
+    armAngles = armControl.changeArmPosition(desiredPose)
 
+    if armAngles:
+        pub.publish(armAngles)
+        
+        time.sleep(2)
+        return True
 
-if __name__ == "__main__":
+    return False        
+
+if __name__=='__main__':
     main()
+
+        
+
+# armControl = ArmControl()
+# pub = None
+
+# def main():
+#     global pub
+#     # p = Vector3(2.0/3, 2.0/3, 0)
+#     # callback(p)
+#     rospy.init_node('IK')
+        
+#     sub = rospy.Subscriber('/my_car/arm_effector/pose', Vector3, callback)
+#     pub = rospy.Publisher('/my_car/joint/angles', ArmAngles, queue_size=10)
+
+#     rospy.spin()
+    
+# def callback(desiredPose):
+#     global pub
+
+#     pub.publish(armControl.changeArmPosition(desiredPose))
+#     # armControl.changeArmPosition(desiredPose)
+
+# if __name__=='__main__':
+#     main()
