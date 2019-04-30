@@ -84,9 +84,6 @@ add_executable(tsp src/test_tsp.cpp)
 target_link_libraries(tsp ${catkin_LIBRARIES} ${GAZEBO_LIBRARIES} ${roscpp_LIBRARIES})
 add_dependencies(tsp robot_lib_gencpp)
 
-add_executable(tsp_client src/tsp_client.cpp)
-target_link_libraries(tsp_client ${catkin_LIBRARIES} ${GAZEBO_LIBRARIES} ${roscpp_LIBRARIES})
-add_dependencies(tsp_client robot_lib_gencpp)
 
 ################################################
 ## Declare ROS dynamic reconfigure parameters ##

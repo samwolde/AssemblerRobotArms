@@ -145,12 +145,12 @@ wheel_ctrl = Plugin("test_plug","libwheel_plugin.so",
     # turns within goal_radian +- turn_accuracy, higher accuracy higher turning time
     "turnAccuracy":0.001
 })
-tsp_plugin = Plugin("test_tsp", "libtsp_plugin.so",
-{
-    "turnAccuracy":0.001,
-    "distanceAccuracy":0.5,
-    "kp":0.2
-})
+# tsp_plugin = Plugin("test_tsp", "libtsp_plugin.so",
+# {
+#     "turnAccuracy":0.001,
+#     "distanceAccuracy":0.5,
+#     "kp":0.2
+# })
 skid_steer_ctrl = Plugin("skid_steer_controller", "libgazebo_ros_skid_steer_drive.so", 
 {
     "alwaysOn": "true",
