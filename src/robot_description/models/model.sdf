@@ -1044,10 +1044,5 @@
 			</axis>
 		</joint>
 		<plugin filename="libgripper_plugin.so" name="gripper_plugin"/>
-		<plugin filename="libtsp_plugin.so" name="test_tsp">
-			<turnAccuracy>0.001</turnAccuracy>
-			<distanceAccuracy>0.5</distanceAccuracy>
-			<kp>0.3</kp>
-		</plugin>
 	</model>
 </sdf>

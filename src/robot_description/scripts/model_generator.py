@@ -149,7 +149,7 @@ tsp_plugin = Plugin("test_tsp", "libtsp_plugin.so",
 {
     "turnAccuracy":0.001,
     "distanceAccuracy":0.5,
-    "kp":0.3
+    "kp":0.2
 })
 skid_steer_ctrl = Plugin("skid_steer_controller", "libgazebo_ros_skid_steer_drive.so", 
 {
@@ -310,7 +310,7 @@ wheel_ctrl, skid_steer_ctrl,steering_wheel_plugin,
 palm, palm_joint, finger_one, finger_one_joint, finger_two, finger_two_joint, finger_three, finger_three_joint, 
 finger_four, finger_four_joint, finger_one_tip, finger_one_tip_joint, finger_two_tip, finger_two_tip_joint, 
 finger_three_tip, finger_three_tip_joint, finger_four_tip, finger_four_tip_joint, 
-gripper_plugin,tsp_plugin]
+gripper_plugin]#,tsp_plugin]
 
 model = Model("robot",links_joints)
 

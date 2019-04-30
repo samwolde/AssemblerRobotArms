@@ -10,8 +10,12 @@ project(robot_lib)
 find_package(catkin REQUIRED COMPONENTS
   roscpp
   std_msgs
+  geometry_msgs
+  gazebo_ros
   message_generation
 )
+find_package(gazebo REQUIRED)
+link_directories(${GAZEBO_LIBRARY_DIRS})
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
@@ -56,11 +60,11 @@ add_message_files(
 )
 
 ## Generate services in the 'srv' folder
-# add_service_files(
-#   FILES
-#   Service1.srv
-#   Service2.srv
-# )
+add_service_files(
+   FILES
+   GoTo.srv
+   MinTour.srv
+)
 
 ## Generate actions in the 'action' folder
 # add_action_files(
@@ -73,7 +77,16 @@ add_message_files(
 generate_messages(
   DEPENDENCIES
   std_msgs
+  geometry_msgs
 )
+
+add_executable(tsp src/test_tsp.cpp)
+target_link_libraries(tsp ${catkin_LIBRARIES} ${GAZEBO_LIBRARIES} ${roscpp_LIBRARIES})
+add_dependencies(tsp robot_lib_gencpp)
+
+add_executable(tsp_client src/tsp_client.cpp)
+target_link_libraries(tsp_client ${catkin_LIBRARIES} ${GAZEBO_LIBRARIES} ${roscpp_LIBRARIES})
+add_dependencies(tsp_client robot_lib_gencpp)
 
 ################################################
 ## Declare ROS dynamic reconfigure parameters ##
@@ -121,6 +134,7 @@ CATKIN_DEPENDS roscpp std_msgs message_runtime
 include_directories(
 # include
   ${catkin_INCLUDE_DIRS}
+  ${GAZEBO_INCLUDE_DIRS}
 )
 
 ## Declare a C++ library
