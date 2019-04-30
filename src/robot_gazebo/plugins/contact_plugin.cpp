@@ -9,7 +9,6 @@
 
 namespace gazebo
 {
-    /// \brief A plugin to control a Velodyne sensor.
     class ContactPlugin : public SensorPlugin
     {
        
@@ -17,7 +16,6 @@ namespace gazebo
         private: event::ConnectionPtr updateConnection;
         private: ros::Publisher data_pub;
         private: std::unique_ptr<ros::NodeHandle> rosNode;
-
 
         void Load(sensors::SensorPtr _sensor, sdf::ElementPtr /*_sdf*/)
         {
@@ -59,10 +57,7 @@ namespace gazebo
             for (unsigned int i = 0; i < contacts.contact_size(); ++i)
             {
                 ss << contacts.contact(i).collision1() << " ";
-                ss << contacts.contact(i).collision2() << " ";
-
                 msg.data = ss.str();
-
                 this->data_pub.publish(msg);
             }
         }

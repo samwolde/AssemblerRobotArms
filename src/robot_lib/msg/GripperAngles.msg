@@ -1,3 +1,4 @@
+float32 palm
 float32 palm_finger1
 float32 palm_finger2
 float32 palm_finger3

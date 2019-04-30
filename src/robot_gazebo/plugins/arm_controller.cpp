@@ -41,16 +41,6 @@ public:
     this->pid = common::PID(5, 0, 0);
     this->jointController = this->model->GetJointController();
 
-    this->SetPid("armBase_armBaseTop", 15, 0, 1.25);
-    this->SetPid("armBaseTop_arm1", 150, 0, 3.5);
-    this->SetPid("arm1_arm2", 80, 0, 3.5);
-    this->SetPid("arm2_gripperBase", 18, 0, 3.5);
-
-    // default arm position
-    this->SetAngle("armBaseTop_arm1", -45, false);
-    this->SetAngle("arm1_arm2", 45, false);
-    
-
     // Apply the P-controller to the joint.
     // this->model->GetJointController()->SetVelocityPID(this->armBase_armBaseTop_J->GetScopedName(), 
     //                                                   this->pid);
@@ -102,7 +92,6 @@ public:
       this->model->GetJoint("armBase_armBaseTop")->SetParam("fmax", 0, 0);
       this->model->GetJoint("armBaseTop_arm1")->SetParam("fmax", 0, 0);
       this->model->GetJoint("arm1_arm2")->SetParam("fmax", 0, 0);
-      this->model->GetJoint("arm2_gripperBase")->SetParam("fmax", 0, 0);
     }
 
     updateNum++;
@@ -114,30 +103,26 @@ public:
   void OnRosJointCmd(const robot_lib::ArmAngles::ConstPtr &msg)
   {
     // std::cout << "ArmBase - ArmBaseTop Angle: " << msg->armBase_armBaseTop << std::endl;   
-    this->SetAngle("armBase_armBaseTop", msg->armBase_armBaseTop, false);
-    this->SetAngle("armBaseTop_arm1", msg->armBaseTop_arm1, false);
-    this->SetAngle("arm1_arm2", msg->arm1_arm2, false);
-    this->SetAngle("arm2_gripperBase", msg->arm2_gripper);
+    this->SetAngle("armBase_armBaseTop", msg->armBase_armBaseTop, 0.9, 0, 1.25, false);
+    this->SetAngle("armBaseTop_arm1", msg->armBaseTop_arm1, 18, 0, 3.5, false);
+    this->SetAngle("arm1_arm2", msg->arm1_arm2, msg->P, msg->I, msg->D, false);
   }
 
 private:
-  void SetAngle(std::string joint_name, float degree, bool smallDegree=true)
+  void SetAngle(std::string joint_name, float degree, float P, float I, float D, bool smallDegree=true)
   {
     if (smallDegree == true && !(degree >= -90 && degree <= 90)){
       return;
     }
 
+    // std::cout << joint_name << std::endl;
     float rad = 3.14 * degree / 180;
     std::string name = this->model->GetJoint(joint_name)->GetScopedName();
 
+    // std::cout << name << std::endl;
+    this->jointController->SetPositionPID(name, common::PID(P, I, D));
     this->jointController->SetPositionTarget(name, rad);
     this->jointController->Update();
-  }
-
-private:
-  void SetPid(std::string jointName, float P, float I, float D){
-    std::string name = this->model->GetJoint(jointName)->GetScopedName();
-    this->jointController->SetPositionPID(name, common::PID(P, I, D));
   }
 
   /// \brief ROS helper function that processes messages

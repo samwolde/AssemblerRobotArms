@@ -9,7 +9,6 @@ width = 0.3
 height = 2 * width
 depth =  width/6
 
-
 # The limit of the joint between Wheel and suspension
 wheel_upper_limit,wheel_lower_limit = None, None
 suspension_upper, suspension_lower = PI/3, -PI/3    #Only Turns 60 degrees
@@ -37,6 +36,12 @@ axel_inertial   = math_helper(Orientation(0,rad(90),0)).inertial_cylinderical(ax
 wheel_inertial  = math_helper(Orientation(0,rad(90),0)).inertial_cylinderical(wheel_mass, wheel_length, wheel_radius)
 
 
+#The PID parameters
+p_pid = 4.0
+i_pid = 1.8
+d_pid = 0.004
+velocity = 4
+
 #Positions and Link of respective links
 
 ##Body LInk
@@ -55,12 +60,12 @@ wheel_1 = CylindericalLink("wheel_1",pose_wheel_1, wheel_length, wheel_mass, whe
 wheel_axel_1 = CylindericalLink("axel_1",pose_axel_1,axel_length, axel_mass, wheel_axel_radius, axel_inertial)
 ## Fixed Joint between body and suspension 1
 j_body_susp1_pose = Pose(Location(0, 0,suspension_depth/2 ),Orientation(0,0,0))
-joint_sup1_body = Joint("susp1_body","fixed",j_body_susp1_pose,"susp_1","body_link")
+joint_sup1_body = RevoluteJoint("susp1_body",j_body_susp1_pose,"susp_1","body_link",0, 0,Orientation(0,0,1))
 ## Fixed join between axel1 and susp1
 pose_axelj = Pose(Location(0,0, -axel_length/2), Orientation(0,0,0))
-joint_sup1_axel = Joint("susp_axel_1","fixed",pose_axelj, "axel_1","susp_1")
+joint_sup1_axel = RevoluteJoint("susp_axel_1",pose_axelj, "axel_1","susp_1",0,0,Orientation(1,0,0))
 ## Revolute Joint between wheel1 and suspension 1
-pose_wheelj = Pose(Location(0,0, -wheel_length/2), Orientation(0,-rad(90),0))
+pose_wheelj = Pose(Location(0,0, -wheel_length/2), Orientation(0,0,0))
 joint_axel1_wheel = RevoluteJoint("axel_wheel_1",pose_wheelj, "wheel_1","axel_1",wheel_upper_limit,wheel_lower_limit,Orientation(1,0,0))
 
 
@@ -75,13 +80,13 @@ wheel_2 = CylindericalLink("wheel_2",pose_wheel_2, wheel_length, wheel_mass, whe
 wheel_axel_2 = CylindericalLink("axel_2",pose_axel_2,axel_length, axel_mass, wheel_axel_radius, axel_inertial)
 ## Fixed Joint between suspension2 and body
 j_body_susp2_pose =  Pose(Location(0, 0,suspension_depth/2 ),Orientation(0,0,0))
-joint_sup2_body = Joint("susp2_body","fixed",j_body_susp2_pose,"susp_2","body_link")
+joint_sup2_body = RevoluteJoint("susp2_body",j_body_susp2_pose,"susp_2","body_link",suspension_upper, suspension_lower,Orientation(0,0,1))
 
 ## Fixed join between axel1 and susp1
 pose_axelj = Pose(Location(0,0, -axel_length/2), Orientation(0,0,0))
-joint_sup2_axel = Joint("susp_axel_2","fixed",pose_axelj, "axel_2","susp_2")
+joint_sup2_axel = RevoluteJoint("susp_axel_2",pose_axelj, "axel_2","susp_2",0,0,Orientation(1,0,0))
 ## Revolute Joint between wheel1 and suspension 1
-pose_wheelj = Pose(Location(0,0, -wheel_length/2), Orientation(0,-rad(90),0))
+pose_wheelj = Pose(Location(0,0, -wheel_length/2), Orientation(0,0,0))
 joint_axel2_wheel = RevoluteJoint("axel_wheel_2",pose_wheelj, "wheel_2","axel_2",wheel_upper_limit,wheel_lower_limit,Orientation(1,0,0))
 
 
@@ -99,12 +104,12 @@ wheel_axel_3 = CylindericalLink("axel_3",pose_axel_3,axel_length, axel_mass, whe
 
 ## Fixed Joint between body and suspension 4
 j_body_susp3_pose = Pose(Location(0, 0,suspension_depth/2 ),Orientation(0,0,0))
-joint_sup3_body = Joint("susp3_body","fixed",j_body_susp3_pose,"susp_3","body_link")
+joint_sup3_body = RevoluteJoint("susp3_body",j_body_susp3_pose,"susp_3","body_link",suspension_upper, suspension_lower,Orientation(0,0,1))
 ## Fixed join between axel1 and susp1
 pose_axelj = Pose(Location(0,0, axel_length/2), Orientation(0,0,0))
-joint_sup3_axel = Joint("susp_axel_3","fixed",pose_axelj, "axel_3","susp_3")
+joint_sup3_axel = RevoluteJoint("susp_axel_3",pose_axelj, "axel_3","susp_3",0,0,Orientation(1,0,0))
 ## Revolute Joint between wheel1 and suspension 1
-pose_wheelj = Pose(Location(0,0, wheel_length/2), Orientation(0,-rad(90),0))
+pose_wheelj = Pose(Location(0,0, wheel_length/2), Orientation(0,0,0))
 joint_axel3_wheel = RevoluteJoint("axel_wheel_3",pose_wheelj, "wheel_3","axel_3",wheel_upper_limit,wheel_lower_limit,Orientation(1,0,0))
 
 
@@ -122,52 +127,41 @@ wheel_axel_4 = CylindericalLink("axel_4",pose_axel_4,axel_length, axel_mass, whe
 
 ## Fixed Joint between body and suspension 4
 j_body_susp4_pose = Pose(Location(0, 0,suspension_depth/2),Orientation(0,0,0))
-joint_sup4_body = Joint("susp4_body","fixed",j_body_susp4_pose,"susp_4","body_link")
+joint_sup4_body = RevoluteJoint("susp4_body",j_body_susp4_pose,"susp_4","body_link",0, 0,Orientation(0,0,1))
 ## Revolute Joint between wheel4 and suspension 4
 pose_axelj = Pose(Location(0,0, axel_length/2), Orientation(0,0,0))
-joint_sup4_axel = Joint("susp_axel_4","fixed",pose_axelj, "axel_4","susp_4")
+joint_sup4_axel = RevoluteJoint("susp_axel_4",pose_axelj, "axel_4","susp_4",0,0,Orientation(1,0,0))
 ## Revolute Joint between wheel1 and suspension 1
-pose_wheelj = Pose(Location(0,0, wheel_length/2), Orientation(0,-rad(90),0))
+pose_wheelj = Pose(Location(0,0, wheel_length/2), Orientation(0,0,0))
 joint_axel4_wheel = RevoluteJoint("axel_wheel_4",pose_wheelj, "wheel_4","axel_4",wheel_upper_limit,wheel_lower_limit,Orientation(1,0,0))
 
 
 ## create a plugin
 
 
-wheel_ctrl = Plugin("test_plug","libwheel_plugin.so", 
+steering_wheel_plugin = Plugin("steering_wheel","libwheel_plugin.so", 
 {
-    "prefix":"wheely/steering",
-    "velPubTopic":"cmd_wheel",
-    "odometrySubTopic":"odom",
-    #Tweak the below two parameteres if the turning angle overshoots.
-    #Or the car is slowly turning.
-    "kp":5,                   #Increase kp if car turn rate is slow, decrease if turning angle overshoots too often
-    # turns within goal_radian +- turn_accuracy, higher accuracy higher turning time
-    "turnAccuracy":0.001
+    "proportional_pid":p_pid,
+    "integral_pid":i_pid,
+    "derivative_pid":d_pid,
+    "velocity"  :10
 })
-tsp_plugin = Plugin("test_tsp", "libtsp_plugin.so",
-{
-    "turnAccuracy":0.001,
-    "distanceAccuracy":0.5,
-    "kp":0.3
-})
-skid_steer_ctrl = Plugin("skid_steer_controller", "libgazebo_ros_skid_steer_drive.so", 
+
+plugin = Plugin("differential_drive_controller", "libgazebo_ros_diff_drive.so", 
 {
     "alwaysOn": "true",
-    "updateRate":1200,
-    "robotNamespace":"wheely/steering",
-    "leftFrontJoint": "axel_wheel_4",
-    "rightFrontJoint": "axel_wheel_1",
-    "leftRearJoint":"axel_wheel_3",
-    "rightRearJoint":"axel_wheel_2",
-    "wheelSeparation": 0.891,#( (susp_1_pose[0]+axel_length) - (susp_4_pose[0]-axel_length) ) -wheel_length,
+    "updateRate":20,
+    "leftJoint": "axel_wheel_1",
+    "rightJoint": "axel_wheel_4",
+    "wheelSeparation": (susp_1_pose[0] + axel_length - wheel_radius)*2,
     "wheelDiameter": wheel_radius*2,
-    "torque": 600,
+    "wheelTorque": 20,
     "commandTopic": "cmd_wheel",
-    "odometryTopic":"odom",
-    "odometryFrame":"odom",
-    "broadcastTF":1,
-    "robotBaseFrame": "body_link",
+    "odometryTopic": "wheel",
+    "odometryFrame": "odom",
+    "robotBaseFrame": "base_footprint",
+    "rosDebugLevel": 1,
+    "wheelAcceleration": 2,
 })
 
 # Create arm
@@ -258,8 +252,8 @@ steering_wheel_plugin = Plugin("arm_controller","libarm_controller.so", {})
 
 #Gripper 
 
-palm_radius     = width/20
-finger_radius   = width/80
+palm_radius     = width/24
+finger_radius   = palm_radius/4
 palm_length     = width/20
 finger_length   = width/6
 palm_mass       = default_mass/30
@@ -282,17 +276,17 @@ finger_two_tip  = CylindericalLinkWithSensor("finger_two_tip",   Pose( Location(
 finger_three_tip= CylindericalLinkWithSensor("finger_three_tip", Pose( Location(palm_pos.loc.x+(palm_radius/2), palm_pos.loc.y, palm_pos.loc.z+(palm_length/2)+((3*finger_length)/2)), Orientation(palm_pos.orie.x, palm_pos.orie.y, palm_pos.orie.z)), finger_length, finger_mass, finger_radius, finger_inertial)
 finger_four_tip = CylindericalLinkWithSensor("finger_four_tip",  Pose( Location(palm_pos.loc.x-(palm_radius/2), palm_pos.loc.y, palm_pos.loc.z+(palm_length/2)+((3*finger_length)/2)), Orientation(palm_pos.orie.x, palm_pos.orie.y, palm_pos.orie.z)), finger_length, finger_mass, finger_radius, finger_inertial)
 
-palm_joint  = RevoluteJoint("palm_joint", Pose( Location(0, 0, -(palm_length/2)), Orientation(palm_pos.orie.x, palm_pos.orie.y, palm_pos.orie.z)), "palm", arm2Link.name, PI, -PI, Orientation(0, 0, 1))
+palm_joint  = RevoluteJoint("palm_joint", Pose( Location(0, 0, -(palm_length/2)), Orientation(palm_pos.orie.x, palm_pos.orie.y, palm_pos.orie.z)), "palm", arm2Link.name, 0, -PI/2, Orientation(1, 0, 0))
 
-finger_one_joint    = RevoluteJoint("finger_one_joint",     Pose( Location(0, 0, -(finger_length/2)), Orientation(palm_pos.orie.x, palm_pos.orie.y, palm_pos.orie.z)), "finger_one",   "palm", PI/4, 0, Orientation(1, 0, 0))
-finger_two_joint    = RevoluteJoint("finger_two_joint",     Pose( Location(0, 0, -(finger_length/2)), Orientation(palm_pos.orie.x, palm_pos.orie.y, palm_pos.orie.z)), "finger_two",   "palm", 0, -PI/4, Orientation(1, 0, 0))
+finger_one_joint    = RevoluteJoint("finger_one_joint",     Pose( Location(0, 0, -(finger_length/2)), Orientation(palm_pos.orie.x, palm_pos.orie.y, palm_pos.orie.z)), "finger_one",   "palm", 0, -PI/4, Orientation(1, 0, 0))
+finger_two_joint    = RevoluteJoint("finger_two_joint",     Pose( Location(0, 0, -(finger_length/2)), Orientation(palm_pos.orie.x, palm_pos.orie.y, palm_pos.orie.z)), "finger_two",   "palm", PI/4, 0, Orientation(1, 0, 0))
 finger_three_joint  = RevoluteJoint("finger_three_joint",   Pose( Location(0, 0, -(finger_length/2)), Orientation(palm_pos.orie.x, palm_pos.orie.y, palm_pos.orie.z)), "finger_three", "palm", PI/4, 0, Orientation(0, 1, 0))
 finger_four_joint   = RevoluteJoint("finger_four_joint",    Pose( Location(0, 0, -(finger_length/2)), Orientation(palm_pos.orie.x, palm_pos.orie.y, palm_pos.orie.z)), "finger_four",  "palm", 0, -PI/4, Orientation(0, 1, 0))
 
-finger_one_tip_joint    = RevoluteJoint("finger_one_tip_joint",   Pose( Location(0, 0, -(finger_length/2)), Orientation(palm_pos.orie.x, palm_pos.orie.y, palm_pos.orie.z)), "finger_one_tip",   "finger_one",  0, -PI/4, Orientation(1, 0, 0))
-finger_two_tip_joint    = RevoluteJoint("finger_two_tip_joint",   Pose( Location(0, 0, -(finger_length/2)), Orientation(palm_pos.orie.x, palm_pos.orie.y, palm_pos.orie.z)), "finger_two_tip",   "finger_two",  PI/4, 0, Orientation(1, 0, 0))
-finger_three_tip_joint  = RevoluteJoint("finger_three_tip_joint", Pose( Location(0, 0, -(finger_length/2)), Orientation(palm_pos.orie.x, palm_pos.orie.y, palm_pos.orie.z)), "finger_three_tip", "finger_three",0, -PI/4, Orientation(0, 1, 0))
-finger_four_tip_joint   = RevoluteJoint("finger_four_tip_joint",  Pose( Location(0, 0, -(finger_length/2)), Orientation(palm_pos.orie.x, palm_pos.orie.y, palm_pos.orie.z)), "finger_four_tip",  "finger_four", PI/4, 0, Orientation(0, 1, 0))
+finger_one_tip_joint    = RevoluteJoint("finger_one_tip_joint",   Pose( Location(0, 0, -(finger_length/2)), Orientation(palm_pos.orie.x, palm_pos.orie.y, palm_pos.orie.z)), "finger_one_tip",   "finger_one",  PI/2, 0,  Orientation(1, 0, 0))
+finger_two_tip_joint    = RevoluteJoint("finger_two_tip_joint",   Pose( Location(0, 0, -(finger_length/2)), Orientation(palm_pos.orie.x, palm_pos.orie.y, palm_pos.orie.z)), "finger_two_tip",   "finger_two",  0, -PI/2, Orientation(1, 0, 0))
+finger_three_tip_joint  = RevoluteJoint("finger_three_tip_joint", Pose( Location(0, 0, -(finger_length/2)), Orientation(palm_pos.orie.x, palm_pos.orie.y, palm_pos.orie.z)), "finger_three_tip", "finger_three",0, -PI/2, Orientation(0, 1, 0))
+finger_four_tip_joint   = RevoluteJoint("finger_four_tip_joint",  Pose( Location(0, 0, -(finger_length/2)), Orientation(palm_pos.orie.x, palm_pos.orie.y, palm_pos.orie.z)), "finger_four_tip",  "finger_four", PI/2, 0, Orientation(0, 1, 0))
 
 gripper_plugin = Plugin("gripper_plugin", "libgripper_plugin.so", {})
 
@@ -305,12 +299,12 @@ wheel_axel_1, joint_axel1_wheel, wheel_axel_2,joint_axel2_wheel,wheel_axel_3,joi
 susp_3,wheel_3,joint_sup3_body,joint_sup3_axel,
 # Arm links and joints
 armBaseLink, bodyLink_armBase, armBaseTopLink, armBase_armBaseTop, arm1Link, armBaseTop_arm1, arm2Link, arm1_arm2,  
-wheel_ctrl, skid_steer_ctrl,steering_wheel_plugin,
+plugin,steering_wheel_plugin,
 # Gripper links and joints
 palm, palm_joint, finger_one, finger_one_joint, finger_two, finger_two_joint, finger_three, finger_three_joint, 
 finger_four, finger_four_joint, finger_one_tip, finger_one_tip_joint, finger_two_tip, finger_two_tip_joint, 
 finger_three_tip, finger_three_tip_joint, finger_four_tip, finger_four_tip_joint, 
-gripper_plugin,tsp_plugin]
+gripper_plugin]
 
 model = Model("robot",links_joints)
 

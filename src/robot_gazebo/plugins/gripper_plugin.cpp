@@ -33,8 +33,8 @@ namespace gazebo
         private: ros::CallbackQueue rosQueue;
         private: std::thread        rosQueueThread;
         
+        private:std::thread rosDataPublishThread;
         private:ros::Publisher data_pub;
-        private:int updateNum = 0;
 
         public: void Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
         {
@@ -51,14 +51,15 @@ namespace gazebo
                 ROS_INFO("Starting GripperPlugin");
             }
 
-            this->pid = common::PID(0, 0, 0);
+            this->pid = common::PID(5, 0, 0);
             
             std::string move_fingers   = "/" + this->model->GetName() + "/gripper/move_fingers";
-            
+
             this->rosNode.reset(new ros::NodeHandle("gazebo_client"));
 
             this->jointController = this->model->GetJointController();
             this->jointController->Reset();
+            this->jointController->AddJoint(model->GetJoint("palm_joint"));
             this->jointController->AddJoint(model->GetJoint("finger_one_joint"));
             this->jointController->AddJoint(model->GetJoint("finger_two_joint"));
             this->jointController->AddJoint(model->GetJoint("finger_three_joint"));
@@ -95,6 +96,7 @@ namespace gazebo
 
         public: void set_angle(const robot_lib::GripperAngles::ConstPtr &_msg)
         {
+            this->SetAngle("palm_joint",            _msg->palm);            
             this->SetAngle("finger_one_joint",      _msg->palm_finger1);
             this->SetAngle("finger_two_joint",      _msg->palm_finger2);
             this->SetAngle("finger_three_joint",    _msg->palm_finger3);
@@ -107,44 +109,13 @@ namespace gazebo
 
         private: void SetAngle(std::string joint_name, float degree)
         {
-            if (degree < -45 && degree > 45)
-            {
-                ROS_INFO("GripperPlugin: angle must be less than 45 degree");
-                return;
-            }
-
             float rad = M_PI * degree / 180;
             std::string name = this->model->GetJoint(joint_name)->GetScopedName();
             this->jointController->SetPositionPID(name, pid);
             this->jointController->SetPositionTarget(name, rad);
             this->jointController->Update();
-
-            std::cout << joint_name + "  |  " << rad << std::endl;   
-
         }
-
-        public: void OnUpdate()
-        {
-            if(updateNum < 4000)
-            {
-              this->jointController->Update();
-            } 
-            else
-            {
-                this->model->GetJoint("finger_one_joint")->SetParam("fmax", 0, 0);
-                this->model->GetJoint("finger_two_joint")->SetParam("fmax", 0, 0);
-                this->model->GetJoint("finger_three_joint")->SetParam("fmax", 0, 0);
-                this->model->GetJoint("finger_four_joint")->SetParam("fmax", 0, 0);
-                this->model->GetJoint("finger_one_tip_joint")->SetParam("fmax", 0, 0);
-                this->model->GetJoint("finger_two_tip_joint")->SetParam("fmax", 0, 0);
-                this->model->GetJoint("finger_three_tip_joint")->SetParam("fmax", 0, 0);
-                this->model->GetJoint("finger_four_tip_joint")->SetParam("fmax", 0, 0);
-            }
-
-            updateNum++;
-          }
     };
-
 
     GZ_REGISTER_MODEL_PLUGIN(GripperPlugin);
 }
