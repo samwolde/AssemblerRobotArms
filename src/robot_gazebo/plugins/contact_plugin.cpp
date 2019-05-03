@@ -56,6 +56,7 @@ namespace gazebo
 
             for (unsigned int i = 0; i < contacts.contact_size(); ++i)
             {
+                // ss << contacts.contact(i).collision1() << "-" << contacts.contact(i).collision2() << "=";
                 ss << contacts.contact(i).collision1() << " ";
                 msg.data = ss.str();
                 this->data_pub.publish(msg);

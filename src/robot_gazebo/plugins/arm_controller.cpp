@@ -80,7 +80,6 @@ public:
     ros::SubscribeOptions so =
         ros::SubscribeOptions::create<robot_lib::ArmAngles>(
             "/" + this->model->GetName() + "/arm/angles_cmd",
-            // "/my_car/arm/angles_cmd",
             1,
             boost::bind(&ArmController::OnRosJointCmd, this, _1),
             ros::VoidPtr(), &this->rosQueue);
