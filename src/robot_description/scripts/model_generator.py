@@ -249,7 +249,7 @@ arm1_arm2 = RevoluteJoint('arm1_arm2', arm2JoiPos, arm2Link.name, arm1Link.name,
 
 # Plugin
 # ----------------------------------------------
-steering_wheel_plugin = Plugin("arm_controller","libarm_controller.so", {})
+arm_control_plugin = Plugin("arm_controller","libarm_controller.so", {})
 # ----------------------------------------------
 
 
@@ -305,12 +305,13 @@ wheel_axel_1, joint_axel1_wheel, wheel_axel_2,joint_axel2_wheel,wheel_axel_3,joi
 susp_3,wheel_3,joint_sup3_body,joint_sup3_axel,
 # Arm links and joints
 armBaseLink, bodyLink_armBase, armBaseTopLink, armBase_armBaseTop, arm1Link, armBaseTop_arm1, arm2Link, arm1_arm2,  
-wheel_ctrl, skid_steer_ctrl,steering_wheel_plugin,
+wheel_ctrl, skid_steer_ctrl,
 # Gripper links and joints
 palm, palm_joint, finger_one, finger_one_joint, finger_two, finger_two_joint, finger_three, finger_three_joint, 
 finger_four, finger_four_joint, finger_one_tip, finger_one_tip_joint, finger_two_tip, finger_two_tip_joint, 
 finger_three_tip, finger_three_tip_joint, finger_four_tip, finger_four_tip_joint, 
-gripper_plugin]#,tsp_plugin]
+gripper_plugin, arm_control_plugin
+]#,tsp_plugin]
 
 model = Model("robot",links_joints)
 

@@ -24,7 +24,7 @@ class ArmControl:
         finalArmAngles.arm1_arm2 = self.radToDeg(finArmAngles[2])
         finalArmAngles.arm2_gripper = self.radToDeg(finArmAngles[3])
 
-        print finalArmAngles
+        print(finalArmAngles)
         return finalArmAngles
 
     def getBestAngles(self, finalPose, candidateAngles):
@@ -32,8 +32,8 @@ class ArmControl:
             minBase = candidateAngles[0][1]
         else:
             minBase = candidateAngles[0][0]
-
-        return (minBase, (math.pi/2)-candidateAngles[1][1][0], candidateAngles[1][1][1], -(math.sqrt(candidateAngles[1][1][2]**2)))
+        # minBase - 90 deg --> since rotation starts from y-axis this moves the start to x-axis
+        return (minBase - (math.pi/2), -((math.pi/2)-candidateAngles[1][1][0]), -candidateAngles[1][1][1], -(math.sqrt(candidateAngles[1][1][2]**2)))
 
     def getCurrentArmAngles(self):
         ang = ArmAngles()
@@ -100,7 +100,7 @@ class ArmControl:
             return (baseAngles, armAngles)
         
         else:
-            print "Position unreachable"
+            print("Position unreachable")
             return False
 
     def radToDeg(self, rad):

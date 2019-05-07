@@ -5,7 +5,7 @@ D = 3.0
 ROBOT_NAME = "wheely"
 ROBOT_NAME_1 = "wheely"
 
-MAIN_LENGTH = 2.0
+MAIN_LENGTH = 0.3
 
 ARM_1 = MAIN_LENGTH/2.0
 ARM_2 = MAIN_LENGTH/2.0
