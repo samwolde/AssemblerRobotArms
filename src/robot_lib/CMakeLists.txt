@@ -55,6 +55,8 @@ add_message_files(
   FILES
   ArmAngles.msg
   GripperAngles.msg
+  Wheely_contour_info.msg
+  Detected_objs_info.msg
 #   Message1.msg
 #   Message2.msg
 )

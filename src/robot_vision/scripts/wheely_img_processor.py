@@ -3,7 +3,7 @@ import roslib
 import sys
 import numpy as np
 import rospy
-from wheely_camera.msg import Wheely_contour_info, Detected_objs_info
+from robot_lib.msg import Wheely_contour_info, Detected_objs_info
 import cv2
 from cv_bridge import CvBridge, CvBridgeError
 from sensor_msgs.msg import Image
