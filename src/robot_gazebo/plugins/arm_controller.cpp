@@ -53,7 +53,7 @@ public:
     // default arm position
     this->SetAngle("armBaseTop_arm1", -45, false);
     this->SetAngle("arm1_arm2", -45, false);
-    sleep(2);
+    
     // Create the node
     this->node = transport::NodePtr(new transport::Node());
     #if GAZEBO_MAJOR_VERSION < 8
