@@ -25,7 +25,7 @@ class ArmController : public ModelPlugin
 public:
   void Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
   {
-    std::cout << "Plugin started" << std::endl;
+    std::cout << "Arm Plugin started" << std::endl;
 
     // Safety check
     if (_model->GetJointCount() == 0)
@@ -41,17 +41,26 @@ public:
     this->pid = common::PID(5, 0, 0);
     this->jointController = this->model->GetJointController();
 
-    // Apply the P-controller to the joint.
-    // this->model->GetJointController()->SetVelocityPID(this->armBase_armBaseTop_J->GetScopedName(), 
-    //                                                   this->pid);
+    // this->SetPid("armBase_armBaseTop", 15, 0, 1.25);
+    // this->SetPid("armBaseTop_arm1", 150, 0, 3.5);
+    // this->SetPid("arm1_arm2", 80, 0, 3.5);
 
+    this->SetPid("armBase_armBaseTop", 0.1, 0.2, 0.2);
+    this->SetPid("armBaseTop_arm1", 90, 0, 1.2);
+    this->SetPid("arm1_arm2", 90, 0, 1.5);
+    // this->SetPid("arm2_gripperBase", 18, 0, 3.5);
+
+    // default arm position
+    this->SetAngle("armBaseTop_arm1", -45, false);
+    this->SetAngle("arm1_arm2", -45, false);
+    
     // Create the node
     this->node = transport::NodePtr(new transport::Node());
-#if GAZEBO_MAJOR_VERSION < 8
+    #if GAZEBO_MAJOR_VERSION < 8
     this->node->Init(this->model->GetWorld()->GetName());
-#else
+    #else
     this->node->Init(this->model->GetWorld()->Name());
-#endif
+    #endif
 
     // Initialize ros, if it has not already bee initialized.
     if (!ros::isInitialized())
@@ -69,8 +78,8 @@ public:
     // Create a named topic, and subscribe to it.
     ros::SubscribeOptions so =
         ros::SubscribeOptions::create<robot_lib::ArmAngles>(
-            // "/" + this->model->GetName() + "/joint/angles",
-            "/my_car/joint/angles",
+            "/wheely/arm/angles_cmd",
+            // "/" + this->model->GetName() + "/arm/angles_cmd",
             1,
             boost::bind(&ArmController::OnRosJointCmd, this, _1),
             ros::VoidPtr(), &this->rosQueue);
@@ -79,7 +88,6 @@ public:
     
     // Spin up the queue helper thread.
     this->rosQueueThread = std::thread(std::bind(&ArmController::QueueThread, this));
-    // ros::spin();
   }
 
   // Called by the world update start event
@@ -92,37 +100,42 @@ public:
       this->model->GetJoint("armBase_armBaseTop")->SetParam("fmax", 0, 0);
       this->model->GetJoint("armBaseTop_arm1")->SetParam("fmax", 0, 0);
       this->model->GetJoint("arm1_arm2")->SetParam("fmax", 0, 0);
+      // this->model->GetJoint("arm2_gripperBase")->SetParam("fmax", 0, 0);
     }
 
     updateNum++;
-    // Apply a small linear velocity to the model.
-    // this->model->SetLinearVel(ignition::math::Vector3d(.3, 0, 0));
   }
 
 public:
   void OnRosJointCmd(const robot_lib::ArmAngles::ConstPtr &msg)
   {
     // std::cout << "ArmBase - ArmBaseTop Angle: " << msg->armBase_armBaseTop << std::endl;   
-    this->SetAngle("armBase_armBaseTop", msg->armBase_armBaseTop, 0.9, 0, 1.25, false);
-    this->SetAngle("armBaseTop_arm1", msg->armBaseTop_arm1, 18, 0, 3.5, false);
-    this->SetAngle("arm1_arm2", msg->arm1_arm2, msg->P, msg->I, msg->D, false);
+    this->SetAngle("armBase_armBaseTop", msg->armBase_armBaseTop, false);
+    this->SetAngle("armBaseTop_arm1", msg->armBaseTop_arm1, false);
+    this->SetAngle("arm1_arm2", msg->arm1_arm2, false);
+    // this->SetAngle("arm2_gripperBase", msg->arm2_gripper);
   }
 
 private:
-  void SetAngle(std::string joint_name, float degree, float P, float I, float D, bool smallDegree=true)
+  void SetAngle(std::string joint_name, float degree, bool smallDegree=true)
   {
     if (smallDegree == true && !(degree >= -90 && degree <= 90)){
       return;
     }
 
-    // std::cout << joint_name << std::endl;
     float rad = 3.14 * degree / 180;
     std::string name = this->model->GetJoint(joint_name)->GetScopedName();
 
-    // std::cout << name << std::endl;
-    this->jointController->SetPositionPID(name, common::PID(P, I, D));
     this->jointController->SetPositionTarget(name, rad);
     this->jointController->Update();
+    
+    updateNum = 0;
+  }
+
+private:
+  void SetPid(std::string jointName, float P, float I, float D){
+    std::string name = this->model->GetJoint(jointName)->GetScopedName();
+    this->jointController->SetPositionPID(name, common::PID(P, I, D));
   }
 
   /// \brief ROS helper function that processes messages
@@ -181,85 +194,3 @@ private:
 // Register this plugin with the simulator
 GZ_REGISTER_MODEL_PLUGIN(ArmController)
 } // namespace gazebo
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//   /// \brief Pointer to all the joints.
-// private:
-//   physics::JointPtr armBase_armBaseTop_J;
-
-// private:
-//   physics::JointPtr armBaseTop_arm1_J;
-
-// private:
-//   physics::JointPtr arm1_arm2_J;
-
-// private:
-//   physics::JointPtr arm2_gripper_J;
-
-
-// Get the first joint. We are making an assumption about the model
-    // having one joint that is the rotational joint.
-    // this->armBase_armBaseTop_J = this->model->GetJoint("armBase_armBaseTop");
-    // this->armBaseTop_arm1_J = this->model->GetJoint("armBaseTop_arm1");
-    // this->arm1_arm2_J = this->model->GetJoint("arm1_arm2");
-    // this->arm2_gripper_J = this->model->GetJoint("arm2_gripper");
-
-
-
-    // ros::SubscribeOptions so1 =
-    //     ros::SubscribeOptions::create<std_msgs::Float32>(
-    //         topicName,
-    //         1,
-    //         boost::bind(&ArmController::ArmBase_ArmBaseTop_Cb, this, _1),
-    //         ros::VoidPtr(), &this->rosQueue1);
-
-    // ros::SubscribeOptions so2 =
-    //     ros::SubscribeOptions::create<std_msgs::Float32>(
-    //         topicName1,
-    //         1,
-    //         boost::bind(&ArmController::ArmBaseTop_Arm1_Cb, this, _1),
-    //         ros::VoidPtr(), &this->rosQueue2);
-
-    // ros::SubscribeOptions so3 =
-    //     ros::SubscribeOptions::create<std_msgs::Float32>(
-    //         "/" + this->model->GetName() + "/" + this->arm1_arm2_J->GetName() + "/force",
-    //         1,
-    //         boost::bind(&ArmController::Arm1_Arm2_Cb, this, _1),
-    //         ros::VoidPtr(), &this->rosQueue3);
-
-    // ros::SubscribeOptions so4 =
-    //     ros::SubscribeOptions::create<std_msgs::Float32>(
-    //         "/" + this->model->GetName() + "/" + this->arm2_gripper_J->GetName() + "/force",
-    //         1,
-    //         boost::bind(&ArmController::Arm2_Gripper_Cb, this, _1),
-    //         ros::VoidPtr(), &this->rosQueue4);
-
-    // this->rosSub1 = this->rosNode->subscribe(so1);
-    // this->rosSub2 = this->rosNode->subscribe(so2);
-    // this->rosSub3 = this->rosNode->subscribe(so3);
-    // this->rosSub4 = this->rosNode->subscribe(so4);

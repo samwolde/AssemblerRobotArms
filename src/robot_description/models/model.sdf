@@ -619,7 +619,6 @@
 			<broadcastTF>1</broadcastTF>
 			<robotBaseFrame>body_link</robotBaseFrame>
 		</plugin>
-		<plugin filename="libarm_controller.so" name="arm_controller"/>
 		<link name="palm">
 			<pose>0 0.27 0.5665 0 0 0</pose>
 			<inertial>
@@ -1044,5 +1043,6 @@
 			</axis>
 		</joint>
 		<plugin filename="libgripper_plugin.so" name="gripper_plugin"/>
+		<plugin filename="libarm_controller.so" name="arm_controller"/>
 	</model>
 </sdf>
