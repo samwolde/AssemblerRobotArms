@@ -217,6 +217,7 @@ void tsp::linkState(gazebo_msgs::LinkStatesConstPtr ls){
     static auto set = false;
     if ( set ){return;}
     this->linkStates = *ls;
+
     set = true;
 }
 void tsp::cmdQueueCb(){
