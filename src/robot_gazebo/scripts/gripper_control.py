@@ -3,6 +3,7 @@ import rospy
 
 from std_msgs.msg import String
 from robot_lib.msg import GripperAngles
+from robot_lib.srv import MoveGripper
 import math
 import re
 
@@ -15,7 +16,6 @@ class GripperController:
 
         self.col_sub = rospy.Subscriber("/robot/gripper/collision", String, self.collision)
         self.pub = rospy.Publisher("/robot/gripper/move_fingers", GripperAngles, queue_size=10)
-        self.command_sub = rospy.Subscriber("/robot/gripper/command", String, self.command_listener)
 
     def open(self):
         if self.cur_status == "Open":
@@ -176,29 +176,32 @@ class GripperController:
     def clear_list(self):
         while len(self.fingers_to_move) > 0:
             self.fingers_to_move.pop()
-
-    def command_listener(self, msg):
-        
-        if msg.data == "open":
-            self.open()
-        elif msg.data == "catch":
-            self.catch()
-        elif msg.data == "close":
-            self.close()
-
-
+ 
 def main():
+    global pub
     rospy.init_node("gripper_controller")
-    gripper_cnt = GripperController()
-
-    # demo
-    gripper_cnt.open()
-    gripper_cnt.catch()
-    gripper_cnt.open()
-    gripper_cnt.close()
-
+    
+    service = rospy.Service('/robot/gripper/move_fingers', MoveGripper, move_gripper)
     rospy.spin()
 
+def move_gripper(request):
+    print("********moving the gripper**********")
+    gripper_cnt = GripperController()
+    action = request.action
+    print(action)
 
-if __name__ == "__main__":
+    if action == "open":
+        gripper_cnt.open()
+    elif action == "catch":
+        gripper_cnt.catch()
+    elif action == "close":
+        gripper_cnt.close()
+    else:
+        return False
+
+    return True  
+
+if __name__=='__main__':
     main()
+
+
