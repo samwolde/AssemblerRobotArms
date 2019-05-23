@@ -700,8 +700,8 @@
 					<damping>0.03</damping>
 				</dynamics>
 				<limit>
-					<upper>0.7853981633974483</upper>
-					<lower>0</lower>
+					<upper>0</upper>
+					<lower>0.7853981633974483</lower>
 				</limit>
 			</axis>
 		</joint>
@@ -743,8 +743,8 @@
 					<damping>0.03</damping>
 				</dynamics>
 				<limit>
-					<upper>0</upper>
-					<lower>-0.7853981633974483</lower>
+					<upper>-0.7853981633974483</upper>
+					<lower>0</lower>
 				</limit>
 			</axis>
 		</joint>
@@ -881,8 +881,8 @@
 					<damping>0.03</damping>
 				</dynamics>
 				<limit>
-					<upper>0</upper>
-					<lower>-0.7853981633974483</lower>
+					<upper>-1.5707963267948966</upper>
+					<lower>0</lower>
 				</limit>
 			</axis>
 		</joint>
@@ -933,8 +933,8 @@
 					<damping>0.03</damping>
 				</dynamics>
 				<limit>
-					<upper>0.7853981633974483</upper>
-					<lower>0</lower>
+					<upper>0</upper>
+					<lower>1.5707963267948966</lower>
 				</limit>
 			</axis>
 		</joint>
@@ -986,7 +986,7 @@
 				</dynamics>
 				<limit>
 					<upper>0</upper>
-					<lower>-0.7853981633974483</lower>
+					<lower>-1.5707963267948966</lower>
 				</limit>
 			</axis>
 		</joint>
@@ -1037,7 +1037,7 @@
 					<damping>0.03</damping>
 				</dynamics>
 				<limit>
-					<upper>0.7853981633974483</upper>
+					<upper>1.5707963267948966</upper>
 					<lower>0</lower>
 				</limit>
 			</axis>
