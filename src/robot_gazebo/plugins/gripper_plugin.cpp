@@ -59,7 +59,6 @@ namespace gazebo
 
             this->jointController = this->model->GetJointController();
             this->jointController->Reset();
-            this->jointController->AddJoint(model->GetJoint("palm_joint"));
             this->jointController->AddJoint(model->GetJoint("finger_one_joint"));
             this->jointController->AddJoint(model->GetJoint("finger_two_joint"));
             this->jointController->AddJoint(model->GetJoint("finger_three_joint"));
@@ -96,7 +95,6 @@ namespace gazebo
 
         public: void set_angle(const robot_lib::GripperAngles::ConstPtr &_msg)
         {
-            this->SetAngle("palm_joint",            _msg->palm);            
             this->SetAngle("finger_one_joint",      _msg->palm_finger1);
             this->SetAngle("finger_two_joint",      _msg->palm_finger2);
             this->SetAngle("finger_three_joint",    _msg->palm_finger3);

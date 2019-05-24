@@ -284,15 +284,15 @@ finger_four_tip = CylindericalLinkWithSensor("finger_four_tip",  Pose( Location(
 
 palm_joint  = RevoluteJoint("palm_joint", Pose( Location(0, 0, -(palm_length/2)), Orientation(palm_pos.orie.x, palm_pos.orie.y, palm_pos.orie.z)), "palm", arm2Link.name, PI, -PI, Orientation(0, 0, 1))
 
-finger_one_joint    = RevoluteJoint("finger_one_joint",     Pose( Location(0, 0, -(finger_length/2)), Orientation(palm_pos.orie.x, palm_pos.orie.y, palm_pos.orie.z)), "finger_one",   "palm", PI/4, 0, Orientation(1, 0, 0))
-finger_two_joint    = RevoluteJoint("finger_two_joint",     Pose( Location(0, 0, -(finger_length/2)), Orientation(palm_pos.orie.x, palm_pos.orie.y, palm_pos.orie.z)), "finger_two",   "palm", 0, -PI/4, Orientation(1, 0, 0))
-finger_three_joint  = RevoluteJoint("finger_three_joint",   Pose( Location(0, 0, -(finger_length/2)), Orientation(palm_pos.orie.x, palm_pos.orie.y, palm_pos.orie.z)), "finger_three", "palm", PI/4, 0, Orientation(0, 1, 0))
-finger_four_joint   = RevoluteJoint("finger_four_joint",    Pose( Location(0, 0, -(finger_length/2)), Orientation(palm_pos.orie.x, palm_pos.orie.y, palm_pos.orie.z)), "finger_four",  "palm", 0, -PI/4, Orientation(0, 1, 0))
+finger_one_joint    = RevoluteJoint("finger_one_joint",     Pose( Location(0, 0, -(finger_length/2)), Orientation(palm_pos.orie.x, palm_pos.orie.y, palm_pos.orie.z)), "finger_one",   "palm",  0,     PI/4, Orientation(1, 0, 0))
+finger_two_joint    = RevoluteJoint("finger_two_joint",     Pose( Location(0, 0, -(finger_length/2)), Orientation(palm_pos.orie.x, palm_pos.orie.y, palm_pos.orie.z)), "finger_two",   "palm", -PI/4,  0,    Orientation(1, 0, 0))
+finger_three_joint  = RevoluteJoint("finger_three_joint",   Pose( Location(0, 0, -(finger_length/2)), Orientation(palm_pos.orie.x, palm_pos.orie.y, palm_pos.orie.z)), "finger_three", "palm",  PI/4,  0,    Orientation(0, 1, 0))
+finger_four_joint   = RevoluteJoint("finger_four_joint",    Pose( Location(0, 0, -(finger_length/2)), Orientation(palm_pos.orie.x, palm_pos.orie.y, palm_pos.orie.z)), "finger_four",  "palm",  0,    -PI/4, Orientation(0, 1, 0))
 
-finger_one_tip_joint    = RevoluteJoint("finger_one_tip_joint",   Pose( Location(0, 0, -(finger_length/2)), Orientation(palm_pos.orie.x, palm_pos.orie.y, palm_pos.orie.z)), "finger_one_tip",   "finger_one",  0, -PI/4, Orientation(1, 0, 0))
-finger_two_tip_joint    = RevoluteJoint("finger_two_tip_joint",   Pose( Location(0, 0, -(finger_length/2)), Orientation(palm_pos.orie.x, palm_pos.orie.y, palm_pos.orie.z)), "finger_two_tip",   "finger_two",  PI/4, 0, Orientation(1, 0, 0))
-finger_three_tip_joint  = RevoluteJoint("finger_three_tip_joint", Pose( Location(0, 0, -(finger_length/2)), Orientation(palm_pos.orie.x, palm_pos.orie.y, palm_pos.orie.z)), "finger_three_tip", "finger_three",0, -PI/4, Orientation(0, 1, 0))
-finger_four_tip_joint   = RevoluteJoint("finger_four_tip_joint",  Pose( Location(0, 0, -(finger_length/2)), Orientation(palm_pos.orie.x, palm_pos.orie.y, palm_pos.orie.z)), "finger_four_tip",  "finger_four", PI/4, 0, Orientation(0, 1, 0))
+finger_one_tip_joint    = RevoluteJoint("finger_one_tip_joint",   Pose( Location(0, 0, -(finger_length/2)), Orientation(palm_pos.orie.x, palm_pos.orie.y, palm_pos.orie.z)), "finger_one_tip",   "finger_one",  -PI/2, 0,    Orientation(1, 0, 0))
+finger_two_tip_joint    = RevoluteJoint("finger_two_tip_joint",   Pose( Location(0, 0, -(finger_length/2)), Orientation(palm_pos.orie.x, palm_pos.orie.y, palm_pos.orie.z)), "finger_two_tip",   "finger_two",   0,    PI/2, Orientation(1, 0, 0))
+finger_three_tip_joint  = RevoluteJoint("finger_three_tip_joint", Pose( Location(0, 0, -(finger_length/2)), Orientation(palm_pos.orie.x, palm_pos.orie.y, palm_pos.orie.z)), "finger_three_tip", "finger_three", 0,   -PI/2, Orientation(0, 1, 0))
+finger_four_tip_joint   = RevoluteJoint("finger_four_tip_joint",  Pose( Location(0, 0, -(finger_length/2)), Orientation(palm_pos.orie.x, palm_pos.orie.y, palm_pos.orie.z)), "finger_four_tip",  "finger_four",  PI/2, 0,    Orientation(0, 1, 0))
 
 gripper_plugin = Plugin("gripper_plugin", "libgripper_plugin.so", {})
 

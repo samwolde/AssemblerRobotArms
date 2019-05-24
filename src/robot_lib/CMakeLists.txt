@@ -68,6 +68,7 @@ add_service_files(
    MinTour.srv
    Steering.srv
    MoveArm.srv
+   MoveGripper.srv
 )
 
 ## Generate actions in the 'action' folder
