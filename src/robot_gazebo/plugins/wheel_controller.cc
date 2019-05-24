@@ -22,10 +22,6 @@ namespace gazebo
 		InitNode();
 		this->con = event::Events::ConnectWorldUpdateBegin(std::bind(&WheelPlugin::OnUpdate, this));
 	};
-
-	bool WheelPlugin::Test(robot_lib::MinTour::Request& req, robot_lib::MinTour::Response& res){
-		ROS_INFO("Worked");
-	}
 	bool WheelPlugin::MoveForward(robot_lib::Steering::Request& req, robot_lib::Steering::Response& res){
 		geometry_msgs::Twist v;
 		v.linear.x =  req.val;

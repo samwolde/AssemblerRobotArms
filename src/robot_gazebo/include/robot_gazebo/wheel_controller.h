@@ -22,7 +22,6 @@ class WheelPlugin : public ModelPlugin
   public:
 		void Load(physics::ModelPtr parent, sdf::ElementPtr sdf_ptr);
 		void OnUpdate(){};
-		bool Test(robot_lib::MinTour::Request& req, robot_lib::MinTour::Response& res);
 		/*Go Forward with the given velocity*/
 		bool MoveForward(robot_lib::Steering::Request& req, robot_lib::Steering::Response& res);
 		/*Go back wards with the given velocity*/

@@ -143,7 +143,7 @@ wheel_ctrl = Plugin("test_plug","libwheel_plugin.so",
     #Or the car is slowly turning.
     "kp":5,                   #Increase kp if car turn rate is slow, decrease if turning angle overshoots too often
     # turns within goal_radian +- turn_accuracy, higher accuracy higher turning time
-    "turnAccuracy":0.02
+    "turnAccuracy":0.04
 })
 # tsp_plugin = Plugin("test_tsp", "libtsp_plugin.so",
 # {
