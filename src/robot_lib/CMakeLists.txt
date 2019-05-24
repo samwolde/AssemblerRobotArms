@@ -66,6 +66,7 @@ add_service_files(
    FILES
    GoTo.srv
    MinTour.srv
+   Steering.srv
    MoveArm.srv
 )
 
@@ -83,9 +84,9 @@ generate_messages(
   geometry_msgs
 )
 
-add_executable(tsp src/test_tsp.cpp)
-target_link_libraries(tsp ${catkin_LIBRARIES} ${GAZEBO_LIBRARIES} ${roscpp_LIBRARIES})
-add_dependencies(tsp robot_lib_gencpp)
+add_executable(nav src/nav_main.cpp src/nav.cpp)
+target_link_libraries(nav ${catkin_LIBRARIES} ${GAZEBO_LIBRARIES} ${roscpp_LIBRARIES})
+add_dependencies(nav robot_lib_gencpp)
 
 
 ################################################

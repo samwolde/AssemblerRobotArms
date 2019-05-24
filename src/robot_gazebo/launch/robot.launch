@@ -19,6 +19,6 @@
     <node name="IK" pkg="robot_gazebo" type="arm_control.py" output="screen" />
 
     <node name="gripper_controller" pkg="robot_gazebo" type="gripper_control.py" output="screen" />
-    <node name="tsp" pkg="robot_lib" type="tsp" output="screen" />
+    <node name="nav" pkg="robot_lib" type="nav" output="screen" />
     
 </launch>

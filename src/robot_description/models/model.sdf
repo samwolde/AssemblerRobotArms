@@ -600,7 +600,7 @@
 			<velPubTopic>cmd_wheel</velPubTopic>
 			<odometrySubTopic>odom</odometrySubTopic>
 			<kp>5</kp>
-			<turnAccuracy>0.001</turnAccuracy>
+			<turnAccuracy>0.02</turnAccuracy>
 		</plugin>
 		<plugin filename="libgazebo_ros_skid_steer_drive.so" name="skid_steer_controller">
 			<alwaysOn>true</alwaysOn>
@@ -610,9 +610,9 @@
 			<rightFrontJoint>axel_wheel_1</rightFrontJoint>
 			<leftRearJoint>axel_wheel_3</leftRearJoint>
 			<rightRearJoint>axel_wheel_2</rightRearJoint>
-			<wheelSeparation>0.891</wheelSeparation>
+			<wheelSeparation>0.30480769230769234</wheelSeparation>
 			<wheelDiameter>0.15</wheelDiameter>
-			<torque>600</torque>
+			<torque>100</torque>
 			<commandTopic>cmd_wheel</commandTopic>
 			<odometryTopic>odom</odometryTopic>
 			<odometryFrame>odom</odometryFrame>

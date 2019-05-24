@@ -7,7 +7,7 @@ namespace gazebo
 	void WheelPlugin::Load(physics::ModelPtr parent, sdf::ElementPtr sdf_ptr)
 	{
 		this->model = parent;
-		ROS_INFO("Wheel Plugin Loaded");
+		ROS_INFO("Wheel Plugin Loaded...");
 
 		if(!ros::isInitialized()){
 			ROS_INFO("Ros not initialiazed");
@@ -16,7 +16,6 @@ namespace gazebo
 			ros::init(argc, argv, "gazebo_client",ros::init_options::NoSigintHandler);
 		}
 		rosNode.reset(new ros::NodeHandle("Wheel_Ctrlr"));
-		this->callBackThread = std::thread(std::bind(&WheelPlugin::QueueThread, this));
 		this->cbThreadOdom = std::thread(std::bind(&WheelPlugin::QueeThreadOdom, this));
 		
 		GetParams(sdf_ptr);
@@ -24,32 +23,35 @@ namespace gazebo
 		this->con = event::Events::ConnectWorldUpdateBegin(std::bind(&WheelPlugin::OnUpdate, this));
 	};
 
-	void WheelPlugin::MoveForward(const std_msgs::Float32ConstPtr vel){
-		geometry_msgs::Twist v;
-		v.linear.x = vel->data;
-		v.linear.y = v.linear.z = v.angular.x = 0;
-		rosPub.publish(v);
-	};
-
-	void WheelPlugin::MoveBackward(const std_msgs::Float32ConstPtr vel){
-		geometry_msgs::Twist v;
-		v.linear.x = -1 * vel->data;
-		v.linear.y = v.linear.z = v.angular.x = 0;
-		rosPub.publish(v);
-	};
-
-	void WheelPlugin::TurnRight(const std_msgs::Float32ConstPtr msg){
-		if ( msg->data > 180 || msg->data < 0){
-			ROS_INFO("Error angle should be [0,180]");
-			return;
-		}
-		Turn(-1 * msg->data, true);
+	bool WheelPlugin::Test(robot_lib::MinTour::Request& req, robot_lib::MinTour::Response& res){
+		ROS_INFO("Worked");
 	}
-	void WheelPlugin::TurnLeft(const std_msgs::Float32ConstPtr msg){
-		if ( msg->data > 180 || msg->data < 0){
-			ROS_INFO("Error angle should be [0,180]");
-		}
-		Turn(1 * msg->data, false);
+	bool WheelPlugin::MoveForward(robot_lib::Steering::Request& req, robot_lib::Steering::Response& res){
+		geometry_msgs::Twist v;
+		v.linear.x =  req.val;
+		v.linear.y = v.linear.z = v.angular.x = 0;
+		rosPub.publish(v);
+		return true;
+	};
+
+	bool WheelPlugin::MoveBackward(robot_lib::Steering::Request& req, robot_lib::Steering::Response& res){
+		geometry_msgs::Twist v;
+		v.linear.x = -1 * req.val;
+		v.linear.y = v.linear.z = v.angular.x = 0;
+		rosPub.publish(v);
+		return true;
+	};
+
+	bool WheelPlugin::TurnRight(robot_lib::Steering::Request& req, robot_lib::Steering::Response& res){
+
+		assert(req.val > 0 && req.val < 180);
+		Turn(-1 * req.val, true);
+		return true;
+	}
+	bool WheelPlugin::TurnLeft(robot_lib::Steering::Request& req, robot_lib::Steering::Response& res){
+		assert(req.val > 0 && req.val < 180);
+		Turn(req.val, false);
+		return true;
 	}
 	void WheelPlugin::Turn(double angle,bool right){
 			Brake();
@@ -64,10 +66,8 @@ namespace gazebo
 			double  goal_yaw=GetGoalRad(rad_ang, this->yaw,right);
 			double init_yaw = this->yaw, prev_yaw = this->yaw;
 			double err=GetError(prev_yaw, goal_yaw, right);
-			double temp_goal= GetGoalRad(right ? -1 * this->kp*err:this->kp*err , prev_yaw,right);
-			double temp_err,kp= this->kp;
-			ros::Rate r(200);
-			ROS_INFO("Goal Yaw is %f,Temp Goal is %f, this yaw is %f",goal_yaw, temp_goal, this->yaw);
+			ros::Rate r(300);
+			ROS_INFO("Goal Yaw is %f,err is %f, this yaw is %f",goal_yaw, err, this->yaw);
 			//Publish velocity continously then examine odometry to know when to stop
 			while(true){
 				err  =GetError(this->yaw, goal_yaw, right);
@@ -93,8 +93,6 @@ namespace gazebo
 				rosPub.publish(velocity);
 				r.sleep();
 			}
-			ROS_INFO("Finished Turning an angle of %f\n\n",rad_ang);
-			Brake();
 	};
 	//is Called back when odometry messages are available.
 	void WheelPlugin::odometryMsg(nav_msgs::OdometryConstPtr odom){
@@ -104,7 +102,7 @@ namespace gazebo
 		tf::Matrix3x3(tf_qut).getRPY(this->roll, this->pitch, this->yaw);
 	};	
 	void WheelPlugin::Brake(){
-			ros::Rate r(400);
+			ros::Rate r(500);
 			geometry_msgs::Twist velocity;
 			geometry_msgs::Twist current_vel = this->odometry.twist.twist;
 

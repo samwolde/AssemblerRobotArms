@@ -12,6 +12,8 @@
 #include <nav_msgs/Odometry.h>
 #include <tf/LinearMath/Matrix3x3.h>
 #include <tf/LinearMath/Quaternion.h>
+#include <robot_lib/MinTour.h>
+#include <robot_lib/Steering.h>
 
 namespace gazebo
 {
@@ -19,26 +21,25 @@ class WheelPlugin : public ModelPlugin
 {
   public:
 		void Load(physics::ModelPtr parent, sdf::ElementPtr sdf_ptr);
-		void OnUpdate(){
-		};
+		void OnUpdate(){};
+		bool Test(robot_lib::MinTour::Request& req, robot_lib::MinTour::Response& res);
 		/*Go Forward with the given velocity*/
-		void MoveForward(const std_msgs::Float32ConstPtr vel);
+		bool MoveForward(robot_lib::Steering::Request& req, robot_lib::Steering::Response& res);
 		/*Go back wards with the given velocity*/
-		void MoveBackward(const std_msgs::Float32ConstPtr vel);
+		bool MoveBackward(robot_lib::Steering::Request& req, robot_lib::Steering::Response& res);
 		/*Given some deegre set the angular velocity for some time
 			to achive a right turn of the degree*/
-		void TurnRight(const std_msgs::Float32ConstPtr msg);
+		bool TurnRight(robot_lib::Steering::Request& req, robot_lib::Steering::Response& res);
 		/*Given some deegre set the angular velocity for some time
 			to achive a left turn of the degree*/
-		void TurnLeft(const std_msgs::Float32ConstPtr msg);
-		void Brake(const std_msgs::Float32ConstPtr msg){this->Brake();};
+		bool TurnLeft(robot_lib::Steering::Request& req, robot_lib::Steering::Response& res);
+		bool Brake(robot_lib::Steering::Request& req, robot_lib::Steering::Response& res){this->Brake();return true;};
 		void Brake();
 		void odometryMsg(nav_msgs::OdometryConstPtr odom);
   
   private:		
 		void InitNode();
 		void GetParams(sdf::ElementPtr sdf_ptr);
-		void QueueThread();
 		void QueeThreadOdom();
 
 		bool HasStoped();
@@ -48,17 +49,16 @@ class WheelPlugin : public ModelPlugin
 		bool Overshoot(double init_yaw, double goal_yaw,bool right);
 
 		std::unique_ptr<ros::NodeHandle> rosNode;
-		ros::Subscriber turnRightSub, odomSub,turnLeftSub, forwardSub, bacSub, brakeSub;
+		ros::Subscriber odomSub;
 		ros::Publisher rosPub;
 
-		ros::CallbackQueue rosQueue;
+		ros::ServiceServer forwardService, backService,turnLServ, turnRSer, brakeServ;
 		ros::CallbackQueue rosOdomQueue;
 
-		std::thread callBackThread; 
 		std::thread cbThreadOdom;
 		nav_msgs::Odometry odometry;
 		
-		double turnAccuracy=0.003, turnMargin=0.003;
+		double turnAccuracy=0.003;
 		double roll,pitch, yaw,kp=0.2;
 		double velocity=0.2,angularVel=3.14;
 		physics::ModelPtr model;

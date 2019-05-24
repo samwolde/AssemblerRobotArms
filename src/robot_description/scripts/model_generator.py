@@ -143,7 +143,7 @@ wheel_ctrl = Plugin("test_plug","libwheel_plugin.so",
     #Or the car is slowly turning.
     "kp":5,                   #Increase kp if car turn rate is slow, decrease if turning angle overshoots too often
     # turns within goal_radian +- turn_accuracy, higher accuracy higher turning time
-    "turnAccuracy":0.001
+    "turnAccuracy":0.02
 })
 # tsp_plugin = Plugin("test_tsp", "libtsp_plugin.so",
 # {
@@ -160,9 +160,9 @@ skid_steer_ctrl = Plugin("skid_steer_controller", "libgazebo_ros_skid_steer_driv
     "rightFrontJoint": "axel_wheel_1",
     "leftRearJoint":"axel_wheel_3",
     "rightRearJoint":"axel_wheel_2",
-    "wheelSeparation": 0.891,#( (susp_1_pose[0]+axel_length) - (susp_4_pose[0]-axel_length) ) -wheel_length,
+    "wheelSeparation":( (susp_1_pose[0]+axel_length) - (susp_4_pose[0]-axel_length) ) -wheel_length,#0.891, 
     "wheelDiameter": wheel_radius*2,
-    "torque": 600,
+    "torque": 100,
     "commandTopic": "cmd_wheel",
     "odometryTopic":"odom",
     "odometryFrame":"odom",

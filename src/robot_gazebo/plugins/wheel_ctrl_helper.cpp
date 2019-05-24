@@ -4,16 +4,21 @@ namespace gazebo
 {
     bool WheelPlugin::HasStoped(){
             geometry_msgs::Twist current_vel = this->odometry.twist.twist;
-            current_vel.linear.x=trunc(current_vel.linear.x*1000);
-            current_vel.linear.y=trunc(current_vel.linear.y*1000);
-            current_vel.linear.z=trunc(current_vel.linear.z*1000);
-            current_vel.angular.z=trunc(current_vel.angular.z*1000);			
+            current_vel.linear.x=trunc(current_vel.linear.x*100);
+            current_vel.linear.y=trunc(current_vel.linear.y*100);
+            current_vel.linear.z=trunc(current_vel.linear.z*100);
+            current_vel.angular.z=trunc(current_vel.angular.z*100);			
             bool stoped = 
             (current_vel.linear.x == 0 && current_vel.linear.y == 0 && current_vel.linear.z == 0 && current_vel.angular.z == 0);
             return stoped;
     }
+	/*The turning angle overshoots if the distance between the starting yaw and the goal yaw is 
+	  less than the error between this->yaw and goal yaw. 
+	  Based on the assumption that this yaw should be converging to goal yaw, in the direction defined
+	  by right.
+	*/
     bool WheelPlugin::Overshoot(double init_yaw, double goal_yaw,bool right){
-		if ( GetError(init_yaw, goal_yaw, right) < GetError(this->yaw, goal_yaw,right)- turnAccuracy * 2){
+		if ( GetError(init_yaw, goal_yaw, right) < GetError(this->yaw,goal_yaw,right) - turnAccuracy * 2){
 			ROS_INFO("Overshoot init_yaw %f, this->yaw %f", init_yaw, this->yaw);
 			ROS_INFO("Overshoot init_yaw_err %f, this->yaw_err %f",GetError(init_yaw, goal_yaw, right),
 			GetError(this->yaw, goal_yaw,right)- turnAccuracy * 1.5);
@@ -25,6 +30,8 @@ namespace gazebo
 	 * rad should be +ve for left turn and -ve for right turn
 	 */
 	double WheelPlugin::GetGoalRad(double rad, double yaw, bool right){
+		assert(right ? rad <= 0 : rad >= 0);
+		assert(rad <= M_PI && rad >= -M_PI);
 		double goal = yaw + rad;
 		if ( right && goal < - M_PI){
 			//Normalize goal, -pi <= goal <= pi
@@ -50,35 +57,12 @@ namespace gazebo
 	};
     //Create the Subscribers and Publishers
 	void WheelPlugin::InitNode(){
-		ros::SubscribeOptions turnSo = ros::SubscribeOptions::create<std_msgs::Float32>(
-      robotNS + "/cmd_turnRight",
-      10,
-      boost::bind(&WheelPlugin::TurnRight, this, _1),
-      ros::VoidPtr(), &this->rosQueue);
+		turnLServ = this->rosNode->advertiseService("/wheely/steering/cmd_turnLeft",&WheelPlugin::TurnLeft, this);
+		turnRSer = this->rosNode->advertiseService("/wheely/steering/cmd_turnRight",&WheelPlugin::TurnRight, this);
+		brakeServ = this->rosNode->advertiseService("/wheely/steering/cmd_brake",&WheelPlugin::Brake, this);
+		forwardService = this->rosNode->advertiseService("/wheely/steering/cmd_moveForward", &WheelPlugin::MoveForward, this); 
+		backService = this->rosNode->advertiseService("/wheely/nav/moveBackward_srv", &WheelPlugin::MoveBackward, this); 
 
-	  ros::SubscribeOptions turnLSo = ros::SubscribeOptions::create<std_msgs::Float32>(
-      robotNS + "/cmd_turnLeft",
-      10,
-      boost::bind(&WheelPlugin::TurnLeft, this, _1),
-      ros::VoidPtr(), &this->rosQueue);
-
-	  ros::SubscribeOptions turnF = ros::SubscribeOptions::create<std_msgs::Float32>(
-      robotNS + "/cmd_moveForward",
-      10,
-      boost::bind(&WheelPlugin::MoveForward, this, _1),
-      ros::VoidPtr(), &this->rosQueue);
-
-		ros::SubscribeOptions turnB = ros::SubscribeOptions::create<std_msgs::Float32>(
-      robotNS + "/cmd_moveBack",
-      10,
-      boost::bind(&WheelPlugin::MoveBackward, this, _1),
-      ros::VoidPtr(), &this->rosQueue);
-
-	  ros::SubscribeOptions bso = ros::SubscribeOptions::create<std_msgs::Float32>(
-      robotNS + "/cmd_brake",
-      10,
-      boost::bind(&WheelPlugin::Brake, this, _1),
-      ros::VoidPtr(), &this->rosQueue);
 		ros::SubscribeOptions odomSo = ros::SubscribeOptions::create<nav_msgs::Odometry>(
 			this->subTopic,
 			100,
@@ -87,14 +71,8 @@ namespace gazebo
 		);
 
 		this->odomSub = this->rosNode->subscribe(odomSo);
-		this->turnRightSub = this->rosNode->subscribe(turnSo);
-		this->turnLeftSub = this->rosNode->subscribe(turnLSo);
-		this->forwardSub = this->rosNode->subscribe(turnF);
-		this->bacSub = this->rosNode->subscribe(turnB);
-		this->brakeSub = this->rosNode->subscribe(bso);
 		//Create A publisher
 		this->rosPub = this->rosNode->advertise<geometry_msgs::Twist>(this->pubTopic, 1000);
-
 	}
 	/**
 	 * Get the neccessary plugin parameters from sdf file.
@@ -129,25 +107,12 @@ namespace gazebo
 			kp = kp;
 			ROS_INFO("Using KP %f.\n", this->kp);
 		}
-		if(sdf_ptr->HasElement("turnMargin")){
-			turnMargin = atof(sdf_ptr->GetElement("turnMargin")->GetValue()->GetAsString().c_str());
-			ROS_INFO("Using Turn Margin %f.\n", this->turnMargin);
-
-		}
 		if(sdf_ptr->HasElement("turnAccuracy")){
 			turnAccuracy = atof(sdf_ptr->GetElement("turnAccuracy")->GetValue()->GetAsString().c_str());
 			ROS_INFO("Using Turn Accuracy %f.\n", this->turnAccuracy);
 
 		}
 	}
-
-	void WheelPlugin::QueueThread(){
-		static const double timeout = 0.01;
-		while (this->rosNode->ok())
-		{
-			this->rosQueue.callAvailable(ros::WallDuration(timeout));
-		}
-	};
 	void WheelPlugin::QueeThreadOdom(){
 		static const double timeout = 0.01;
 		while (this->rosNode->ok())
