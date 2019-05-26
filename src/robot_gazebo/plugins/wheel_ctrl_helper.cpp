@@ -104,8 +104,19 @@ namespace gazebo
 		}
 		if(sdf_ptr->HasElement("kp")){
 			kp = atof(sdf_ptr->GetElement("kp")->GetValue()->GetAsString().c_str());
-			kp = kp;
 			ROS_INFO("Using KP %f.\n", this->kp);
+		}
+		if(sdf_ptr->HasElement("ki")){
+			ki = atof(sdf_ptr->GetElement("ki")->GetValue()->GetAsString().c_str());
+			ROS_INFO("Using ki %f.\n", this->ki);
+		}
+		if(sdf_ptr->HasElement("kd")){
+			kd = atof(sdf_ptr->GetElement("kd")->GetValue()->GetAsString().c_str());
+			ROS_INFO("Using KD %f.\n", this->kd);
+		}
+		if(sdf_ptr->HasElement("dt")){
+			dt = atof(sdf_ptr->GetElement("dt")->GetValue()->GetAsString().c_str());
+			ROS_INFO("Using dt %f.\n", this->dt);
 		}
 		if(sdf_ptr->HasElement("turnAccuracy")){
 			turnAccuracy = atof(sdf_ptr->GetElement("turnAccuracy")->GetValue()->GetAsString().c_str());

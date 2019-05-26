@@ -101,7 +101,7 @@ bool nav::adjustOrientation(Eigen::Vector3d dest_vect){
     }
     return false;
 }
-/* Return the angle difference betweeen The robots current pose
+/* Return the angle difference betweeen The robots current pose (front vector)
    and the destination vector dest_vect
 */
 float nav::getAngleDiff(Eigen::Vector3d dest_vect){
@@ -130,6 +130,7 @@ bool nav::controlSpeed(Eigen::Vector3d dest){
     while(true){
         auto temp_distance = (Eigen::Vector3d(x,y,0.0) - dest).norm();
         vel.data = kp * temp_distance;
+        vel.data = vel.data > 2.3 ? 2.3 : vel.data;   
         if( temp_distance <= distanceAccuracy){
             ROS_INFO("Destination Reached!");
             robot_lib::Steering s;
@@ -141,7 +142,7 @@ bool nav::controlSpeed(Eigen::Vector3d dest){
             ROS_INFO("Angle Diverging, Angle difference > 10 degrees, adjusting orientation");
             adjustOrientation(dest);
         }
-        //Accelerate for the last 80% of the distance
+        //Accelerate for the last 20% of the distance
         if (accelerate && temp_distance < 0.2  * distance ){
             ROS_INFO("Accelerating");
             kp = this->kp + 0.5;

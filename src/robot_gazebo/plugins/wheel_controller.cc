@@ -27,7 +27,7 @@ namespace gazebo
 		v.linear.x =  req.val;
 		v.linear.y = v.linear.z = v.angular.x = 0;
 		rosPub.publish(v);
-		return true;
+		return res.suc = true;
 	};
 
 	bool WheelPlugin::MoveBackward(robot_lib::Steering::Request& req, robot_lib::Steering::Response& res){
@@ -35,19 +35,20 @@ namespace gazebo
 		v.linear.x = -1 * req.val;
 		v.linear.y = v.linear.z = v.angular.x = 0;
 		rosPub.publish(v);
-		return true;
+		return res.suc = true;
 	};
 
 	bool WheelPlugin::TurnRight(robot_lib::Steering::Request& req, robot_lib::Steering::Response& res){
 
-		assert(req.val > 0 && req.val < 180);
+		assert(req.val >= 0 && req.val <= 180);
 		Turn(-1 * req.val, true);
-		return true;
+		return res.suc = true;
 	}
 	bool WheelPlugin::TurnLeft(robot_lib::Steering::Request& req, robot_lib::Steering::Response& res){
-		assert(req.val > 0 && req.val < 180);
+		assert(req.val >= 0 && req.val <= 180);
 		Turn(req.val, false);
-		return true;
+
+		return res.suc = true;
 	}
 	void WheelPlugin::Turn(double angle,bool right){
 			Brake();
@@ -63,13 +64,19 @@ namespace gazebo
 			double init_yaw = this->yaw, prev_yaw = this->yaw;
 			double err=GetError(prev_yaw, goal_yaw, right);
 			ros::Rate r(300);
+
 			ROS_INFO("Goal Yaw is %f,err is %f, this yaw is %f",goal_yaw, err, this->yaw);
+			double integral=0,Iout=0,derivative,prev_err=err;
 			//Publish velocity continously then examine odometry to know when to stop
 			while(true){
 				err  =GetError(this->yaw, goal_yaw, right);
+				integral += dt * err;
+				Iout =integral * ki;
+				derivative = dt == 0? 0: (err - prev_err)/dt;
+				derivative *= kd;
 				//Preserve the sign, make magnitude 1
 				velocity.angular.z /= fabsf64(velocity.angular.z);
-				velocity.angular.z *= this->kp * err;
+				velocity.angular.z *= this->kp * err+ Iout + derivative;
 				if( err <= turnAccuracy){
 					ROS_INFO("Done! Goal Yaw is %f,this yaw is %f\n",goal_yaw, this->yaw);
 					Brake();
@@ -81,13 +88,17 @@ namespace gazebo
 					init_yaw = this->yaw;
 					right = !right;
 					err  =GetError(this->yaw, goal_yaw, right);
+					integral = 0;
+					Iout =0;
+					derivative = 0;
 					//Preserve the sign, make magnitude 1
 					velocity.angular.z /= fabsf64(velocity.angular.z);
 					//Reversse back to the goal yaw
-					velocity.angular.z *= -1 *this->kp * err;
+					velocity.angular.z *= -1 *(this->kp * err + Iout + derivative);
 				}
 				rosPub.publish(velocity);
 				r.sleep();
+				prev_err = err;
 			}
 	};
 	//is Called back when odometry messages are available.

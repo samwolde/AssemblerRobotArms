@@ -131,7 +131,82 @@ class CylindericalLink(Link):
         self.appendChild(self.col_vis.col_vis[0])
         self.appendChild(self.col_vis.col_vis[1])
 
+class Plugin(DOM.Element):
+    def __init__(self, name:str, filename:str,parameters:dict):
+        super().__init__("plugin")
+        sdf = Sdf.createSdfDoc()
+        self.setAttributeNode(sdf.createAttribute("filename"))
+        self.setAttributeNode(sdf.createAttribute("name"))
+        self.setAttribute("filename", filename)
+        self.setAttribute("name", name)
 
+        for p in parameters:
+            param = sdf.createElement(p)
+            param.appendChild(sdf.createTextNode(str(parameters[p])))
+            self.appendChild(param)
+
+
+'''
+    Generic Sensor Class
+'''
+class _Sensor(DOM.Element):
+
+    def __init__(self, name:str, type:str,updateRate, visualize_, pose_p:Pose, plugin:Plugin):
+        super().__init__("sensor")
+        sdf_doc = Sdf.createSdfDoc()
+        self.setAttributeNode(sdf_doc.createAttribute("name"))
+        self.setAttribute("name",name)
+        self.setAttributeNode(sdf_doc.createAttribute("type"))
+        self.setAttribute("type",type)
+        update_rate = sdf_doc.createElement("update_rate")
+        update_rate.appendChild(sdf_doc.createTextNode(str(updateRate)))
+        pose = sdf_doc.createElement("pose")
+        text = "{0} {1} {2} {3} {4} {5}".format(pose_p.loc.x,pose_p.loc.y,pose_p.loc.z,pose_p.orie.x,pose_p.orie.y,pose_p.orie.z)
+        textNode = sdf_doc.createTextNode(text)
+        pose.appendChild(textNode)
+        visualize = sdf_doc.createElement("visualize")
+
+        visualize.appendChild(sdf_doc.createTextNode(str(visualize_)))
+        self.appendChild(visualize)
+        self.appendChild(update_rate)
+        self.appendChild(pose)
+        self.appendChild(plugin)
+'''
+    Infrared sensor
+'''
+class IRSensor(_Sensor):
+    def __init__(self, name:str, hr:dict, vert:dict,range_:dict,pose:Pose, plugin:Plugin):
+        super().__init__(name,"ray", 50,"true", pose, plugin)
+        sdf_doc = Sdf.createSdfDoc()
+
+        ray  = sdf_doc.createElement("ray")
+        scan = sdf_doc.createElement("scan")
+        hor = sdf_doc.createElement("horizontal")
+        ver = sdf_doc.createElement("vertical")
+        range_el = sdf_doc.createElement("range")
+
+        scan.appendChild(hor)
+        scan.appendChild(ver)
+
+        ray.appendChild(scan)
+        ray.appendChild(range_el)
+        self.appendChild(ray)
+        for h in hr:
+            t = sdf_doc.createElement(h)
+            t.appendChild(sdf_doc.createTextNode(str(hr[h])))            
+            hor.appendChild(t)
+        for v in vert:
+            t = sdf_doc.createElement(v)
+            t.appendChild(sdf_doc.createTextNode(str(vert[v])))
+            ver.appendChild(t)
+        for r in range_:
+            t = sdf_doc.createElement(r)
+            t.appendChild(sdf_doc.createTextNode(str(range_[r])))
+            range_el.appendChild(t)
+        
+        always_on = sdf_doc.createElement("always_on")
+        always_on.appendChild(sdf_doc.createTextNode("true"))
+        self.appendChild(always_on)
 
 class CylindericalLinkWithSensor(CylindericalLink):
 
@@ -324,20 +399,6 @@ class Axis(DOM.Element):
         if(upper_s == None or lower_s == None):
             return
         self.appendChild(limit)
-
-class Plugin(DOM.Element):
-    def __init__(self, name:str, filename:str,parameters:dict):
-        super().__init__("plugin")
-        sdf = Sdf.createSdfDoc()
-        self.setAttributeNode(sdf.createAttribute("filename"))
-        self.setAttributeNode(sdf.createAttribute("name"))
-        self.setAttribute("filename", filename)
-        self.setAttribute("name", name)
-
-        for p in parameters:
-            param = sdf.createElement(p)
-            param.appendChild(sdf.createTextNode(str(parameters[p])))
-            self.appendChild(param)
 
 class math_helper():
     def __init__(self, orie:Orientation):

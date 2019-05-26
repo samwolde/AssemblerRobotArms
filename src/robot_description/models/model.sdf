@@ -595,12 +595,15 @@
 				</limit>
 			</axis>
 		</joint>
-		<plugin filename="libwheel_plugin.so" name="test_plug">
+		<plugin filename="libwheel_plugin.so" name="wheel_ctr">
 			<prefix>wheely/steering</prefix>
 			<velPubTopic>cmd_wheel</velPubTopic>
 			<odometrySubTopic>odom</odometrySubTopic>
-			<kp>5</kp>
-			<turnAccuracy>0.04</turnAccuracy>
+			<kp>2</kp>
+			<ki>6</ki>
+			<kd>2</kd>
+			<dt>0.01</dt>
+			<turnAccuracy>0.01</turnAccuracy>
 		</plugin>
 		<plugin filename="libgazebo_ros_skid_steer_drive.so" name="skid_steer_controller">
 			<alwaysOn>true</alwaysOn>
@@ -1044,5 +1047,71 @@
 		</joint>
 		<plugin filename="libgripper_plugin.so" name="gripper_plugin"/>
 		<plugin filename="libarm_controller.so" name="arm_controller"/>
+		<link name="IR_link">
+			<pose>0 -0.31 0.19649999999999998 0 0 0</pose>
+			<inertial>
+				<inertia>
+					<ixx>0.00000100</ixx>
+					<iyy>0.00000100</iyy>
+					<izz>0.00000100</izz>
+				</inertia>
+				<mass>0.00001000</mass>
+			</inertial>
+			<visual name="IR_link_vis">
+				<geometry>
+					<box>
+						<size>0.02 0.02 0.02</size>
+					</box>
+				</geometry>
+			</visual>
+			<collision name="IR_link_col">
+				<geometry>
+					<box>
+						<size>0.02 0.02 0.02</size>
+					</box>
+				</geometry>
+			</collision>
+			<sensor name="ir_sensor" type="ray">
+				<visualize>true</visualize>
+				<update_rate>50</update_rate>
+				<pose>0 -0.01 0 0 0 -1.5707963267948966</pose>
+				<plugin filename="libgazebo_ros_range.so" name="gazebo_ros_range">
+					<gaussianNoise>0.005</gaussianNoise>
+					<alwaysOn>true</alwaysOn>
+					<updateRate>50</updateRate>
+					<topicName>wheely/sensor/ir</topicName>
+					<frameName>IR_link</frameName>
+					<radiation>infrared</radiation>
+					<fov>0.2967</fov>
+				</plugin>
+				<ray>
+					<scan>
+						<horizontal>
+							<samples>10</samples>
+							<resolution>1</resolution>
+							<min_angle>-0.1308996938995747</min_angle>
+							<max_angle>0.1308996938995747</max_angle>
+						</horizontal>
+						<vertical>
+							<samples>1</samples>
+							<resolution>1</resolution>
+							<min_angle>0</min_angle>
+							<max_angle>0</max_angle>
+						</vertical>
+					</scan>
+					<range>
+						<min>0.01</min>
+						<max>5</max>
+						<resolution>0.02</resolution>
+					</range>
+				</ray>
+				<always_on>true</always_on>
+			</sensor>
+		</link>
+		<joint name="IR_body_joint" type="fixed">
+			<pose>0 0.01 0 0 0 0</pose>
+			<child>IR_link</child>
+			<parent>body_link</parent>
+		</joint>
 	</model>
 </sdf>

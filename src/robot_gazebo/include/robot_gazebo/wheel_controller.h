@@ -32,7 +32,7 @@ class WheelPlugin : public ModelPlugin
 		/*Given some deegre set the angular velocity for some time
 			to achive a left turn of the degree*/
 		bool TurnLeft(robot_lib::Steering::Request& req, robot_lib::Steering::Response& res);
-		bool Brake(robot_lib::Steering::Request& req, robot_lib::Steering::Response& res){this->Brake();return true;};
+		bool Brake(robot_lib::Steering::Request& req, robot_lib::Steering::Response& res){this->Brake();return res.suc =true;};
 		void Brake();
 		void odometryMsg(nav_msgs::OdometryConstPtr odom);
   
@@ -58,7 +58,7 @@ class WheelPlugin : public ModelPlugin
 		nav_msgs::Odometry odometry;
 		
 		double turnAccuracy=0.003;
-		double roll,pitch, yaw,kp=0.2;
+		double roll,pitch, yaw,kp=0.2,ki,kd,dt;
 		double velocity=0.2,angularVel=3.14;
 		physics::ModelPtr model;
 		event::ConnectionPtr con;

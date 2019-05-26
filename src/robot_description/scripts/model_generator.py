@@ -131,19 +131,56 @@ pose_wheelj = Pose(Location(0,0, wheel_length/2), Orientation(0,-rad(90),0))
 joint_axel4_wheel = RevoluteJoint("axel_wheel_4",pose_wheelj, "wheel_4","axel_4",wheel_upper_limit,wheel_lower_limit,Orientation(1,0,0))
 
 
+ir_pose = Pose(Location(0,-height/2-0.02/2,body_depth), Orientation(0,0,0) )
+ir_sensor_link = RectangularLink("IR_link", ir_pose,1e-5, [0.02,0.02,0.02],[1e-6,1e-6,1e-6])
+
+ir_joint_pose = Pose(Location(0,0.02/2,0), Orientation(0,0,0))
+ir_joint = Joint("IR_body_joint", "fixed", ir_joint_pose,"IR_link","body_link")
+
+ir_hori_vert_param = {
+    "samples":"10",
+    "resolution":"1",
+    "min_angle":str(-PI/24),
+    "max_angle":str(PI/24)
+}
+ir_vert_param = {
+    "samples":"1",
+    "resolution":"1",
+    "min_angle":"0",
+    "max_angle":"0"
+}
+ir_plugin = Plugin("gazebo_ros_range", "libgazebo_ros_range.so", {
+    "gaussianNoise":0.005,
+    "alwaysOn":"true",
+    "updateRate":50,
+    "topicName":"wheely/sensor/ir",
+    "frameName":"IR_link",
+    "radiation":"infrared",
+    "fov":"0.2967"
+})
+ir_sensor = IRSensor("ir_sensor",ir_hori_vert_param,ir_vert_param,{
+    "min":"0.01",
+    "max":"5",
+    "resolution":"0.02"},Pose(Location(0,-0.01,0), Orientation(0,0,-PI/2)),ir_plugin
+)
+ir_sensor_link.appendChild(ir_sensor)
+
 ## create a plugin
 
 
-wheel_ctrl = Plugin("test_plug","libwheel_plugin.so", 
+wheel_ctrl = Plugin("wheel_ctr","libwheel_plugin.so", 
 {
     "prefix":"wheely/steering",
     "velPubTopic":"cmd_wheel",
     "odometrySubTopic":"odom",
-    #Tweak the below two parameteres if the turning angle overshoots.
+    #Tweak the below parameteres if the turning angle overshoots.
     #Or the car is slowly turning.
-    "kp":5,                   #Increase kp if car turn rate is slow, decrease if turning angle overshoots too often
+    "kp":2,                   #Increase kp if car turn rate is slow, decrease if turning angle overshoots too often
+    "ki":6,
+    "kd":2,
+    "dt":0.01,
     # turns within goal_radian +- turn_accuracy, higher accuracy higher turning time
-    "turnAccuracy":0.04
+    "turnAccuracy":0.01
 })
 # tsp_plugin = Plugin("test_tsp", "libtsp_plugin.so",
 # {
@@ -310,7 +347,7 @@ wheel_ctrl, skid_steer_ctrl,
 palm, palm_joint, finger_one, finger_one_joint, finger_two, finger_two_joint, finger_three, finger_three_joint, 
 finger_four, finger_four_joint, finger_one_tip, finger_one_tip_joint, finger_two_tip, finger_two_tip_joint, 
 finger_three_tip, finger_three_tip_joint, finger_four_tip, finger_four_tip_joint, 
-gripper_plugin, arm_control_plugin
+gripper_plugin, arm_control_plugin,ir_sensor_link,ir_joint
 ]#,tsp_plugin]
 
 model = Model("robot",links_joints)
