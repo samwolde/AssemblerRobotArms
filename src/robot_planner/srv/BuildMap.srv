@@ -1,0 +1,4 @@
+int32 mapSize
+float32 cellSize
+---
+bool mapBuilt

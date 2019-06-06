@@ -122,7 +122,7 @@ add_dependencies(nav robot_lib_gencpp)
 catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES robot_lib
-CATKIN_DEPENDS roscpp std_msgs message_runtime
+CATKIN_DEPENDS roscpp std_msgs message_runtime geometry_msgs
 #  DEPENDS system_lib
 
 )
