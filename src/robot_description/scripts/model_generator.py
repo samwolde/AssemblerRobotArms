@@ -131,17 +131,17 @@ pose_wheelj = Pose(Location(0,0, wheel_length/2), Orientation(0,-rad(90),0))
 joint_axel4_wheel = RevoluteJoint("axel_wheel_4",pose_wheelj, "wheel_4","axel_4",wheel_upper_limit,wheel_lower_limit,Orientation(1,0,0))
 
 
-ir_pose = Pose(Location(0,-height/2-0.02/2,body_depth), Orientation(0,0,0) )
-ir_sensor_link = RectangularLink("IR_link", ir_pose,1e-5, [0.02,0.02,0.02],[1e-6,1e-6,1e-6])
+ir_pose = Pose(Location(0,-height/2+0.02,body_depth+depth/2+0.03), Orientation(0,0,0) )
+ir_sensor_link = CylindericalLink("IR_link", ir_pose,0.06,1e-5, 0.02,[1e-6,1e-6,1e-6])
 
-ir_joint_pose = Pose(Location(0,0.02/2,0), Orientation(0,0,0))
-ir_joint = Joint("IR_body_joint", "fixed", ir_joint_pose,"IR_link","body_link")
+ir_joint_pose = Pose(Location(0,0,-0.06/2), Orientation(0,0,0))
+ir_joint = RevoluteJoint("IR_body_joint", ir_joint_pose,"IR_link","body_link",None,None,Orientation(0,0,1))
 
 ir_hori_vert_param = {
-    "samples":"10",
+    "samples":"1",
     "resolution":"1",
-    "min_angle":str(-PI/24),
-    "max_angle":str(PI/24)
+    "min_angle":0,
+    "max_angle":0
 }
 ir_vert_param = {
     "samples":"1",
@@ -150,7 +150,7 @@ ir_vert_param = {
     "max_angle":"0"
 }
 ir_plugin = Plugin("gazebo_ros_range", "libgazebo_ros_range.so", {
-    "gaussianNoise":0.005,
+    "gaussianNoise":0.0,
     "alwaysOn":"true",
     "updateRate":50,
     "topicName":"wheely/sensor/ir",
@@ -160,11 +160,12 @@ ir_plugin = Plugin("gazebo_ros_range", "libgazebo_ros_range.so", {
 })
 ir_sensor = IRSensor("ir_sensor",ir_hori_vert_param,ir_vert_param,{
     "min":"0.01",
-    "max":"5",
-    "resolution":"0.02"},Pose(Location(0,-0.01,0), Orientation(0,0,-PI/2)),ir_plugin
+    "max":"50",
+    "resolution":"1"},Pose(Location(0,-0.02,0.03), Orientation(0,0,-PI/2)),ir_plugin
 )
+ir_joint.addOde()
 ir_sensor_link.appendChild(ir_sensor)
-
+ir_sensor_ctrl = Plugin("IR_sensor_ctrl","libIR_sensor.so",{})
 ## create a plugin
 
 
@@ -175,9 +176,9 @@ wheel_ctrl = Plugin("wheel_ctr","libwheel_plugin.so",
     "odometrySubTopic":"odom",
     #Tweak the below parameteres if the turning angle overshoots.
     #Or the car is slowly turning.
-    "kp":2,                   #Increase kp if car turn rate is slow, decrease if turning angle overshoots too often
-    "ki":6,
-    "kd":2,
+    "kp":1.4,                   #Increase kp if car turn rate is slow, decrease if turning angle overshoots too often
+    "ki":5.5,
+    "kd":1.4,
     "dt":0.01,
     # turns within goal_radian +- turn_accuracy, higher accuracy higher turning time
     "turnAccuracy":0.01
@@ -341,13 +342,14 @@ joint_sup2_axel,susp_4,wheel_4,joint_sup4_body,joint_sup4_axel,
 wheel_axel_1, joint_axel1_wheel, wheel_axel_2,joint_axel2_wheel,wheel_axel_3,joint_axel3_wheel,wheel_axel_4,joint_axel4_wheel,
 susp_3,wheel_3,joint_sup3_body,joint_sup3_axel,
 # Arm links and joints
-armBaseLink, bodyLink_armBase, armBaseTopLink, armBase_armBaseTop, arm1Link, armBaseTop_arm1, arm2Link, arm1_arm2,  
+# armBaseLink, bodyLink_armBase, armBaseTopLink, armBase_armBaseTop, arm1Link, armBaseTop_arm1, arm2Link, arm1_arm2,  
 wheel_ctrl, skid_steer_ctrl,
 # Gripper links and joints
-palm, palm_joint, finger_one, finger_one_joint, finger_two, finger_two_joint, finger_three, finger_three_joint, 
-finger_four, finger_four_joint, finger_one_tip, finger_one_tip_joint, finger_two_tip, finger_two_tip_joint, 
-finger_three_tip, finger_three_tip_joint, finger_four_tip, finger_four_tip_joint, 
-gripper_plugin, arm_control_plugin,ir_sensor_link,ir_joint
+# palm, palm_joint, finger_one, finger_one_joint, finger_two, finger_two_joint, finger_three, finger_three_joint, 
+# finger_four, finger_four_joint, finger_one_tip, finger_one_tip_joint, finger_two_tip, finger_two_tip_joint, 
+# finger_three_tip, finger_three_tip_joint, finger_four_tip, finger_four_tip_joint, 
+# gripper_plugin, arm_control_plugin,
+ir_sensor_link,ir_joint,ir_sensor_ctrl
 ]#,tsp_plugin]
 
 model = Model("robot",links_joints)

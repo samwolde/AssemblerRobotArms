@@ -51,10 +51,7 @@ namespace gazebo
 		return res.suc = true;
 	}
 	void WheelPlugin::Turn(double angle,bool right){
-			Brake();
-			geometry_msgs::Twist velocity;
-			velocity.linear.x = velocity.linear.y = velocity.linear.z = 0;
-			
+			geometry_msgs::Twist velocity = this->odometry.twist.twist;			
 			/*Yaw and angular velocity opposite signs*/
 			velocity.angular.z = right ? this->angularVel : -1 *  this->angularVel;
 			double rad_ang =  M_PI * angle/180;
@@ -109,14 +106,18 @@ namespace gazebo
 		tf::Matrix3x3(tf_qut).getRPY(this->roll, this->pitch, this->yaw);
 	};	
 	void WheelPlugin::Brake(){
+			static auto stopedTurning = [](geometry_msgs::Twist current_vel){
+				current_vel.angular.z=trunc(current_vel.angular.z*100);			
+				return ((int)current_vel.angular.z == 0);
+			};
 			ros::Rate r(500);
 			geometry_msgs::Twist velocity;
 			geometry_msgs::Twist current_vel = this->odometry.twist.twist;
-
-			velocity.linear.x = velocity.linear.y = velocity.linear.z = 
-			velocity.angular.x = velocity.angular.y = velocity.angular.z = 0;
-			while( !this->HasStoped()){
+			velocity = current_vel;
+			velocity.angular.z = 0;
+			while( !stopedTurning(current_vel)){
 				this->rosPub.publish(velocity);
+				current_vel = this->odometry.twist.twist;
 				r.sleep();	
 			}
 	};

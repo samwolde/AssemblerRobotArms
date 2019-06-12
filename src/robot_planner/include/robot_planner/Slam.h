@@ -2,10 +2,13 @@
 #define SLAM_H
 
 #include <robot_planner/GridMap.h>
+#include <robot_planner/MapBuilder.h>
+#include <robot_planner/PathPlanner.h>
 #include <functional>
-#include <robot_lib/MinTour.h>
+#include <dirent.h>
+#include <robot_planner/BuildMap.h>
+#include <robot_lib/Sensor.h>
 #include <robot_lib/GoTo.h>
-#include <robot_lib/Steering.h>
 #include <iostream>
 #include <regex>
 #include <ignition/math/Vector3.hh>
@@ -22,16 +25,46 @@
 #include <eigen3/Eigen/Dense>
 #include <eigen3/Eigen/Geometry>
 #include <eigen3/Eigen/Core>
+#include <sensor_msgs/Range.h>
+#include <signal.h>
+#include <std_msgs/Float32.h>
 #include <thread>
 
 namespace wheely_planner{
 class Slam{
     public:
         Slam();
-        /*Take N samples turning a 360 degrees*/
-        bool UpdateMap();
+        Slam(MapFile map);
+        void init();
+        void A_S_PlanPath(Coordinate to);
+        void constructPath(Cell* node);
+        void gotoPt(geometry_msgs::PointConstPtr);
+        //ROS subscriptions
+        void odometryMsg(nav_msgs::OdometryConstPtr odom);
+        void rangeMsg(sensor_msgs::RangeConstPtr range);
+        void senseMsg(std_msgs::Float32ConstPtr state);
+        void odomQueueCb();
+        void senseQueueCb();
+        void rangeQueueCb();
+        void clicked_sub(geometry_msgs::PointConstPtr);
     private:
         GridMap* gridMap;
+        MapBuilder* mapBuilder;
+        PathPlanner* pathPlanner;
+        int sampleSize,kh,mapSize;
+        double roll,  pitch, yaw,x,y,z,sensor_offset,robo_radius,cellSize/*Change this if robots height(along the Y-axis changes)*/;
+        double sensor_angle,range;
+        ros::Publisher pub,marker_pub;
+        visualization_msgs::Marker begin_end,explored_pts,path_found;
+        ros::NodeHandlePtr rosNode;
+        ros::ServiceClient sensorTurn, mvFrwdC, turnRC, turnLC, brakeC,goto_cl;   
+        ros::CallbackQueue odom_queue,range_queue,sense_queue;
+        ros::Subscriber sub,range_sub,sens_sub,cmd_go_sub,updateMapSub,mapSave;
+        std::thread odomQueueThread,rangeThread,sense_th;
+        nav_msgs::Odometry odometry;
+        geometry_msgs::Point pose;
 };
+
 }
+
 #endif

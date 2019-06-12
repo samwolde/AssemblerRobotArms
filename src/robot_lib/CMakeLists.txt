@@ -67,6 +67,7 @@ add_service_files(
    GoTo.srv
    MinTour.srv
    Steering.srv
+   Sensor.srv
    MoveArm.srv
    MoveGripper.srv
 )

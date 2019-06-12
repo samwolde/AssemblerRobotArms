@@ -88,8 +88,9 @@ bool nav::GetMinTour(robot_lib::MinTour::Request& req, robot_lib::MinTour::Respo
 bool nav::adjustOrientation(Eigen::Vector3d dest_vect){
     std_msgs::Float32 theta;
     theta.data =  getAngleDiff(dest_vect);
+    dest_vect[2] = 0;
     robot_lib::Steering str;
-    ROS_INFO("Theta is %f", theta.data);
+    ROS_INFO("Theta is %f, z is %f", theta.data,dest_vect.z());
     if (theta.data < 0){
         theta.data *= -1;
         str.request.val = theta.data;
@@ -119,54 +120,70 @@ float nav::getAngleDiff(Eigen::Vector3d dest_vect){
 /*Given the destination point (vector with initials (0,0,0))
     *It Controls the speed using a proportionla controller
 */
-bool nav::controlSpeed(Eigen::Vector3d dest){
+bool nav::controlSpeed(Eigen::Vector3d dest,bool isBegin, bool isFinalDest){
     std_msgs::Float32 vel;
     bool accelerate = true;
-    double kp = this->kp;
+    ros::Rate r(100);
+    dest[2] = 0.0;
     robot_lib::Steering str;
     // ros::Rate r(120);
-    auto distance = (Eigen::Vector3d(x,y,0.0) - dest).norm(); //distance
+    double err = (Eigen::Vector3d(x,y,0.0) - dest).norm(); //distance
+    double prev_err = err;
     ROS_INFO("Controlling Speed");
     while(true){
-        auto temp_distance = (Eigen::Vector3d(x,y,0.0) - dest).norm();
-        vel.data = kp * temp_distance;
-        vel.data = vel.data > 2.3 ? 2.3 : vel.data;   
-        if( temp_distance <= distanceAccuracy){
+        //if obstacle on the way return.
+        err = (Eigen::Vector3d(x,y,0.0) - dest).norm();  
+        if( err <= distanceAccuracy){
             ROS_INFO("Destination Reached!");
             robot_lib::Steering s;
-            bool ret = brakeC.call(s);        
+            bool ret = true;
+            if ( isFinalDest )
+                ret = brakeC.call(s);        
             ROS_INFO("Robot state yaw = %f, (%f,%f,%f)", yaw, x,y,z);
             return ret;
         }
-        if( fabsf32( getAngleDiff(dest)) > 10 ){
-            ROS_INFO("Angle Diverging, Angle difference > 10 degrees, adjusting orientation");
+        if( fabsf32( getAngleDiff(dest)) > 45 ){
+            ROS_INFO("Angle Diverging, Angle difference > 45 degrees, adjusting orientation");
             adjustOrientation(dest);
         }
-        //Accelerate for the last 20% of the distance
-        if (accelerate && temp_distance < 0.2  * distance ){
-            ROS_INFO("Accelerating");
-            kp = this->kp + 0.5;
-            accelerate = false;
+        auto current = odometry.twist.twist.linear.x;
+        if( isBegin || current <= 0.8){
+            str.request.val = 0.8;
+            if (!mvFrwdC.call(str)){
+                return false;
+            };
         }
-        str.request.val = vel.data;
-        if (!mvFrwdC.call(str)){
-            return false;
-        };
+        r.sleep();
+        prev_err = err;
     }
     return false;
 }
 bool nav::goTo(robot_lib::GoTo::Request& req, robot_lib::GoTo::Response& res){
-    auto * pt = &req.pt;
-    ROS_INFO("Starting tour...");   
-    Eigen::Vector3d destVect;
-        destVect << pt->x,
-                pt->y, 
-                0.0;
-    ROS_INFO("Going to node => Dest is (%f, %f)", 
-    pt->x,
-    pt->y);
-    res.s =adjustOrientation(destVect) && controlSpeed(destVect) ;
+    ROS_INFO("Starting tour...");  
+    auto begin =req.path.front();
+    auto end =req.path.back();
+    ROS_INFO("Going to node beign is (%f,%f) => Dest is (%f, %f)", 
+    begin.x,
+    begin.y, 
+    end.x,
+    end.y);
+    bool isBegin, isEnd;
+    for (auto pt : req.path)
+    {
+        Eigen::Vector3d destVect;
+        destVect << pt.x,
+                    pt.y, 
+                    0;
+        isBegin =pointsEqual(&pt, &begin);
+        isEnd = pointsEqual(&pt, &end) ;
+        res.s = isBegin || isEnd
+                ?adjustOrientation(destVect) && controlSpeed(destVect,isBegin,isEnd) 
+                :controlSpeed(destVect,isBegin,isEnd);   
+    }
     return res.s;
+}
+bool nav::pointsEqual(geometry_msgs::Point* p1, geometry_msgs::Point* p2){
+    return p1->x == p2->x && p1->y == p2->y;
 }
 //Continously update the odometry
 void nav::odometryMsg(nav_msgs::OdometryConstPtr odom){

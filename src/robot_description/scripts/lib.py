@@ -362,7 +362,19 @@ class Joint(DOM.Element):
         self.setAttributeNode(sdf_doc.createAttribute("type"))
         self.setAttribute("type",type)
         self.setAttribute("name",name)
+    def addOde(self):
+        sdf_doc = Sdf.createSdfDoc()
+        physics = sdf_doc.createElement("physics")
+        ode = sdf_doc.createElement("ode")
+        cfm = sdf_doc.createElement("cfm_damping")
+        imp = sdf_doc.createElement("implicit_spring_damper")
+        physics.appendChild(ode)
+        ode.appendChild(cfm)
+        ode.appendChild(imp)
 
+        cfm.appendChild(sdf_doc.createTextNode("1"))
+        imp.appendChild(sdf_doc.createTextNode("1"))
+        self.appendChild(physics)
 class RevoluteJoint(Joint):
     def __init__(self, name:str, pose:Pose,child:str, parent:str, upper, lower, axis_orie:Orientation):
         super().__init__(name,"revolute", pose, child, parent)

@@ -13,6 +13,8 @@ find_package(catkin REQUIRED COMPONENTS
   gazebo_ros
   rospy
   robot_lib
+  genmsg
+  message_generation
 )
 
 ## System dependencies are found with CMake's conventions
@@ -31,6 +33,13 @@ include_directories(
 
 add_library(wheel_plugin SHARED plugins/wheel_controller.cc plugins/wheel_ctrl_helper.cpp)
 target_link_libraries(wheel_plugin ${catkin_LIBRARIES} ${GAZEBO_LIBRARIES} ${roscpp_LIBRARIES})
+add_dependencies(wheel_plugin robot_gazebo_gencpp)
+add_dependencies(wheel_plugin robot_lib_gencpp)
+
+add_library(IR_sensor SHARED plugins/IR_sensor_ctrl.cpp )
+target_link_libraries(IR_sensor ${catkin_LIBRARIES} ${GAZEBO_LIBRARIES} ${roscpp_LIBRARIES})
+add_dependencies(IR_sensor robot_gazebo_gencpp)
+add_dependencies(IR_sensor robot_lib_gencpp)
 
 add_library(arm_controller SHARED plugins/arm_controller.cpp)
 target_link_libraries(arm_controller ${catkin_LIBRARIES} ${GAZEBO_LIBRARIES} ${roscpp_LIBRARIES})
@@ -40,6 +49,9 @@ target_link_libraries(gripper_plugin ${catkin_LIBRARIES} ${GAZEBO_LIBRARIES} ${r
 
 add_library(contact_plugin plugins/contact_plugin.cpp)
 target_link_libraries(contact_plugin ${catkin_LIBRARIES} ${GAZEBO_LIBRARIES} ${roscpp_LIBRARIES})
+
+add_library(ClickListner plugins/ClickListner.cpp)
+target_link_libraries(ClickListner ${catkin_LIBRARIES} ${GAZEBO_LIBRARIES} ${roscpp_LIBRARIES})
 
 ## Uncomment this if the package has a setup.py. This macro ensures
 ## modules and global scripts declared therein get installed

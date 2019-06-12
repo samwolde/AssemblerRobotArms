@@ -9,7 +9,7 @@ namespace gazebo
             current_vel.linear.z=trunc(current_vel.linear.z*100);
             current_vel.angular.z=trunc(current_vel.angular.z*100);			
             bool stoped = 
-            (current_vel.linear.x == 0 && current_vel.linear.y == 0 && current_vel.linear.z == 0 && current_vel.angular.z == 0);
+            ((int)current_vel.linear.x == 0 && (int)current_vel.linear.y == 0 && (int)current_vel.linear.z == 0 && (int)current_vel.angular.z == 0);
             return stoped;
     }
 	/*The turning angle overshoots if the distance between the starting yaw and the goal yaw is 

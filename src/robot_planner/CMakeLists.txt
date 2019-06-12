@@ -18,7 +18,7 @@ find_package(gazebo REQUIRED)
 link_directories(${GAZEBO_LIBRARY_DIRS})
 
 ## System dependencies are found with CMake's conventions
-# find_package(Boost REQUIRED COMPONENTS system)
+find_package(Boost REQUIRED COMPONENTS system)
 
 
 ## Uncomment this if the package has a setup.py. This macro ensures
@@ -76,7 +76,7 @@ generate_messages(
    std_msgs
 )
 
-add_executable(Slam src/Slam_main.cpp src/Slam.cpp src/GridMap.cpp)
+add_executable(Slam  src/Slam.cpp src/GridMap.cpp src/MapBuilder.cpp src/PathPlanner.cpp)
 target_link_libraries(Slam ${catkin_LIBRARIES} ${roscpp_LIBRARIES} ${GAZEBO_LIBRARIES})
 add_dependencies(Slam robot_planner_gencpp)
 

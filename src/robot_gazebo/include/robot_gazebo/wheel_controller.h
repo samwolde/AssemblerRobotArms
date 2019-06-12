@@ -1,3 +1,5 @@
+#ifndef WHEEL_CTRLR_H
+#define WHEEL_CTRLR_H
 #include <functional>
 #include <gazebo/gazebo.hh>
 #include <gazebo/physics/physics.hh>
@@ -32,7 +34,16 @@ class WheelPlugin : public ModelPlugin
 		/*Given some deegre set the angular velocity for some time
 			to achive a left turn of the degree*/
 		bool TurnLeft(robot_lib::Steering::Request& req, robot_lib::Steering::Response& res);
-		bool Brake(robot_lib::Steering::Request& req, robot_lib::Steering::Response& res){this->Brake();return res.suc =true;};
+		bool Brake(robot_lib::Steering::Request& req, robot_lib::Steering::Response& res){
+			ros::Rate r(500);
+			geometry_msgs::Twist velocity;
+			velocity.linear.x = velocity.linear.y = velocity.linear.z = 0;
+			while( !HasStoped()){
+				this->rosPub.publish(velocity);
+				r.sleep();	
+			}
+			return res.suc =true;
+			};
 		void Brake();
 		void odometryMsg(nav_msgs::OdometryConstPtr odom);
   
@@ -65,3 +76,5 @@ class WheelPlugin : public ModelPlugin
 		std::string robotNS="/",	pubTopic="/cmd_vel", subTopic="/odom";
     };
 }
+
+#endif
