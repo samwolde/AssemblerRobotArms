@@ -10,16 +10,18 @@ namespace wheely_planner
     Slam::Slam(){
         ROS_INFO("Slam Node Started");
         init();
-        gridMap = new GridMap(mapSize,cellSize);
-        mapBuilder = new MapBuilder(rosNode,gridMap, sensor_offset,sampleSize);
+        signal(10, shh);
+        gridMap = new GridMap(mapSize,cellSize,robo_radius,&marker_pub);
+        pathPlanner  = new PathPlanner(rosNode,gridMap,kh);
+        mapBuilder = new MapBuilder(rosNode,gridMap,pathPlanner, sensor_offset,sampleSize);
     }
     Slam::Slam(MapFile map){
         ROS_INFO("Slam Node Started");
         init();
         signal(10, shh);
-        gridMap = new GridMap(map,robo_radius);
-        mapBuilder = new MapBuilder(rosNode,gridMap, sensor_offset,sampleSize);
+        gridMap = new GridMap(map,robo_radius,&marker_pub);
         pathPlanner  = new PathPlanner(rosNode,gridMap,kh);
+        mapBuilder = new MapBuilder(rosNode,gridMap,pathPlanner, sensor_offset,sampleSize);
     }
     void Slam::init(){
         rosNode.reset(new ros::NodeHandle("~"));
@@ -30,6 +32,7 @@ namespace wheely_planner
         rosNode->getParam("cellSize",cellSize);
         rosNode->getParam("kh",kh);
         // rosNode->para
+        marker_pub = rosNode->advertise<visualization_msgs::Marker>("visualization_marker", 10);
         ROS_INFO("\nParameters kh %d, robo_radius %lf, sensor_offset %lf\n", kh, robo_radius, sensor_offset);
         odomQueueThread = std::thread(std::bind(&Slam::odomQueueCb, this));
         rangeThread = std::thread(std::bind(&Slam::rangeQueueCb, this));

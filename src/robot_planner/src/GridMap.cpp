@@ -2,15 +2,27 @@
 
 namespace wheely_planner{
 
+
+//Clone a gridMap
+GridMap::GridMap(GridMap* gridMap){
+    mapSize =gridMap->mapSize;
+    cellSize = gridMap->cellSize;
+    robot_radius = gridMap->robot_radius;
+    pub = gridMap->pub;
+    ROS_INFO("USING MAPSIZE %ld, CELLSIZE %f,",mapSize, cellSize);
+    allocateGrid();
+}
 //Needed to construct the map for the first time, new Environment
-GridMap::GridMap(size_t _mapSize, float _cellSize) :
-mapSize(_mapSize) , cellSize(_cellSize){
+GridMap::GridMap(size_t _mapSize, float _cellSize,double roborad, ros::Publisher* _pub) :
+mapSize(_mapSize) , cellSize(_cellSize),robot_radius(roborad),pub(_pub){
     //Create a grid of mapSize * mapSize
+    ROS_INFO("USING MAPSIZE %ld, CELLSIZE %f,",mapSize, cellSize);
     allocateGrid();
 }
 //Construct a GridMap from an already constructed map
-GridMap::GridMap(MapFile map,double robo_radius){
+GridMap::GridMap(MapFile map,double robo_radius,ros::Publisher* _pub):pub(_pub){
     std::string path = ros::package::getPath(THIS_ROS_PACKAGE_NAME);
+    robot_radius = robo_radius;
     path.append("/map/");
     path.append(map);
     ROS_INFO("Opening Map File : %s", path.c_str());
@@ -62,9 +74,8 @@ GridMap::GridMap(MapFile map,double robo_radius){
     }
     ROS_INFO("Loaded Map %s", map);
     ROS_INFO("Enlargin Obstacles");
-    EnlargeObstacles(robo_radius);
+    EnlargeObstacles();
 }
-
 bool GridMap::allocateGrid(){
     grid = (OccupancyGrid_t) malloc(mapSize * sizeof(OccupancyGrid *));
     if ( !grid ){ROS_ERROR("Grid Aloccation failed"); return false;}
@@ -106,7 +117,7 @@ std::vector<Cell> GridMap::getAdjacentCells(Coordinate_t c){
     }
     return adjacents;
 }  
-std::vector<Cell> GridMap::getAdjacentCells_8(Coordinate_t c){
+std::vector<Cell> GridMap::getAdjacentCells_8(Coordinate_t c,bool includeOccupied){
     Index * index = computeCellIndex(c->x,c->y);
     std::vector<Cell> adjacents;
     if( !index ) return adjacents;
@@ -122,11 +133,29 @@ std::vector<Cell> GridMap::getAdjacentCells_8(Coordinate_t c){
         if( i == 6) kx =0;
         ky = ky_s[i%3];
         Cell c(cx + kx, cy+ ky);
-        if ( !getCellStatus(&c.center))
+        if ( !getCellStatus(&c.center) || includeOccupied )
             adjacents.push_back(c);
     }
     
     return adjacents;
+}
+std::vector<Cell> GridMap::getAdjacentCells_24(Coordinate_t c){
+    std::unordered_map<Cell,Cell,CellKeyHasher> encountered;
+    std::vector<Cell> adjacents_24;
+    std::vector<Cell> adjacents_8 = getAdjacentCells_8(c);
+    for( auto cell : adjacents_8){
+        encountered[cell] = cell;
+        adjacents_24.push_back(cell);
+    }
+    for( auto cell : adjacents_8 ){
+        for ( auto n : getAdjacentCells_8(&cell.center) ){
+            if ( encountered.find(n) == encountered.end() ){
+                encountered[n] = n;
+                adjacents_24.push_back(n);
+            }
+        }
+    }
+    return adjacents_24;
 }
 Index* GridMap::computeCellIndex(double x, double y){
     //Calculate the distance of the cell's center from origin
@@ -165,10 +194,10 @@ bool GridMap::getCellStatus(Coordinate_t c){
     if(!grid) return true; //No map so its safer to assume point is an obstacle.
     return grid[i][j];
 }
-void GridMap::EnlargeObstacles(double roboRadius){
-    //Extract those deteted by sensor
+void GridMap::EnlargeObstacles(GridMap* dest){
+    //Extract those detected by sensor
     ROS_INFO("Enlarging Obstacles.");
-    if ( !grid ){
+    if (  !dest || !grid || !dest->grid ){
         ROS_ERROR("Erorr! No map file Found.");
         return;
     }
@@ -178,7 +207,7 @@ void GridMap::EnlargeObstacles(double roboRadius){
     {
         for (size_t j = 0; j < mapSize; j++)
         {
-            if( grid[i][j]){
+            if(grid[i][j]){
                 //remember it 
                 index = new Index(i,j);
                 computeCellCenter(index); 
@@ -190,32 +219,56 @@ void GridMap::EnlargeObstacles(double roboRadius){
     for (auto index : occupiedGrids)
     {
         auto c = Coordinate(index->cx,index->cy);
-        EnlargeObstacles(&c, roboRadius);
+        EnlargeObstacles(c,dest);
         delete index;
     }
 }
+void GridMap::EnlargeObstacles(){
+    EnlargeObstacles(this);
+}
+
 //Enlarge the obstacle located at the cell where c belongs
-void GridMap::EnlargeObstacles(Coordinate_t c,double robot_radius){
+void GridMap::EnlargeObstacles(Coordinate c,GridMap* dest){
     //Expand X by using breadth first search
+    size_t ratio = std::ceil(robot_radius / dest->cellSize);
+    // ROS_INFO("CELL RATIO IS %ld,",ratio);
+    std::vector<std::vector<Coordinate>> level;
+    std::vector<Coordinate > lvl_0;
+    lvl_0.push_back(c);
+    level.push_back(lvl_0);
+    for( int i=0;i <= ratio ; i++){
+        std::vector<Coordinate> levl_i;
+        for( auto coord : level[i]){
+            for( auto neighbours : getAdjacentCells_8(&coord)){
+                levl_i.push_back(neighbours.center);
+                dest->setCellStatus(neighbours.center.x,neighbours.center.y);
+            }
+        }
+        level.push_back(levl_i);
+    }
+}
+std::queue<Coordinate> GridMap::getNearestUnoccupied(Coordinate_t c){
+    std::queue<Coordinate> valids;
     size_t ratio = std::ceil(robot_radius / cellSize);
     // ROS_INFO("CELL RATIO IS %ld,",ratio);
-    std::queue<Coordinate_t> queue;
-    queue.push(c);
-    for (size_t i = 0; i <= ratio; i++)
-    {
-        if( queue.empty() ) break;
-        c = queue.front();
-        queue.pop();
-        for (auto neighbors : getAdjacentCells_8(c)) //getAdjacentCells returns unoccupied adjacent cells
-        {
-            auto i = computeCellIndex(neighbors.center.x, neighbors.center.y);
-            if( !i ) continue;
-            if( !grid[i->i][i->j]) grid[i->i][i->j] = true;
-            delete i;
-            // ROS_INFO("Enlarging (%f,%f), Neighbors (%f,%f)",c->x,c->y,neighbors.center.x,neighbors.center.y);
-            if( ratio != 1 ) queue.push(&neighbors.center);
+    std::vector<std::vector<Coordinate>> level;
+    std::vector<Coordinate > lvl_0;
+    lvl_0.push_back(*c);
+    level.push_back(lvl_0);
+    for( int i=0;i <= ratio ; i++){
+        std::vector<Coordinate> levl_i;
+        for( auto coord : level[i]){
+            for( auto neighbour : getAdjacentCells_8(&coord,true)){
+                if( !getCellStatus(&neighbour.center) ){
+                    
+                    valids.push(neighbour.center);
+                }
+                levl_i.push_back(neighbour.center);
+            }
         }
+        level.push_back(levl_i);
     }
+    return valids;
 }
 void GridMap::storePtForVis(Coordinate_t c , visualization_msgs::Marker* marker){
         geometry_msgs::Point p;
@@ -250,7 +303,7 @@ void GridMap::saveMap(const std_msgs::StringConstPtr str){
     close(fd);
     fflush(NULL);
 }
-void GridMap::visualizeMap(ros::Publisher *pub){
+void GridMap::visualizeMap(double * rgb, int id){
     if( !grid ){ 
         ROS_ERROR("No map found for visualization.");
         return;
@@ -270,10 +323,10 @@ void GridMap::visualizeMap(ros::Publisher *pub){
             }
         }
     }
-    visualizeMapData(pub,&cells,0,new double[3]{0,1,0});
+    visualizeMapData(&cells,id,rgb);
 }
 
-void GridMap::visualizeMapData(ros::Publisher *pub, visualization_msgs::Marker *marker,int id,double *rgb,double * scale){
+void GridMap::visualizeMapData(visualization_msgs::Marker *marker,int id,double *rgb,double * scale){
     marker->header.frame_id = "/odom";
     marker->header.stamp = ros::Time();
     marker->ns = "wheely";

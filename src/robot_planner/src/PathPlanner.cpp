@@ -4,12 +4,11 @@ namespace wheely_planner
 {
     PathPlanner::PathPlanner(ros::NodeHandlePtr rosNode,GridMap* grid, double kh ){
         goto_cl = rosNode->serviceClient<robot_lib::GoTo>("/wheely/nav/goto_srv");
-        marker_pub = rosNode->advertise<visualization_msgs::Marker>("visualization_marker", 10);
         cmd_go_sub = rosNode->subscribe( "/wheely/clicked_pos",10,&PathPlanner::clicked_sub,this);
         gridMap = grid;
         this->kh = kh;
     }
-    void PathPlanner::A_S_PlanPath(Coordinate to){
+    Cell PathPlanner::A_S_PlanPath(Coordinate from, Coordinate to){
         // rosNode->param<int>("kh",kh,1);
         int k_heuristics = kh;
         static double uniform_cost = 2;
@@ -25,15 +24,16 @@ namespace wheely_planner
         Index * i = gridMap->computeCellIndex(to.x,to.y);
         if( !i ) {
             ROS_ERROR("Goal (%f,%f) Not On the map, Can't navigate to it.", to.x,to.y);
-            return;
+            return Cell(0,0);
         }
         Cell goal(i->cx,i->cy);
         delete i;
         //Identify start as current pose, insert in priority_queue.
-        i = gridMap->computeCellIndex(this->x,this->y);
+        i = gridMap->computeCellIndex(from.x,from.y);
         if( !i ) {
-            ROS_ERROR("start (%f,%f) Not registered on the map,Aborting.", this->x,this->y);
-            return;
+            ROS_ERROR("start (%f,%f) Not registered on the map,Aborting.", from.x,from.y);
+            goal.parent = nullptr;
+            return goal;
         }
         auto start = Cell(i->cx,i->cy);
         delete i;
@@ -60,7 +60,7 @@ namespace wheely_planner
                 break;
             }
             //process adjacent cells that are open 
-            std::vector<Cell> neighbors = gridMap->getAdjacentCells_8(&c.center);
+            std::vector<Cell> neighbors = gridMap->getAdjacentCells_24(&c.center);
             for (auto  neighbor: neighbors)
             {
                 double n_cost = c.g + uniform_cost;
@@ -78,20 +78,22 @@ namespace wheely_planner
         if(found_path ){
             ROS_INFO("Found Path from (%f, %f) -> (%f, %f)",start.center.x,start.center.y,goal.center.x,goal.center.y);
             ROS_INFO("Nodes Visited %d",nodes_visited);
-            constructPath(&encountered[goal]);
+            return encountered[goal];
         }
+        goal.parent = nullptr;
+        return goal;
     }
 
-    void PathPlanner::constructPath(Cell *node){
+    std::stack<Cell*> PathPlanner::constructPath(Cell *node){
+        std::stack<Cell*> path;
         if( !node  ){
             ROS_INFO("Not a valid path node is null");
-            return;
+            return path;
         }
         if(!node->parent){
             ROS_INFO("Not a valid path parent is null");
-            return;
+            return path;
         }
-        std::stack<Cell*> path;
         path_found.points.clear();
         auto parent = node;
         while( parent != nullptr ){
@@ -99,20 +101,34 @@ namespace wheely_planner
             gridMap->storePtForVis(&parent->center, &path_found);
             parent = parent->parent;
         }
-        gridMap->visualizeMapData(&marker_pub,&path_found,3,COLOR_LIGHT_BLUE,SCALE_MAP_Z(1));
+        //pop the init node.
+        path.pop();
+        gridMap->visualizeMapData(&path_found,2,COLOR_LIGHT_BLUE,SCALE_MAP_Z(1));
+        gridMap->visualizeMap();
+        // pause();
+        return path;
+    }
+    bool PathPlanner::FollowPath(std::stack<Cell*>* path){
         robot_lib::GoTo g;
-        while( !path.empty() ){
-            auto n = path.top();
-            path.pop();
+        while( !path->empty() ){
+            auto n = path->top();
+            path->pop();
             geometry_msgs::Point pt;
             pt.x = n->center.x;
             pt.y = n->center.y;
             g.request.path.push_back(pt);
         }
-        goto_cl.call(g);
+        return goto_cl.call(g);
     }
     void PathPlanner::clicked_sub(geometry_msgs::PointConstPtr pt){
+        // return;
         ROS_INFO("Calling A_S_PlanPath Sart %f,%f -> Goal  %f, %f...",this->x,this->y,pt->x, pt->y);
-        A_S_PlanPath(Coordinate(pt->x,pt->y));
+        auto goal = A_S_PlanPath(Coordinate(this->x,this->y),Coordinate(pt->x,pt->y));
+        if ( !goal.parent ){
+            ROS_INFO("Path Not Found!");
+            return;
+        }
+        auto path = constructPath(&goal);
+        // FollowPath(&path);
     }
 } // namespace wheely_planner

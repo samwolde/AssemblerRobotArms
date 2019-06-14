@@ -130,14 +130,52 @@ joint_sup4_axel = Joint("susp_axel_4","fixed",pose_axelj, "axel_4","susp_4")
 pose_wheelj = Pose(Location(0,0, wheel_length/2), Orientation(0,-rad(90),0))
 joint_axel4_wheel = RevoluteJoint("axel_wheel_4",pose_wheelj, "wheel_4","axel_4",wheel_upper_limit,wheel_lower_limit,Orientation(1,0,0))
 
+##Short Range Finder, for detecting unanticipated obstacles
+ir_short_pose = Pose(Location(0,-height/2-0.01,body_depth), Orientation(0,0,0))
+ir_short_sens_link = RectangularLink("Short_IR_Link",ir_short_pose,1e-5,[0.02,0.02,0.02],[1e-6,1e-6,1e-6])
 
+ir_shrt_jt_pose = Pose(Location(0,0.01,0),Orientation(0,0,0))
+ir_shrt_jt = Joint("Short_IR_Body_Jt","fixed",ir_shrt_jt_pose,"Short_IR_Link","body_link")
+
+edge_threshold = 0.15
+detection_range = 0.45
+# print("${shrt_min_angle} is " + str(shrt_min_angle * 180/math.pi))
+ir_shrt_hori_param = {
+    "samples":"180",
+    "resolution":"1",
+    "min_angle":-1 * math.radians(80),  
+    "max_angle":math.radians(80)
+}
+ir_shrt_vert_param = {
+    "samples":"1",
+    "resolution":"1",
+    "min_angle":"0",
+    "max_angle":"0"
+}
+ir_shrt_plugin = Plugin("gazebo_ros_range_shrt", "libgazebo_ros_range.so", {
+    "gaussianNoise":0.0,
+    "alwaysOn":"true",
+    "updateRate":50,
+    "topicName":"wheely/sensor/ir_shrt",
+    "frameName":"Short_IR_Link",
+    "radiation":"infrared",
+    "fov":"0.2967"
+})
+ir_shrt_sensor = IRSensor("ir_sensor_shrt",ir_shrt_hori_param,ir_shrt_vert_param,{
+    "min":"0.01",
+    "max":detection_range,
+    "resolution":"1"},Pose(Location(0,-0.02,0), Orientation(0,0,-PI/2)),ir_shrt_plugin
+)
+
+ir_short_sens_link.appendChild(ir_shrt_sensor)
+##Long Range Finder, rotates for map building
 ir_pose = Pose(Location(0,-height/2+0.02,body_depth+depth/2+0.03), Orientation(0,0,0) )
 ir_sensor_link = CylindericalLink("IR_link", ir_pose,0.06,1e-5, 0.02,[1e-6,1e-6,1e-6])
 
 ir_joint_pose = Pose(Location(0,0,-0.06/2), Orientation(0,0,0))
 ir_joint = RevoluteJoint("IR_body_joint", ir_joint_pose,"IR_link","body_link",None,None,Orientation(0,0,1))
 
-ir_hori_vert_param = {
+ir_hori_param = {
     "samples":"1",
     "resolution":"1",
     "min_angle":0,
@@ -158,7 +196,7 @@ ir_plugin = Plugin("gazebo_ros_range", "libgazebo_ros_range.so", {
     "radiation":"infrared",
     "fov":"0.2967"
 })
-ir_sensor = IRSensor("ir_sensor",ir_hori_vert_param,ir_vert_param,{
+ir_sensor = IRSensor("ir_sensor",ir_hori_param,ir_vert_param,{
     "min":"0.01",
     "max":"50",
     "resolution":"1"},Pose(Location(0,-0.02,0.03), Orientation(0,0,-PI/2)),ir_plugin
@@ -168,7 +206,6 @@ ir_sensor_link.appendChild(ir_sensor)
 ir_sensor_ctrl = Plugin("IR_sensor_ctrl","libIR_sensor.so",{})
 ## create a plugin
 
-
 wheel_ctrl = Plugin("wheel_ctr","libwheel_plugin.so", 
 {
     "prefix":"wheely/steering",
@@ -176,12 +213,12 @@ wheel_ctrl = Plugin("wheel_ctr","libwheel_plugin.so",
     "odometrySubTopic":"odom",
     #Tweak the below parameteres if the turning angle overshoots.
     #Or the car is slowly turning.
-    "kp":1.4,                   #Increase kp if car turn rate is slow, decrease if turning angle overshoots too often
-    "ki":5.5,
-    "kd":1.4,
+    "kp":1.5,                   #Increase kp if car turn rate is slow, decrease if turning angle overshoots too often
+    "ki":6.2,
+    "kd":1.2,
     "dt":0.01,
     # turns within goal_radian +- turn_accuracy, higher accuracy higher turning time
-    "turnAccuracy":0.01
+    "turnAccuracy":0.03
 })
 # tsp_plugin = Plugin("test_tsp", "libtsp_plugin.so",
 # {
@@ -349,7 +386,7 @@ wheel_ctrl, skid_steer_ctrl,
 # finger_four, finger_four_joint, finger_one_tip, finger_one_tip_joint, finger_two_tip, finger_two_tip_joint, 
 # finger_three_tip, finger_three_tip_joint, finger_four_tip, finger_four_tip_joint, 
 # gripper_plugin, arm_control_plugin,
-ir_sensor_link,ir_joint,ir_sensor_ctrl
+ir_sensor_link,ir_joint,ir_sensor_ctrl,ir_short_sens_link,ir_shrt_jt#,wall_1,wall_2,wall_3,wall_4
 ]#,tsp_plugin]
 
 model = Model("robot",links_joints)

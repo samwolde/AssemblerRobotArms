@@ -37,8 +37,9 @@ namespace wheely_planner
     public:
         PathPlanner(ros::NodeHandlePtr,GridMap* grid, double kh );
         ~PathPlanner(){};
-        void A_S_PlanPath(Coordinate to);
-        void constructPath(Cell * node);
+        Cell A_S_PlanPath(Coordinate from,Coordinate to);
+        std::stack<Cell*> constructPath(Cell * node);
+        bool FollowPath(std::stack<Cell*>* path);
         void clicked_sub(geometry_msgs::PointConstPtr pt);
         void setXY(double _x, double _y){
             x =_x;
@@ -49,7 +50,6 @@ namespace wheely_planner
         ros::ServiceClient goto_cl;
         GridMap* gridMap;
         double x,y;
-        ros::Publisher marker_pub;
         ros::Subscriber cmd_go_sub;
         int kh;
     };    

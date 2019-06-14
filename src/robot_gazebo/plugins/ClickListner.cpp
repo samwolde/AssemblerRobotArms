@@ -42,14 +42,16 @@ public:
         }
         rosNode.reset(new ros::NodeHandle("clickty"));
         pub = rosNode->advertise<geometry_msgs::Point>("/wheely/clicked_pos",10);
-        pubScan = rosNode->advertise<geometry_msgs::Point>("/wheely/slam/updateMap",10);
+        pubScan = rosNode->advertise<geometry_msgs::Point>("/wheely/slam/BuildMap",10);
     }
 
     bool OnKey(const common::KeyEvent& _event)
     {
-        ROS_INFO("Double Clicked! key : %d", _event.key);
         if ( _event.key ==  16777220){
             geometry_msgs::Point p;
+            p.x = 21;//20.260273,3.967819
+            p.y = 4;
+            p.z = 0;
             pubScan.publish(p);
         }
         return true;

@@ -2,19 +2,71 @@
 
 namespace wheely_planner
 {
-    MapBuilder::MapBuilder(ros::NodeHandlePtr rosNode, GridMap* g,double sensor_of, double sample){
+    MapBuilder::MapBuilder(ros::NodeHandlePtr rosNode, GridMap* g,PathPlanner* pathPlanner,double sensor_of, double sample){
         sensorTurn = rosNode->serviceClient<robot_lib::Sensor>("/wheely/ir_sensor/cmd_turn");
-        updateMapSub = rosNode->subscribe("/wheely/slam/updateMap",10,&MapBuilder::UpdateMap,this);
+        updateMapSub = rosNode->subscribe("/wheely/slam/BuildMap",10,&MapBuilder::BuildMap,this);
         mapSave = rosNode->subscribe("/wheely/slam/saveMap", 10 , &GridMap::saveMap,g );
         sensor_offset = sensor_of;
         gridMap = g;
+        rosNode->getParam("robo_radius",robo_radius);
+        localMap = new GridMap(g);
         sampleSize = sample;
-        marker_pub = rosNode->advertise<visualization_msgs::Marker>("visualization_marker", 10);
+        this->pathPlanner = pathPlanner;
     }
-    void MapBuilder::UpdateMap(geometry_msgs::PointConstPtr p){
+    void MapBuilder::BuildMap(geometry_msgs::PointConstPtr unreachablePt){
+        auto goal_pt =Coordinate(unreachablePt->x, unreachablePt->y);
+        while ( true ){
+            UpdateMap();
+            auto goal = pathPlanner->A_S_PlanPath(Coordinate(x,y),goal_pt);
+            if ( !goal.parent  ){
+                ROS_INFO("jUST HAPPEND (x:%f,y%f) ", x,y);
+                if( !CheckBlocked(&goal_pt) ){
+                    break;
+                }
+                //Robot might be caught in some obstacle on the map
+                continue;
+            }
+            auto path = pathPlanner->constructPath(&goal);
+            if (!pathPlanner->FollowPath(&path)){   
+                //Until an obstacle avoidance algorithm, just backup a bit 
+                ROS_INFO("pROBLEM DETECTED");
+            }
+        }
+        ROS_INFO("YAY.. DONE BUILDING MAP.");
+        localMap->visualizeMap(COLOR_DARK_RED,5);
+        gridMap->visualizeMap();
+        pause();
+        // 
+    }   
+    bool MapBuilder::CheckBlocked(Coordinate_t goal_pt){
+        static auto last_blocked = ros::Time::now();
+        static std::queue<Coordinate>  valids;
+        static bool first = true;
+
+        auto canUnblock = false;
+        auto c = Coordinate(x,y);
+        if( gridMap->getCellStatus(&c) ){
+            //UnBlock robot,find nearest unoccupied cell and plan from there
+            // if ( )
+            auto timeout = ros::Time::now().toSec() - last_blocked.toSec();
+            last_blocked = ros::Time::now();
+            valids = timeout > 3 || first?  gridMap->getNearestUnoccupied(&c): valids;
+            first = false;
+            ROS_INFO("timeout i %f,valids size %ld",timeout,valids.size( ));
+            if( !valids.empty() ) {
+                auto goal = pathPlanner->A_S_PlanPath(valids.front(),*goal_pt);
+                valids.pop();
+                auto path = pathPlanner->constructPath(&goal);
+                pathPlanner->FollowPath(&path);
+                canUnblock = true;
+            }
+        }
+        return canUnblock;
+    }
+    void MapBuilder::UpdateMap(){
         robot_lib::Sensor sensor;
         ROS_INFO("UpdatingMap...");
-        double intervalAngle = 2 * M_PI/sampleSize;
+        double intervalAngle = 2* M_PI/sampleSize;
         for (size_t i = 0; i < sampleSize; i++)
         {
             //set sensor angle to i*intervalAngle
@@ -33,10 +85,13 @@ namespace wheely_planner
             Tf_From_Robo_World(c);
             // gridMap->storePtForVis(c, &marker);
             //Register on the gridMap
-            gridMap->setCellStatus(c->x, c->y);
+            localMap->setCellStatus(c->x, c->y);
+            // gridMap->setCellStatus(c->x,c->y);
             delete c;
         }
-        gridMap->visualizeMap(&marker_pub);
+        localMap->EnlargeObstacles(gridMap);
+        localMap->visualizeMap(COLOR_DARK_RED,5);
+        gridMap->visualizeMap();
     }
     void MapBuilder::Tf_From_Sensor_Robo(Coordinate_t c, double angle){
         //Translation Vector S_origin - Robo_Origin

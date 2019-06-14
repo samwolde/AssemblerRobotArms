@@ -14,6 +14,8 @@
 #include <limits.h>
 #include <visualization_msgs/Marker.h>
 #include <thread>
+#include <unordered_map>
+#include <boost/functional/hash/hash.hpp>
 
 namespace wheely_planner{
 #define EPSILON 0.001
@@ -71,22 +73,19 @@ struct CellKeyHasher
 {
     std::size_t operator()(const Cell& c)const
     {
-        // using boost::hash_value;
-        // using boost::hash_combine;
-        // std::size_t seed = 0;//((int )c.center.x ^ (int) c.center.y) << 2;
-        // // Modify 'seed' by XORing and bit-shifting in
-        // // one member of 'Key' after the other:
-        // hash_combine(seed,hash_value(c.center.x));
-        // hash_combine(seed,hash_value(c.center.y));
-      return( ( (std::hash<double>()(c.center.x) )
-                ^(std::hash<double>()(c.center.y) >> 1) )
-                  << 2);
+        using boost::hash_value;
+        using boost::hash_combine;
+        std::size_t seed = ((int) trunc(c.center.x * 1000)) ^  ((int) trunc(c.center.y * 1000));
+        hash_combine(seed,hash_value(c.center.x));
+        hash_combine(seed,hash_value(c.center.y));
+      return seed;
     }
 };
 class GridMap{
     public:
-        GridMap(size_t, float);
-        GridMap(MapFile map,double robo_radius);
+        GridMap(size_t, float,double,ros::Publisher*);
+        GridMap(MapFile map,double robo_radius,ros::Publisher*);
+        GridMap(GridMap *);
         bool allocateGrid();
         ~GridMap();
         /*Computes the index into the grid map, i.e determines the grid in which (x,y) belongs to.
@@ -100,23 +99,27 @@ class GridMap{
         void computeCellCenter(Index* i);
         //Get the unoccupied adjacentCells of the cell the point (x,y) is part of
         std::vector<Cell> getAdjacentCells(Coordinate_t c);
-        std::vector<Cell> getAdjacentCells_8(Coordinate_t c);
+        std::vector<Cell> getAdjacentCells_8(Coordinate_t c,bool includeOccupied=false);
+        std::vector<Cell> getAdjacentCells_24(Coordinate_t c);
+        std::queue<Coordinate> getNearestUnoccupied(Coordinate_t c);
         //Sets the occupancy status of the cell the point (x,y) is a part of 
         void setCellStatus(double x, double y,bool occupied=true);
         void saveMap(const std_msgs::StringConstPtr);
         //For Visualizing the map with Rviz
         void storePtForVis(Coordinate_t c , visualization_msgs::Marker* marker);
-        void visualizeMap(ros::Publisher *pub);
-        void visualizeMapData(ros::Publisher *pub, visualization_msgs::Marker* marker,int id,double *rgb, double * scale=NULL);
-    private:
-        void EnlargeObstacles(double);  
-        void EnlargeObstacles(Coordinate_t,double);
+        void visualizeMap(double * rgb = new double[3]{0,1,0}, int id =0);
+        void visualizeMapData(visualization_msgs::Marker* marker,int id,double *rgb, double * scale=NULL);
+        void EnlargeObstacles(GridMap* dest);
         bool getCellStatus(Coordinate_t);
+    private:
+        void EnlargeObstacles();  
+        void EnlargeObstacles(Coordinate,GridMap* dest);
         
         size_t mapSize;
-        double cellSize; 
+        double cellSize,robot_radius; 
         OccupancyGrid_t grid = nullptr;          /*is a multi-dimensional array of bools, each cell is represented by a center.*/
 
+        ros::Publisher* pub;
         visualization_msgs::Marker cells;
 };
 

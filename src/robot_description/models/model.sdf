@@ -442,11 +442,11 @@
 			<prefix>wheely/steering</prefix>
 			<velPubTopic>cmd_wheel</velPubTopic>
 			<odometrySubTopic>odom</odometrySubTopic>
-			<kp>1.4</kp>
-			<ki>5.5</ki>
-			<kd>1.4</kd>
+			<kp>1.5</kp>
+			<ki>6.2</ki>
+			<kd>1.2</kd>
 			<dt>0.01</dt>
-			<turnAccuracy>0.01</turnAccuracy>
+			<turnAccuracy>0.03</turnAccuracy>
 		</plugin>
 		<plugin filename="libgazebo_ros_skid_steer_drive.so" name="skid_steer_controller">
 			<alwaysOn>true</alwaysOn>
@@ -547,5 +547,71 @@
 			</physics>
 		</joint>
 		<plugin filename="libIR_sensor.so" name="IR_sensor_ctrl"/>
+		<link name="Short_IR_Link">
+			<pose>0 -0.31 0.19649999999999998 0 0 0</pose>
+			<inertial>
+				<inertia>
+					<ixx>0.00000100</ixx>
+					<iyy>0.00000100</iyy>
+					<izz>0.00000100</izz>
+				</inertia>
+				<mass>0.00001000</mass>
+			</inertial>
+			<visual name="Short_IR_Link_vis">
+				<geometry>
+					<box>
+						<size>0.02 0.02 0.02</size>
+					</box>
+				</geometry>
+			</visual>
+			<collision name="Short_IR_Link_col">
+				<geometry>
+					<box>
+						<size>0.02 0.02 0.02</size>
+					</box>
+				</geometry>
+			</collision>
+			<sensor name="ir_sensor_shrt" type="ray">
+				<visualize>true</visualize>
+				<update_rate>50</update_rate>
+				<pose>0 -0.02 0 0 0 -1.5707963267948966</pose>
+				<plugin filename="libgazebo_ros_range.so" name="gazebo_ros_range_shrt">
+					<gaussianNoise>0.0</gaussianNoise>
+					<alwaysOn>true</alwaysOn>
+					<updateRate>50</updateRate>
+					<topicName>wheely/sensor/ir_shrt</topicName>
+					<frameName>Short_IR_Link</frameName>
+					<radiation>infrared</radiation>
+					<fov>0.2967</fov>
+				</plugin>
+				<ray>
+					<scan>
+						<horizontal>
+							<samples>180</samples>
+							<resolution>1</resolution>
+							<min_angle>-1.3962634015954636</min_angle>
+							<max_angle>1.3962634015954636</max_angle>
+						</horizontal>
+						<vertical>
+							<samples>1</samples>
+							<resolution>1</resolution>
+							<min_angle>0</min_angle>
+							<max_angle>0</max_angle>
+						</vertical>
+					</scan>
+					<range>
+						<min>0.01</min>
+						<max>0.45</max>
+						<resolution>1</resolution>
+					</range>
+				</ray>
+				<always_on>true</always_on>
+			</sensor>
+		</link>
+		<joint name="Short_IR_Body_Jt" type="fixed">
+			<pose>0 0.01 0 0 0 0</pose>
+			<child>Short_IR_Link</child>
+			<parent>body_link</parent>
+		</joint>
 	</model>
 </sdf>

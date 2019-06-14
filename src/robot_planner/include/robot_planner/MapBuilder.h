@@ -1,10 +1,10 @@
 #ifndef MAP_BUILDER_H
 #define MAP_BUILDER_H
 #include <robot_planner/GridMap.h>
+#include <robot_planner/BuildMap.h>
+#include <robot_planner/PathPlanner.h>
 #include <functional>
 #include <dirent.h>
-#include <robot_planner/GridMap.h>
-#include <robot_planner/BuildMap.h>
 #include <robot_lib/Sensor.h>
 #include <robot_lib/Steering.h>
 #include <robot_lib/GoTo.h>
@@ -31,9 +31,11 @@
 namespace wheely_planner{
     class MapBuilder{
     public:
-        MapBuilder(ros::NodeHandlePtr rosNode, GridMap* g,double sensor_of, double sample);
+        MapBuilder(ros::NodeHandlePtr rosNode, GridMap* g,PathPlanner* pathPlanner,double sensor_of, double sample);
+        void BuildMap(geometry_msgs::PointConstPtr unreachablePt);
         /*Take N samples turning a 360 degrees*/
-        void UpdateMap(geometry_msgs::PointConstPtr p);
+        void UpdateMap();
+        bool CheckBlocked(Coordinate_t);
         //For coordinate transformations.
         void Tf_From_Sensor_Robo(Coordinate_t c, double angle);
         void Tf_From_Robo_World(Coordinate_t c);
@@ -41,12 +43,12 @@ namespace wheely_planner{
         void SetRange(double _r){range = _r;};
     private:        
         int sampleSize;
-        ros::Publisher marker_pub;
-        ros::ServiceClient sensorTurn;
+        ros::ServiceClient sensorTurn,mvBack;
         ros::Subscriber  updateMapSub,mapSave;
-        GridMap* gridMap;
+        GridMap* gridMap,*localMap;
+        PathPlanner* pathPlanner;
         double yaw,x,y,z,sensor_offset;
-        double sensor_angle,range;
+        double sensor_angle,range,robo_radius;
     };
 }
 #endif
