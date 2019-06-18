@@ -39,7 +39,7 @@ namespace wheely_planner
         ~PathPlanner(){};
         Cell A_S_PlanPath(Coordinate from,Coordinate to);
         std::stack<Cell*> constructPath(Cell * node);
-        bool FollowPath(std::stack<Cell*>* path);
+        bool FollowPath(std::stack<Cell*>* path,bool detectObstacles=true);
         void clicked_sub(geometry_msgs::PointConstPtr pt);
         void setXY(double _x, double _y){
             x =_x;

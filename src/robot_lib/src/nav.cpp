@@ -47,68 +47,34 @@ nav::nav(int argc, char ** argv){
 void nav::shortSensorMsg(sensor_msgs::RangeConstPtr range){
     this->range = range->range;
 }
-
-bool nav::goTo(robot_lib::GoTo::Request& req, robot_lib::GoTo::Response& res){
-    ROS_INFO("Starting tour...");  
-    auto begin =req.path.front();
-    auto end =req.path.back();
-    ROS_INFO("Going to node beign is (%f,%f) => Dest is (%f, %f)", begin.x,begin.y, end.x,end.y);
-    bool isBegin, isEnd;
-    Eigen::Vector3d destVect;
-    for (auto pt : req.path)
-    {
-        destVect << pt.x,
-                    pt.y, 
-                    0;
-        isBegin =pointsEqual(&pt, &begin);
-        isEnd = pointsEqual(&pt, &end) ;
-        res.s = adjustOrientation(destVect) && controlSpeed(destVect,isBegin,isEnd);
-        if ( !res.s) return res.s;   
-    }
-    return true;
-}
 /* Adjust the orientation betweeen The robots current pose
    and the destination vector dest_vect
 */
-bool nav::adjustOrientation(Eigen::Vector3d dest_pt){
-    #define ANGLE_THRESHOLD 10
-    static int i = 1;
-    static Eigen::Vector3d prev_pt(x,y,0);
-    static Eigen::Vector3d prev_Line(0,0,0);
-    //Construct a vector parellel to the path, assuming the path is straight
-    Eigen::Vector3d assumed_line = dest_pt - prev_pt;
-    prev_pt = dest_pt;
+bool nav::adjustOrientation(Eigen::Vector3d dest_vect){
     std_msgs::Float32 theta;
-    //Is the robot diverging from the assumed line
-    theta.data =  getAngleDiff(assumed_line);
-    /**
-     * If the robot diverges from the line, too much you might need to
-     * check the perpendicular distance between the robot and 
-     * the line.
-     */
-    if( fabs((assumed_line - prev_Line).norm()) <= 0.001 && fabs(theta.data) <= ANGLE_THRESHOLD ){
-        i=0;
-        return true;
-    }
-    //New line, probably a new turn required
-    prev_Line = assumed_line;
-    dest_pt[2] = 0;
+    theta.data =  getAngleDiff(dest_vect);
+    dest_vect[2] = 0;
     robot_lib::Steering str;
+    if( fabs(theta.data) <= 15 ) return true;
     if (theta.data < 0){
         theta.data *= -1;
         str.request.val = theta.data;
+        // pause();
         return this->turnRC.call(str);
     }
     else{
         str.request.val = theta.data;
+        // pause();
         return this->turnLC.call(str);
     }
+    return false;
 }
 /* Return the angle difference betweeen The robots current pose (front vector)
    and the destination vector dest_vect
 */
 float nav::getAngleDiff(Eigen::Vector3d dest_vect){
     dest_vect[2] = 0.0;
+    dest_vect -= Eigen::Vector3d(x,y,0.0);
     Eigen::Affine3d rot_mat(Eigen::AngleAxisd(this->yaw, Eigen::Vector3d::UnitZ()));
     //Calculate the new robo axis
     //Its axis is rotated by this->yaw from the initial robot axis
@@ -120,38 +86,32 @@ float nav::getAngleDiff(Eigen::Vector3d dest_vect){
 /*Given the destination point (vector with initials (0,0,0))
     *It Controls the speed using a proportionla controller
 */
-bool nav::controlSpeed(Eigen::Vector3d dest,bool isBegin, bool isFinalDest){
+bool nav::controlSpeed(Eigen::Vector3d dest,bool isBegin, bool isFinalDest,bool detectObstacles){
     std_msgs::Float32 vel;
     bool accelerate = true;
     ros::Rate r(100);
     dest[2] = 0.0;
     robot_lib::Steering str;
-    auto direction = dest - Eigen::Vector3d(x,y,0.0);
-    auto oposite = -1 * direction;
-    double err = (direction).norm(); //distance
-    double prev_err = err;  
-    while(true){    
-        // if obstacle on the way return.
-        if(range <= CLOSE_RANGE){
+    // ros::Rate r(120);
+    double err = (Eigen::Vector3d(x,y,0.0) - dest).norm(); //distance
+    double prev_err = err;
+    while(true){
+        //if obstacle on the way return.
+        if(detectObstacles && range <= CLOSE_RANGE){
             ROS_INFO("CLOSE RANGE OBSTACLE...");
             robot_lib::Steering s;
-            s.request.val = 0.35;
+            s.request.val = 0.6;
             mvBack.call(s);
             sleep(2);
             brakeC.call(s);     
             return false;
         }
-        auto current_dir = dest - Eigen::Vector3d(x,y,0.0) ;
-        err = (current_dir).norm();  
-        // auto angle = getAngleDiff(current_dir)
-        if( err <= DISTANCE_THRESHOLD || err > prev_err){
+        err = (Eigen::Vector3d(x,y,0.0) - dest).norm();  
+        if( err <= distanceAccuracy){
+            robot_lib::Steering s;
             bool ret = true;
-            if ( isFinalDest ){
-                ROS_INFO("Destination Reached!");
-                robot_lib::Steering s;
-                ret = brakeC.call(s);  
-            }      
-            ROS_INFO("Robot state yaw = %f, (%f,%f,%f)", yaw, x,y,z);
+            if ( isFinalDest )
+                ret = brakeC.call(s);        
             return ret;
         }
         auto current = odometry.twist.twist.linear.x;
@@ -161,13 +121,36 @@ bool nav::controlSpeed(Eigen::Vector3d dest,bool isBegin, bool isFinalDest){
                 return false;
             };
         }
+        // r.sleep();
         prev_err = err;
     }
     return false;
 }
+bool nav::goTo(robot_lib::GoTo::Request& req, robot_lib::GoTo::Response& res){
+    ROS_INFO("Starting tour...");  
+    auto begin =req.path.front();
+    auto end =req.path.back();
+    ROS_INFO("Going to node beign is (%f,%f) => Dest is (%f, %f)", 
+    begin.x,
+    begin.y, 
+    end.x,
+    end.y);
+    bool isBegin, isEnd;
+    for (auto pt : req.path)
+    {
+        Eigen::Vector3d destVect;
+        destVect << pt.x,
+                    pt.y, 
+                    0;
+        isBegin =pointsEqual(&pt, &begin);
+        isEnd = pointsEqual(&pt, &end) ;
+        res.s = adjustOrientation(destVect) && controlSpeed(destVect,isBegin,isEnd,req.detectObstacles);
+        if ( !res.s) return res.s;   
+    }
+    return true;
+}
 bool nav::pointsEqual(geometry_msgs::Point* p1, geometry_msgs::Point* p2){
-    return fabs(p1->x - p2->x ) <= 0.001
-           && fabs(p1->y - p2->y ) <= 0.001;
+    return p1->x == p2->x && p1->y == p2->y;
 }
 //Continously update the odometry
 void nav::odometryMsg(nav_msgs::OdometryConstPtr odom){

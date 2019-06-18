@@ -236,7 +236,7 @@ void GridMap::EnlargeObstacles(Coordinate c,GridMap* dest){
     std::vector<Coordinate > lvl_0;
     lvl_0.push_back(c);
     level.push_back(lvl_0);
-    for( int i=0;i <= ratio ; i++){
+    for( int i=0;i < ratio ; i++){
         std::vector<Coordinate> levl_i;
         for( auto coord : level[i]){
             for( auto neighbours : getAdjacentCells_8(&coord)){
@@ -255,7 +255,7 @@ std::queue<Coordinate> GridMap::getNearestUnoccupied(Coordinate_t c){
     std::vector<Coordinate > lvl_0;
     lvl_0.push_back(*c);
     level.push_back(lvl_0);
-    for( int i=0;i <= ratio ; i++){
+    for( int i=0;i < ratio ; i++){
         std::vector<Coordinate> levl_i;
         for( auto coord : level[i]){
             for( auto neighbour : getAdjacentCells_8(&coord,true)){

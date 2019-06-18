@@ -589,8 +589,8 @@
 						<horizontal>
 							<samples>180</samples>
 							<resolution>1</resolution>
-							<min_angle>-1.3962634015954636</min_angle>
-							<max_angle>1.3962634015954636</max_angle>
+							<min_angle>-1.2217304763960306</min_angle>
+							<max_angle>1.2217304763960306</max_angle>
 						</horizontal>
 						<vertical>
 							<samples>1</samples>

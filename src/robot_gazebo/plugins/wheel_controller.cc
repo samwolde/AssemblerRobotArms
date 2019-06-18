@@ -55,14 +55,11 @@ namespace gazebo
 			/*Yaw and angular velocity opposite signs*/
 			velocity.angular.z = right ? this->angularVel : -1 *  this->angularVel;
 			double rad_ang =  M_PI * angle/180;
-			ROS_INFO("Publishing to topic %s", this->pubTopic.c_str());
 			//save the current Orientation
 			double  goal_yaw=GetGoalRad(rad_ang, this->yaw,right);
 			double init_yaw = this->yaw, prev_yaw = this->yaw;
 			double err=GetError(prev_yaw, goal_yaw, right);
 			ros::Rate r(300);
-
-			ROS_INFO("Goal Yaw is %f,err is %f, this yaw is %f",goal_yaw, err, this->yaw);
 			double integral=0,Iout=0,derivative,prev_err=err;
 			//Publish velocity continously then examine odometry to know when to stop
 			while(true){
@@ -75,7 +72,6 @@ namespace gazebo
 				velocity.angular.z /= fabsf64(velocity.angular.z);
 				velocity.angular.z *= this->kp * err+ Iout + derivative;
 				if( err <= turnAccuracy){
-					ROS_INFO("Done! Goal Yaw is %f,this yaw is %f\n",goal_yaw, this->yaw);
 					Brake();
 					velocity.angular.z = 0;
 					return;

@@ -143,8 +143,8 @@ detection_range = 0.45
 ir_shrt_hori_param = {
     "samples":"180",
     "resolution":"1",
-    "min_angle":-1 * math.radians(80),  
-    "max_angle":math.radians(80)
+    "min_angle":-1 * math.radians(70),  
+    "max_angle":math.radians(70)
 }
 ir_shrt_vert_param = {
     "samples":"1",

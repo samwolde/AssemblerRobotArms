@@ -47,6 +47,12 @@ struct Coordinate
     Coordinate(double _x,double _y):x(_x),y(_y){}
     double x;
     double y;
+    bool operator==(Coordinate const &other)const
+    {
+        auto in_x = fabs(x - other.x) <=EPSILON;
+        auto in_y = fabs(y - other.y) <=EPSILON;
+        return in_x && in_y;
+    } 
 };
 struct Cell{
     Cell(){};
@@ -75,10 +81,12 @@ struct CellKeyHasher
     {
         using boost::hash_value;
         using boost::hash_combine;
-        std::size_t seed = ((int) trunc(c.center.x * 1000)) ^  ((int) trunc(c.center.y * 1000));
-        hash_combine(seed,hash_value(c.center.x));
-        hash_combine(seed,hash_value(c.center.y));
-      return seed;
+        int trunced_x = (int) trunc(c.center.x * 1000);
+        int trunced_y = (int) trunc(c.center.y * 1000);
+        std::size_t seed = (trunced_x) ^  (trunced_y);
+        hash_combine(seed,hash_value(trunced_x));
+        hash_combine(seed,hash_value(trunced_y));
+        return seed;
     }
 };
 class GridMap{

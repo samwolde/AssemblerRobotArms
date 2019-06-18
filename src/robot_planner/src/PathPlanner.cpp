@@ -102,13 +102,14 @@ namespace wheely_planner
             parent = parent->parent;
         }
         //pop the init node.
-        path.pop();
+        if ( !path.empty() )path.pop();
         gridMap->visualizeMapData(&path_found,2,COLOR_LIGHT_BLUE,SCALE_MAP_Z(1));
         gridMap->visualizeMap();
         // pause();
         return path;
     }
-    bool PathPlanner::FollowPath(std::stack<Cell*>* path){
+    bool PathPlanner::FollowPath(std::stack<Cell*>* path, bool detectObstacles){
+        if ( path->empty() ) return false;
         robot_lib::GoTo g;
         while( !path->empty() ){
             auto n = path->top();
@@ -118,6 +119,7 @@ namespace wheely_planner
             pt.y = n->center.y;
             g.request.path.push_back(pt);
         }
+        g.request.detectObstacles = detectObstacles;
         return goto_cl.call(g);
     }
     void PathPlanner::clicked_sub(geometry_msgs::PointConstPtr pt){
@@ -129,6 +131,6 @@ namespace wheely_planner
             return;
         }
         auto path = constructPath(&goal);
-        // FollowPath(&path);
+        FollowPath(&path,false);
     }
 } // namespace wheely_planner

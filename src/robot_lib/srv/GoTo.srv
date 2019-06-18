@@ -1,3 +1,4 @@
 geometry_msgs/Point[] path
+bool detectObstacles
 ---
 bool s

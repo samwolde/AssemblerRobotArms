@@ -17,9 +17,9 @@ namespace wheely_planner
         auto goal_pt =Coordinate(unreachablePt->x, unreachablePt->y);
         while ( true ){
             UpdateMap();
-            auto goal = pathPlanner->A_S_PlanPath(Coordinate(x,y),goal_pt);
+            auto current = Coordinate(x,y);
+            auto goal = pathPlanner->A_S_PlanPath(current,goal_pt);
             if ( !goal.parent  ){
-                ROS_INFO("jUST HAPPEND (x:%f,y%f) ", x,y);
                 if( !CheckBlocked(&goal_pt) ){
                     break;
                 }
@@ -29,8 +29,10 @@ namespace wheely_planner
             auto path = pathPlanner->constructPath(&goal);
             if (!pathPlanner->FollowPath(&path)){   
                 //Until an obstacle avoidance algorithm, just backup a bit 
-                ROS_INFO("pROBLEM DETECTED");
+                continue;
             }
+            ROS_INFO("Reachead at goal ... ");
+            break;
         }
         ROS_INFO("YAY.. DONE BUILDING MAP.");
         localMap->visualizeMap(COLOR_DARK_RED,5);
@@ -49,18 +51,23 @@ namespace wheely_planner
             //UnBlock robot,find nearest unoccupied cell and plan from there
             // if ( )
             auto timeout = ros::Time::now().toSec() - last_blocked.toSec();
-            last_blocked = ros::Time::now();
-            valids = timeout > 3 || first?  gridMap->getNearestUnoccupied(&c): valids;
+            valids = timeout > 4 || first?  gridMap->getNearestUnoccupied(&c): valids;
             first = false;
             ROS_INFO("timeout i %f,valids size %ld",timeout,valids.size( ));
             if( !valids.empty() ) {
-                auto goal = pathPlanner->A_S_PlanPath(valids.front(),*goal_pt);
-                valids.pop();
-                auto path = pathPlanner->constructPath(&goal);
+                auto done = false;
+                std::stack<Cell*> path;
+                while ( !done ){
+                    auto goal = pathPlanner->A_S_PlanPath(valids.front(),*goal_pt);
+                    valids.pop();
+                    path = pathPlanner->constructPath(&goal);
+                    done = path.empty() || valids.empty() ? false : true;
+                }
                 pathPlanner->FollowPath(&path);
                 canUnblock = true;
             }
         }
+        last_blocked = ros::Time::now();
         return canUnblock;
     }
     void MapBuilder::UpdateMap(){

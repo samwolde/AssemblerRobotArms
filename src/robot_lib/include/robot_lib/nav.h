@@ -22,9 +22,9 @@
 #include <eigen3/Eigen/Core>
 #include <thread>
 
-#define DISTANCE_THRESHOLD 0.45
-#define CLOSE_RANGE 0.23
-
+#define CLOSE_RANGE 0.2
+//An order array of Nodes.
+typedef  geometry_msgs::Point* Tour_t;
 class nav 
 {
     public:
@@ -33,7 +33,7 @@ class nav
         double GetError(double prev_yaw, double goal_yaw, bool right);
         bool HasStoped();
         double GetGoalRad(double rad, double yaw, bool right);
-        bool controlSpeed(Eigen::Vector3d dest,bool isBegin, bool isFinalDest);
+        bool controlSpeed(Eigen::Vector3d dest,bool isBegin, bool isFinalDest,bool detectObstacles);
         bool adjustOrientation(Eigen::Vector3d dest_vect);
         float getAngleDiff(Eigen::Vector3d dest_vect);
         void odometryMsg(nav_msgs::OdometryConstPtr odom);
@@ -57,6 +57,6 @@ class nav
         double roll, pitch, yaw,x,y,z;
         Eigen::Vector3d robo_axis_init;
         gazebo_msgs::LinkStates linkStates;
-        double distanceAccuracy=0.5,kp=0.08,range;
+        double distanceAccuracy=0.45,kp=0.08,range;
         
 };
