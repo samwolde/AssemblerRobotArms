@@ -175,8 +175,8 @@ class _Sensor(DOM.Element):
     Infrared sensor
 '''
 class IRSensor(_Sensor):
-    def __init__(self, name:str, hr:dict, vert:dict,range_:dict,pose:Pose, plugin:Plugin):
-        super().__init__(name,"ray", 50,"true", pose, plugin)
+    def __init__(self, name:str,hr:dict, vert:dict,range_:dict,pose:Pose, plugin:Plugin, visualize:str="false"):
+        super().__init__(name,"ray", 50,visualize, pose, plugin)
         sdf_doc = Sdf.createSdfDoc()
 
         ray  = sdf_doc.createElement("ray")
@@ -186,7 +186,8 @@ class IRSensor(_Sensor):
         range_el = sdf_doc.createElement("range")
 
         scan.appendChild(hor)
-        scan.appendChild(ver)
+        if ( vert != None):
+            scan.appendChild(ver)
 
         ray.appendChild(scan)
         ray.appendChild(range_el)
@@ -195,10 +196,11 @@ class IRSensor(_Sensor):
             t = sdf_doc.createElement(h)
             t.appendChild(sdf_doc.createTextNode(str(hr[h])))            
             hor.appendChild(t)
-        for v in vert:
-            t = sdf_doc.createElement(v)
-            t.appendChild(sdf_doc.createTextNode(str(vert[v])))
-            ver.appendChild(t)
+        if vert != None:
+            for v in vert:
+                t = sdf_doc.createElement(v)
+                t.appendChild(sdf_doc.createTextNode(str(vert[v])))
+                ver.appendChild(t)
         for r in range_:
             t = sdf_doc.createElement(r)
             t.appendChild(sdf_doc.createTextNode(str(range_[r])))

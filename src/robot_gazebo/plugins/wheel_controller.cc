@@ -78,6 +78,7 @@ namespace gazebo
 				}
 				if ( this->Overshoot(init_yaw, goal_yaw,right)){
 					Brake();
+					ROS_INFO_ONCE("Turning Degree is %f",angle);
 					init_yaw = this->yaw;
 					right = !right;
 					err  =GetError(this->yaw, goal_yaw, right);

@@ -25,6 +25,7 @@
 #include <eigen3/Eigen/Geometry>
 #include <eigen3/Eigen/Core>
 #include <sensor_msgs/Range.h>
+#include <sensor_msgs/LaserScan.h>
 #include <std_msgs/Float32.h>
 #include <thread>
 
@@ -41,8 +42,10 @@ namespace wheely_planner{
         void Tf_From_Robo_World(Coordinate_t c);
         void SetXYZ_Yaw(double,double,double,double);
         void SetRange(double _r){range = _r;};
+        void SetLaserScan(sensor_msgs::LaserScanConstPtr las){ laserScan = *las;}
     private:        
         int sampleSize;
+        sensor_msgs::LaserScan laserScan;
         ros::ServiceClient sensorTurn,mvBack;
         ros::Subscriber  updateMapSub,mapSave;
         GridMap* gridMap,*localMap;

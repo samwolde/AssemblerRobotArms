@@ -123,7 +123,7 @@ namespace wheely_planner
         return goto_cl.call(g);
     }
     void PathPlanner::clicked_sub(geometry_msgs::PointConstPtr pt){
-        // return;
+        return;
         ROS_INFO("Calling A_S_PlanPath Sart %f,%f -> Goal  %f, %f...",this->x,this->y,pt->x, pt->y);
         auto goal = A_S_PlanPath(Coordinate(this->x,this->y),Coordinate(pt->x,pt->y));
         if ( !goal.parent ){

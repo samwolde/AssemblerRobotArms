@@ -18,7 +18,8 @@
 
     <node name="maze_sdf" pkg="gazebo_ros" type="spawn_model" args="-file $(find robot_description)/models/maze.sdf -sdf -model maze">
     </node>
-    
+    <node name="close_maze_sdf" pkg="gazebo_ros" type="spawn_model" args="-file $(find robot_description)/models/no_exit_maze/model.sdf -sdf -model maze_no">
+    </node>    
     <node name="IK" pkg="robot_gazebo" type="arm_control.py" output="screen" />
 
     <node name="gripper_controller" pkg="robot_gazebo" type="gripper_control.py" output="screen" />

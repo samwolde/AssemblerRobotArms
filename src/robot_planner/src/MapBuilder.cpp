@@ -49,7 +49,6 @@ namespace wheely_planner
         auto c = Coordinate(x,y);
         if( gridMap->getCellStatus(&c) ){
             //UnBlock robot,find nearest unoccupied cell and plan from there
-            // if ( )
             auto timeout = ros::Time::now().toSec() - last_blocked.toSec();
             valids = timeout > 4 || first?  gridMap->getNearestUnoccupied(&c): valids;
             first = false;
@@ -57,14 +56,15 @@ namespace wheely_planner
             if( !valids.empty() ) {
                 auto done = false;
                 std::stack<Cell*> path;
-                while ( !done ){
+                while ( !done && !valids.empty()  ){
                     auto goal = pathPlanner->A_S_PlanPath(valids.front(),*goal_pt);
                     valids.pop();
                     path = pathPlanner->constructPath(&goal);
-                    done = path.empty() || valids.empty() ? false : true;
+                    done = !path.empty();
                 }
-                pathPlanner->FollowPath(&path);
-                canUnblock = true;
+                if( done)
+                    pathPlanner->FollowPath(&path);
+                canUnblock = done;
             }
         }
         last_blocked = ros::Time::now();
@@ -73,29 +73,31 @@ namespace wheely_planner
     void MapBuilder::UpdateMap(){
         robot_lib::Sensor sensor;
         ROS_INFO("UpdatingMap...");
-        double intervalAngle = 2* M_PI/sampleSize;
-        for (size_t i = 0; i < sampleSize; i++)
+        for (size_t j = 0; j < 2; j++)
         {
-            //set sensor angle to i*intervalAngle
-            sensor.request.angle = -1 * (i * intervalAngle ) * 180/M_PI; 
-            // sensor.request.angle  = (M_PI_2 - i*intervalAngle) * 180/M_PI;
-            if ( !sensorTurn.call(sensor) ){
-                ROS_INFO("Sensor turning service Failed.");
-                return;
+            for (size_t i = 0; i < laserScan.ranges.size(); i++)
+            {
+                double angle = laserScan.angle_min + i * laserScan.angle_increment + j * M_PI;
+                //change the range reading to coordinates of the world frame
+                //1st transform from the sensor coordinates to robots
+                Coordinate_t c = new(Coordinate);
+                if ( laserScan.ranges[i] < laserScan.range_min || laserScan.ranges[i] >laserScan.range_max )
+                    continue;
+
+                c->x = laserScan.ranges[i];
+                c->y = 0;
+                Tf_From_Sensor_Robo(c,angle);       
+                Tf_From_Robo_World(c);
+                // gridMap->storePtForVis(c, &marker);
+                //Register on the gridMap
+                localMap->setCellStatus(c->x, c->y);
+                // gridMap->setCellStatus(c->x,c->y);
+                delete c;
             }
-            //change the range reading to coordinates of the world frame
-            //1st transform from the sensor coordinates to robots
-            Coordinate_t c = new(Coordinate);
-            c->x = range;
-            c->y = 0;
-            Tf_From_Sensor_Robo(c,sensor.request.angle * M_PI/180);       
-            Tf_From_Robo_World(c);
-            // gridMap->storePtForVis(c, &marker);
-            //Register on the gridMap
-            localMap->setCellStatus(c->x, c->y);
-            // gridMap->setCellStatus(c->x,c->y);
-            delete c;
+            sensor.request.angle = (1 - j) * 180;
+            sensorTurn.call(sensor);
         }
+        
         localMap->EnlargeObstacles(gridMap);
         localMap->visualizeMap(COLOR_DARK_RED,5);
         gridMap->visualizeMap();

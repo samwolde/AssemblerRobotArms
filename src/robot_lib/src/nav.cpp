@@ -11,13 +11,10 @@ nav::nav(int argc, char ** argv){
     ros::init(argc, argv, "sth",ros::init_options::NoSigintHandler);
     rosNode.reset(new ros::NodeHandle("nav_ctr"));
     odomQueueThread = std::thread(std::bind(&nav::odomQueueCb, this));
-    linkThread = std::thread(std::bind(&nav::linkQueueCb,this));
-    shrtSensorTh = std::thread(std::bind(&nav::shrtSensorQueueCb,this));
-    ros::SubscribeOptions so_l = ros::SubscribeOptions::create<gazebo_msgs::LinkStates>(
-        "/gazebo/link_states",1,
-        boost::bind(&nav::linkState, this, _1),
-        ros::VoidPtr(), &linkQueue
-    );
+    shrtSensorTh[0] = std::thread([this](){this->shrtSensorQueueCb(0);});
+    shrtSensorTh[1] = std::thread([this](){this->shrtSensorQueueCb(1);});
+    shrtSensorTh[2] = std::thread([this](){this->shrtSensorQueueCb(2);});
+    shrtSensorTh[3] = std::thread([this](){this->shrtSensorQueueCb(3);});
     std::string  odom_topic = std::string("/wheely/steering/odom");
     ROS_INFO("Using %s for odometry", odom_topic.c_str());
     ros::SubscribeOptions so_od = ros::SubscribeOptions::create<nav_msgs::Odometry>(
@@ -25,16 +22,33 @@ nav::nav(int argc, char ** argv){
         boost::bind(&nav::odometryMsg, this, _1),
         ros::VoidPtr(), &odom_queue
     );
-    ros::SubscribeOptions so_sens = ros::SubscribeOptions::create<sensor_msgs::Range>(
-        "/wheely/sensor/ir_shrt",1,
+    ros::SubscribeOptions so_sens_front = ros::SubscribeOptions::create<sensor_msgs::Range>(
+        "/wheely/sensor/ir_shrt_front",1,
         boost::bind(&nav::shortSensorMsg, this, _1),
-        ros::VoidPtr(), &shrtSensorqueue
+        ros::VoidPtr(), &shrtSensorqueue[0]
+    );
+    ros::SubscribeOptions so_sens_left = ros::SubscribeOptions::create<sensor_msgs::Range>(
+        "/wheely/sensor/ir_shrt_left",1,
+        boost::bind(&nav::shortSensorMsg, this, _1),
+        ros::VoidPtr(), &shrtSensorqueue[1]
+    );
+    ros::SubscribeOptions so_sens_right = ros::SubscribeOptions::create<sensor_msgs::Range>(
+        "/wheely/sensor/ir_shrt_right",1,
+        boost::bind(&nav::shortSensorMsg, this, _1),
+        ros::VoidPtr(), &shrtSensorqueue[2]
+    );
+    ros::SubscribeOptions so_sens_rear = ros::SubscribeOptions::create<sensor_msgs::Range>(
+        "/wheely/sensor/ir_shrt_rear",1,
+        boost::bind(&nav::shortSensorMsg, this, _1),
+        ros::VoidPtr(), &shrtSensorqueue[3]
     );
 
     // sub1 = rosNode->subscribe(so);
     sub2 =  rosNode->subscribe(so_od);
-    link_state_sub = rosNode->subscribe(so_l);
-    sensor_sub = rosNode->subscribe(so_sens);
+    sensor_sub[0] = rosNode->subscribe(so_sens_front);
+    sensor_sub[1] = rosNode->subscribe(so_sens_left);
+    sensor_sub[2] = rosNode->subscribe(so_sens_right);
+    sensor_sub[3] = rosNode->subscribe(so_sens_rear);
 
     mvFrwdC = rosNode->serviceClient<robot_lib::Steering>("/wheely/steering/cmd_moveForward");
     turnLC = rosNode->serviceClient<robot_lib::Steering>("/wheely/steering/cmd_turnLeft");
@@ -45,7 +59,16 @@ nav::nav(int argc, char ** argv){
 }
 
 void nav::shortSensorMsg(sensor_msgs::RangeConstPtr range){
-    this->range = range->range;
+    static int count[4] = {0};
+    if ( !range->header.frame_id.compare(FRONT) ){/* count[0]++*/; SET_FRONT_RANGE(this->range,range->range)}
+    if ( !range->header.frame_id.compare(RIGHT) ){/* count[1]++*/; SET_RIGHT_RANGE(this->range,range->range)}
+    if ( !range->header.frame_id.compare(LEFT) ){ /*count[2]++;*/ SET_LEFT_RANGE(this->range,range->range)}
+    if ( !range->header.frame_id.compare(REAR) ){ /*count[3]++;*/ SET_REAR_RANGE(this->range,range->range)}
+//     ROS_INFO_DELAYED_THROTTLE(6,"fr%d, right %d, left %d, rear %d", count[0], count[1], count[2], count[3]);
+//     ROS_INFO_DELAYED_THROTTLE(2,"range front :%f,%s:%f,%s:%f ,%s:%f \n", FRONT_RANGE
+//  , "range right",RIGHT_RANGE
+//  , "range left",LEFT_RANGE
+//  , "range rear",REAR_RANGE);
 }
 /* Adjust the orientation betweeen The robots current pose
    and the destination vector dest_vect
@@ -97,13 +120,7 @@ bool nav::controlSpeed(Eigen::Vector3d dest,bool isBegin, bool isFinalDest,bool 
     double prev_err = err;
     while(true){
         //if obstacle on the way return.
-        if(detectObstacles && range <= CLOSE_RANGE){
-            ROS_INFO("CLOSE RANGE OBSTACLE...");
-            robot_lib::Steering s;
-            s.request.val = 0.6;
-            mvBack.call(s);
-            sleep(2);
-            brakeC.call(s);     
+        if(detectObstacles && checkForObstacle()){     
             return false;
         }
         err = (Eigen::Vector3d(x,y,0.0) - dest).norm();  
@@ -115,8 +132,8 @@ bool nav::controlSpeed(Eigen::Vector3d dest,bool isBegin, bool isFinalDest,bool 
             return ret;
         }
         auto current = odometry.twist.twist.linear.x;
-        if( isBegin || current <= 1.2){
-            str.request.val = 1.2;
+        if( isBegin || current <= 1.35){
+            str.request.val = 1.35;
             if (!mvFrwdC.call(str)){
                 return false;
             };
@@ -125,6 +142,91 @@ bool nav::controlSpeed(Eigen::Vector3d dest,bool isBegin, bool isFinalDest,bool 
         prev_err = err;
     }
     return false;
+}
+bool nav::checkForObstacle(){
+    static const double scale = 1.4;
+    static const double turnAngle = 30;
+    static const double roboRadius = 0.3;
+
+    if ( !( CHECK_FRONT_RANGE(this->range,1) ||  CHECK_RIGHT_RANGE(this->range,1) 
+        ||CHECK_LEFT_RANGE(this->range,1)) ){
+        //There is no obstacle
+        return false;
+    }
+    ROS_INFO("CLOSE RANGE OBSTACLE...");
+    robot_lib::Steering s;
+    while ( true ){
+        //Unblock robot by a bit, handle individual cases.
+        //Break if robot unblocked or is impossible to unblock robot
+        ROS_INFO("ADJUSTING ROBOT AWAY FROM OBSTACLE");
+        if ( CHECK_FRONT_RANGE(this->range,scale) ){
+            //Handle Front blocked case
+            ROS_INFO("FRONT OBSTACLE");
+            brakeC.call(s);    
+            double backUpspace = 1.5 * CLOSE_RANGE +  CLOSE_RANGE - FRONT_RANGE ;
+            if( CHECK_REAR_RANGE(this->range, backUpspace/CLOSE_RANGE)){
+                //Can't unblock, not enough space to move back
+                ROS_INFO("Not enough room ... space needed %f, RANGE %f", backUpspace, REAR_RANGE);
+                break;
+            }
+            //Go back enough to unblock the vehicle
+            s.request.val =( scale + 0.1 ) * CLOSE_RANGE;
+            mvBack.call(s);
+            ros::Duration(1.3).sleep();
+            brakeC.call(s);
+            ROS_INFO("backup space %f, turn angle %f, requ speed %f",backUpspace, turnAngle,s.request.val );
+
+        }
+        else if ( CHECK_RIGHT_RANGE(this->range,scale) ){
+            //Handle Right blocked case
+            ROS_INFO("RIGHT OBSTACLE");
+            brakeC.call(s);  
+            if ( CHECK_FRONT_RANGE(this->range,scale) ) {          
+                continue;
+            }
+            double backUpspace = scale * CLOSE_RANGE + sin(turnAngle) * roboRadius ;
+            if( CHECK_LEFT_RANGE(this->range,backUpspace/CLOSE_RANGE) ){
+                //Not enough room to make a turn
+                ROS_INFO("Not enough room ... space needed %f, RANGE %f",backUpspace,LEFT_RANGE );
+                break;
+            }
+            s.request.val =turnAngle;
+            turnLC.call(s);
+            s.request.val  = scale * CLOSE_RANGE + 0.1;
+            mvFrwdC.call(s);
+            sleep(1);
+            brakeC.call(s);
+            s.request.val =turnAngle;
+            turnRC.call(s);
+            ROS_INFO("backup space %f, turn angle %f, requ speed %f",backUpspace, turnAngle,CLOSE_RANGE);
+        }   
+        else if ( CHECK_LEFT_RANGE(this->range,1) ){
+            //Handle Left blocked case
+            ROS_INFO("LEFT OBSTACLE");
+            brakeC.call(s);    
+            if ( CHECK_FRONT_RANGE(this->range,scale) ) {        
+                        continue;
+            }
+            double backUpspace = 1.5 * CLOSE_RANGE + sin(turnAngle) * roboRadius ;
+            if( CHECK_RIGHT_RANGE(this->range,backUpspace/CLOSE_RANGE) ){
+                //Not enough room to make a turn
+                ROS_INFO("Not enough room ... space needed %f, RANGE %f",backUpspace, RIGHT_RANGE);
+                break;
+            }
+            s.request.val =turnAngle;
+            turnRC.call(s);
+            s.request.val  = scale * CLOSE_RANGE + 0.1;
+            mvFrwdC.call(s);
+            sleep(1);
+            brakeC.call(s);
+            s.request.val =turnAngle;
+            turnLC.call(s);
+            ROS_INFO("backup space %f, turn angle %f, requ speed %f",backUpspace, turnAngle,CLOSE_RANGE);
+        }
+        else break;
+    }
+   
+    return true;
 }
 bool nav::goTo(robot_lib::GoTo::Request& req, robot_lib::GoTo::Response& res){
     ROS_INFO("Starting tour...");  
@@ -163,14 +265,6 @@ void nav::odometryMsg(nav_msgs::OdometryConstPtr odom){
     y = odom->pose.pose.position.y;
     z = odom->pose.pose.position.z;   
 }
-
-void nav::linkState(gazebo_msgs::LinkStatesConstPtr ls){
-    static auto set = false;
-    if ( set ){return;}
-    this->linkStates = *ls;
-
-    set = true;
-}
 void nav::odomQueueCb(){
     static const double timeout = 0.01;
     while (this->rosNode->ok())
@@ -178,17 +272,10 @@ void nav::odomQueueCb(){
         this->odom_queue.callAvailable(ros::WallDuration(timeout));
     }
 }
-void nav::linkQueueCb(){
+void nav::shrtSensorQueueCb(int i){
     static const double timeout = 0.01;
     while (this->rosNode->ok())
     {
-        this->linkQueue.callAvailable(ros::WallDuration(timeout));
-    }
-}
-void nav::shrtSensorQueueCb(){
-    static const double timeout = 0.01;
-    while (this->rosNode->ok())
-    {
-        this->shrtSensorqueue.callAvailable(ros::WallDuration(timeout));
+        this->shrtSensorqueue[i].callAvailable(ros::WallDuration(timeout));
     }
 }

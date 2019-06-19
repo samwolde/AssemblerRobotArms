@@ -35,7 +35,7 @@ namespace wheely_planner
         marker_pub = rosNode->advertise<visualization_msgs::Marker>("visualization_marker", 10);
         ROS_INFO("\nParameters kh %d, robo_radius %lf, sensor_offset %lf\n", kh, robo_radius, sensor_offset);
         odomQueueThread = std::thread(std::bind(&Slam::odomQueueCb, this));
-        rangeThread = std::thread(std::bind(&Slam::rangeQueueCb, this));
+        laserThread = std::thread(std::bind(&Slam::laserQueueCb, this));
         sense_th = std::thread(std::bind(&Slam::senseQueueCb, this));
         std::string  odom_topic = std::string("/wheely/steering/odom");
         ROS_INFO("Slam : Using %s for odometry", odom_topic.c_str());
@@ -44,10 +44,10 @@ namespace wheely_planner
             boost::bind(&Slam::odometryMsg, this, _1),
             ros::VoidPtr(), &odom_queue
         );
-        ros::SubscribeOptions so_range = ros::SubscribeOptions::create<sensor_msgs::Range>(
-            "/wheely/sensor/ir",1,
-            boost::bind(&Slam::rangeMsg, this, _1),
-            ros::VoidPtr(), &range_queue
+        ros::SubscribeOptions so_laser = ros::SubscribeOptions::create<sensor_msgs::LaserScan>(
+            "/wheely/sensor/ir_laser",1,
+            boost::bind(&Slam::laserMsg, this, _1),
+            ros::VoidPtr(), &laser_queue
         );
         ros::SubscribeOptions so_sens = ros::SubscribeOptions::create<std_msgs::Float32>(
             "/wheely/ir_sensor/state",1,
@@ -55,25 +55,24 @@ namespace wheely_planner
             ros::VoidPtr(), &sense_queue
         );
         sub =  rosNode->subscribe(so_od);
-        range_sub = rosNode->subscribe(so_range);
+        laser_sub = rosNode->subscribe(so_laser);
         sens_sub = rosNode->subscribe(so_sens);
         pub = rosNode->advertise<geometry_msgs::Point>("/wheely/slam/world_coordinates",10);
     }
     void Slam::senseMsg(std_msgs::Float32ConstPtr state){
         sensor_angle = state->data;
-        auto c = new(Coordinate);
-        c->x = range;
-        c->y = 0;
-        mapBuilder->Tf_From_Sensor_Robo(c,sensor_angle);       
-        mapBuilder->Tf_From_Robo_World(c);
-        geometry_msgs::Point p;
-        p.x = c->x;
-        p.y = c->y;
-        pub.publish(p);
+        // auto c = new(Coordinate);
+        // // c->x = laser;
+        // c->y = 0;
+        // mapBuilder->Tf_From_Sensor_Robo(c,sensor_angle);       
+        // mapBuilder->Tf_From_Robo_World(c);
+        // geometry_msgs::Point p;
+        // p.x = c->x;
+        // p.y = c->y;
+        // pub.publish(p);
     }
-    void Slam::rangeMsg(sensor_msgs::RangeConstPtr r){
-        this->range = r->range;
-        mapBuilder->SetRange(range);
+    void Slam::laserMsg(sensor_msgs::LaserScanConstPtr r){
+        mapBuilder->SetLaserScan(r);
     }
     void Slam::odometryMsg(nav_msgs::OdometryConstPtr odom){
         this->odometry = *odom;
@@ -95,11 +94,11 @@ namespace wheely_planner
             this->odom_queue.callAvailable(ros::WallDuration(timeout));
         }
     }
-    void Slam::rangeQueueCb(){
+    void Slam::laserQueueCb(){
         static const double timeout = 0.01;
         while (this->rosNode->ok())
         {
-            this->range_queue.callAvailable(ros::WallDuration(timeout));
+            this->laser_queue.callAvailable(ros::WallDuration(timeout));
         }
     }
 

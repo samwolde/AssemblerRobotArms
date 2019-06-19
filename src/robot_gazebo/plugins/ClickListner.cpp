@@ -49,8 +49,8 @@ public:
     {
         if ( _event.key ==  16777220){
             geometry_msgs::Point p;
-            p.x = 21;//20.260273,3.967819
-            p.y = 4;
+            p.x = -14;//20.260273,3.967819
+            p.y = -12;
             p.z = 0;
             pubScan.publish(p);
         }

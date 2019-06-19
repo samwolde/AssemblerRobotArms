@@ -130,44 +130,50 @@ joint_sup4_axel = Joint("susp_axel_4","fixed",pose_axelj, "axel_4","susp_4")
 pose_wheelj = Pose(Location(0,0, wheel_length/2), Orientation(0,-rad(90),0))
 joint_axel4_wheel = RevoluteJoint("axel_wheel_4",pose_wheelj, "wheel_4","axel_4",wheel_upper_limit,wheel_lower_limit,Orientation(1,0,0))
 
-##Short Range Finder, for detecting unanticipated obstacles
-ir_short_pose = Pose(Location(0,-height/2-0.01,body_depth), Orientation(0,0,0))
-ir_short_sens_link = RectangularLink("Short_IR_Link",ir_short_pose,1e-5,[0.02,0.02,0.02],[1e-6,1e-6,1e-6])
+def createShortRanges(location_ir:Location, loc_jt:Location,name_ir:str,name_plugin:str,topic:str,pose_sens:Pose):
+    detection_range = 3
+    ir_short_pose = Pose(location_ir, Orientation(0,0,0))
+    ir_short_sens_link = RectangularLink(name_ir + '_link',ir_short_pose,1e-5,[0.02,0.02,0.02],[1e-6,1e-6,1e-6])
 
-ir_shrt_jt_pose = Pose(Location(0,0.01,0),Orientation(0,0,0))
-ir_shrt_jt = Joint("Short_IR_Body_Jt","fixed",ir_shrt_jt_pose,"Short_IR_Link","body_link")
+    ir_shrt_jt_pose = Pose(loc_jt,Orientation(0,0,0))
+    ir_shrt_jt = Joint(name_ir + '_jt',"fixed",ir_shrt_jt_pose,name_ir + '_link',"body_link")
+    ir_shrt_hori_param = {
+        "samples":"180",
+        "resolution":"1",
+        "min_angle":-1 * math.radians(70),  
+        "max_angle":math.radians(70)
+    }
+    ir_shrt_vert_param = {
+        "samples":"1",
+        "resolution":"1",
+        "min_angle":"0",
+        "max_angle":"0"
+    }
+    ir_shrt_plugin = Plugin(name_plugin, "libgazebo_ros_range.so", {
+        "gaussianNoise":0.0,
+        "alwaysOn":"true",
+        "updateRate":50,
+        "topicName":topic,
+        "frameName":name_ir + '_link',
+        "radiation":"infrared",
+        "fov":"0.2967"
+    })
 
-edge_threshold = 0.15
-detection_range = 0.45
-# print("${shrt_min_angle} is " + str(shrt_min_angle * 180/math.pi))
-ir_shrt_hori_param = {
-    "samples":"180",
-    "resolution":"1",
-    "min_angle":-1 * math.radians(70),  
-    "max_angle":math.radians(70)
-}
-ir_shrt_vert_param = {
-    "samples":"1",
-    "resolution":"1",
-    "min_angle":"0",
-    "max_angle":"0"
-}
-ir_shrt_plugin = Plugin("gazebo_ros_range_shrt", "libgazebo_ros_range.so", {
-    "gaussianNoise":0.0,
-    "alwaysOn":"true",
-    "updateRate":50,
-    "topicName":"wheely/sensor/ir_shrt",
-    "frameName":"Short_IR_Link",
-    "radiation":"infrared",
-    "fov":"0.2967"
-})
-ir_shrt_sensor = IRSensor("ir_sensor_shrt",ir_shrt_hori_param,ir_shrt_vert_param,{
-    "min":"0.01",
-    "max":detection_range,
-    "resolution":"1"},Pose(Location(0,-0.02,0), Orientation(0,0,-PI/2)),ir_shrt_plugin
-)
+    ir_shrt_sensor = IRSensor(name_ir + '_sensor',ir_shrt_hori_param,ir_shrt_vert_param,{
+        "min":"0.01",
+        "max":detection_range,
+        "resolution":"0.01"},pose_sens,ir_shrt_plugin
+    )
+    ir_short_sens_link.appendChild(ir_shrt_sensor)
+    return [ir_short_sens_link,ir_shrt_jt]
+### ## Front & Rear Short Range Finder, for detecting unanticipated obstacles
+short_sensors_joints = []
+short_sensors_joints.extend(createShortRanges(Location(0,-height/2-0.01,body_depth),Location(0,0.01,0),"short_ir_front","short_plugin_front","/wheely/sensor/ir_shrt_front",Pose(Location(0,-0.02,0), Orientation(0,0,-PI/2))))
+short_sensors_joints.extend(createShortRanges(Location(0,height/2+0.01,body_depth),Location(0,-0.01,0),"short_ir_rear","short_plugin_rear","/wheely/sensor/ir_shrt_rear",Pose(Location(0,0.02,0), Orientation(0,0,PI/2))))
+## Short range finders on the sides for unanticipated obstacle detection
+short_sensors_joints.extend(createShortRanges(Location(width/2+0.01,0,body_depth),Location(-0.01,0,0),"short_ir_left","short_plugin_left","/wheely/sensor/ir_shrt_left",Pose(Location(0.02,0,0), Orientation(0,0,0))) )
+short_sensors_joints.extend(createShortRanges(Location(-width/2-0.01,0,body_depth),Location(0.01,0,0),"short_ir_right","short_plugin_right","/wheely/sensor/ir_shrt_right",Pose(Location(-0.02,0,0), Orientation(0,0,-PI))))
 
-ir_short_sens_link.appendChild(ir_shrt_sensor)
 ##Long Range Finder, rotates for map building
 ir_pose = Pose(Location(0,-height/2+0.02,body_depth+depth/2+0.03), Orientation(0,0,0) )
 ir_sensor_link = CylindericalLink("IR_link", ir_pose,0.06,1e-5, 0.02,[1e-6,1e-6,1e-6])
@@ -176,10 +182,10 @@ ir_joint_pose = Pose(Location(0,0,-0.06/2), Orientation(0,0,0))
 ir_joint = RevoluteJoint("IR_body_joint", ir_joint_pose,"IR_link","body_link",None,None,Orientation(0,0,1))
 
 ir_hori_param = {
-    "samples":"1",
+    "samples":360 * 4,
     "resolution":"1",
-    "min_angle":0,
-    "max_angle":0
+    "min_angle":-math.radians(90),
+    "max_angle":math.radians(90)
 }
 ir_vert_param = {
     "samples":"1",
@@ -187,19 +193,19 @@ ir_vert_param = {
     "min_angle":"0",
     "max_angle":"0"
 }
-ir_plugin = Plugin("gazebo_ros_range", "libgazebo_ros_range.so", {
+ir_plugin = Plugin("gazebo_ros_range", "libgazebo_ros_laser.so", {
     "gaussianNoise":0.0,
     "alwaysOn":"true",
     "updateRate":50,
-    "topicName":"wheely/sensor/ir",
+    "topicName":"wheely/sensor/ir_laser",
     "frameName":"IR_link",
     "radiation":"infrared",
     "fov":"0.2967"
 })
-ir_sensor = IRSensor("ir_sensor",ir_hori_param,ir_vert_param,{
-    "min":"0.01",
-    "max":"50",
-    "resolution":"1"},Pose(Location(0,-0.02,0.03), Orientation(0,0,-PI/2)),ir_plugin
+ir_sensor = IRSensor("ir_sensor",ir_hori_param,None,{
+    "min":"0.1",
+    "max":"30.0",
+    "resolution":"0.01"},Pose(Location(0,-0.02,0.03), Orientation(0,0,-PI/2)),ir_plugin,"false"
 )
 ir_joint.addOde()
 ir_sensor_link.appendChild(ir_sensor)
@@ -214,11 +220,11 @@ wheel_ctrl = Plugin("wheel_ctr","libwheel_plugin.so",
     #Tweak the below parameteres if the turning angle overshoots.
     #Or the car is slowly turning.
     "kp":1.5,                   #Increase kp if car turn rate is slow, decrease if turning angle overshoots too often
-    "ki":6.2,
-    "kd":1.2,
+    "ki":6,
+    "kd":1.5,
     "dt":0.01,
     # turns within goal_radian +- turn_accuracy, higher accuracy higher turning time
-    "turnAccuracy":0.03
+    "turnAccuracy":0.01
 })
 # tsp_plugin = Plugin("test_tsp", "libtsp_plugin.so",
 # {
@@ -386,8 +392,9 @@ wheel_ctrl, skid_steer_ctrl,
 # finger_four, finger_four_joint, finger_one_tip, finger_one_tip_joint, finger_two_tip, finger_two_tip_joint, 
 # finger_three_tip, finger_three_tip_joint, finger_four_tip, finger_four_tip_joint, 
 # gripper_plugin, arm_control_plugin,
-ir_sensor_link,ir_joint,ir_sensor_ctrl,ir_short_sens_link,ir_shrt_jt#,wall_1,wall_2,wall_3,wall_4
-]#,tsp_plugin]
+ir_sensor_link,ir_joint,ir_sensor_ctrl
+]
+links_joints.extend(short_sensors_joints)
 
 model = Model("robot",links_joints)
 

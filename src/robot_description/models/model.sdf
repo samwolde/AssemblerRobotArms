@@ -443,10 +443,10 @@
 			<velPubTopic>cmd_wheel</velPubTopic>
 			<odometrySubTopic>odom</odometrySubTopic>
 			<kp>1.5</kp>
-			<ki>6.2</ki>
-			<kd>1.2</kd>
+			<ki>6</ki>
+			<kd>1.5</kd>
 			<dt>0.01</dt>
-			<turnAccuracy>0.03</turnAccuracy>
+			<turnAccuracy>0.01</turnAccuracy>
 		</plugin>
 		<plugin filename="libgazebo_ros_skid_steer_drive.so" name="skid_steer_controller">
 			<alwaysOn>true</alwaysOn>
@@ -492,14 +492,14 @@
 				</geometry>
 			</collision>
 			<sensor name="ir_sensor" type="ray">
-				<visualize>true</visualize>
+				<visualize>false</visualize>
 				<update_rate>50</update_rate>
 				<pose>0 -0.02 0.03 0 0 -1.5707963267948966</pose>
-				<plugin filename="libgazebo_ros_range.so" name="gazebo_ros_range">
+				<plugin filename="libgazebo_ros_laser.so" name="gazebo_ros_range">
 					<gaussianNoise>0.0</gaussianNoise>
 					<alwaysOn>true</alwaysOn>
 					<updateRate>50</updateRate>
-					<topicName>wheely/sensor/ir</topicName>
+					<topicName>wheely/sensor/ir_laser</topicName>
 					<frameName>IR_link</frameName>
 					<radiation>infrared</radiation>
 					<fov>0.2967</fov>
@@ -507,22 +507,16 @@
 				<ray>
 					<scan>
 						<horizontal>
-							<samples>1</samples>
+							<samples>1440</samples>
 							<resolution>1</resolution>
-							<min_angle>0</min_angle>
-							<max_angle>0</max_angle>
+							<min_angle>-1.5707963267948966</min_angle>
+							<max_angle>1.5707963267948966</max_angle>
 						</horizontal>
-						<vertical>
-							<samples>1</samples>
-							<resolution>1</resolution>
-							<min_angle>0</min_angle>
-							<max_angle>0</max_angle>
-						</vertical>
 					</scan>
 					<range>
-						<min>0.01</min>
-						<max>50</max>
-						<resolution>1</resolution>
+						<min>0.1</min>
+						<max>30.0</max>
+						<resolution>0.01</resolution>
 					</range>
 				</ray>
 				<always_on>true</always_on>
@@ -547,7 +541,7 @@
 			</physics>
 		</joint>
 		<plugin filename="libIR_sensor.so" name="IR_sensor_ctrl"/>
-		<link name="Short_IR_Link">
+		<link name="short_ir_front_link">
 			<pose>0 -0.31 0.19649999999999998 0 0 0</pose>
 			<inertial>
 				<inertia>
@@ -557,30 +551,30 @@
 				</inertia>
 				<mass>0.00001000</mass>
 			</inertial>
-			<visual name="Short_IR_Link_vis">
+			<visual name="short_ir_front_link_vis">
 				<geometry>
 					<box>
 						<size>0.02 0.02 0.02</size>
 					</box>
 				</geometry>
 			</visual>
-			<collision name="Short_IR_Link_col">
+			<collision name="short_ir_front_link_col">
 				<geometry>
 					<box>
 						<size>0.02 0.02 0.02</size>
 					</box>
 				</geometry>
 			</collision>
-			<sensor name="ir_sensor_shrt" type="ray">
-				<visualize>true</visualize>
+			<sensor name="short_ir_front_sensor" type="ray">
+				<visualize>false</visualize>
 				<update_rate>50</update_rate>
 				<pose>0 -0.02 0 0 0 -1.5707963267948966</pose>
-				<plugin filename="libgazebo_ros_range.so" name="gazebo_ros_range_shrt">
+				<plugin filename="libgazebo_ros_range.so" name="short_plugin_front">
 					<gaussianNoise>0.0</gaussianNoise>
 					<alwaysOn>true</alwaysOn>
 					<updateRate>50</updateRate>
-					<topicName>wheely/sensor/ir_shrt</topicName>
-					<frameName>Short_IR_Link</frameName>
+					<topicName>/wheely/sensor/ir_shrt_front</topicName>
+					<frameName>short_ir_front_link</frameName>
 					<radiation>infrared</radiation>
 					<fov>0.2967</fov>
 				</plugin>
@@ -601,16 +595,214 @@
 					</scan>
 					<range>
 						<min>0.01</min>
-						<max>0.45</max>
-						<resolution>1</resolution>
+						<max>3</max>
+						<resolution>0.01</resolution>
 					</range>
 				</ray>
 				<always_on>true</always_on>
 			</sensor>
 		</link>
-		<joint name="Short_IR_Body_Jt" type="fixed">
+		<joint name="short_ir_front_jt" type="fixed">
 			<pose>0 0.01 0 0 0 0</pose>
-			<child>Short_IR_Link</child>
+			<child>short_ir_front_link</child>
+			<parent>body_link</parent>
+		</joint>
+		<link name="short_ir_rear_link">
+			<pose>0 0.31 0.19649999999999998 0 0 0</pose>
+			<inertial>
+				<inertia>
+					<ixx>0.00000100</ixx>
+					<iyy>0.00000100</iyy>
+					<izz>0.00000100</izz>
+				</inertia>
+				<mass>0.00001000</mass>
+			</inertial>
+			<visual name="short_ir_rear_link_vis">
+				<geometry>
+					<box>
+						<size>0.02 0.02 0.02</size>
+					</box>
+				</geometry>
+			</visual>
+			<collision name="short_ir_rear_link_col">
+				<geometry>
+					<box>
+						<size>0.02 0.02 0.02</size>
+					</box>
+				</geometry>
+			</collision>
+			<sensor name="short_ir_rear_sensor" type="ray">
+				<visualize>false</visualize>
+				<update_rate>50</update_rate>
+				<pose>0 0.02 0 0 0 1.5707963267948966</pose>
+				<plugin filename="libgazebo_ros_range.so" name="short_plugin_rear">
+					<gaussianNoise>0.0</gaussianNoise>
+					<alwaysOn>true</alwaysOn>
+					<updateRate>50</updateRate>
+					<topicName>/wheely/sensor/ir_shrt_rear</topicName>
+					<frameName>short_ir_rear_link</frameName>
+					<radiation>infrared</radiation>
+					<fov>0.2967</fov>
+				</plugin>
+				<ray>
+					<scan>
+						<horizontal>
+							<samples>180</samples>
+							<resolution>1</resolution>
+							<min_angle>-1.2217304763960306</min_angle>
+							<max_angle>1.2217304763960306</max_angle>
+						</horizontal>
+						<vertical>
+							<samples>1</samples>
+							<resolution>1</resolution>
+							<min_angle>0</min_angle>
+							<max_angle>0</max_angle>
+						</vertical>
+					</scan>
+					<range>
+						<min>0.01</min>
+						<max>3</max>
+						<resolution>0.01</resolution>
+					</range>
+				</ray>
+				<always_on>true</always_on>
+			</sensor>
+		</link>
+		<joint name="short_ir_rear_jt" type="fixed">
+			<pose>0 -0.01 0 0 0 0</pose>
+			<child>short_ir_rear_link</child>
+			<parent>body_link</parent>
+		</joint>
+		<link name="short_ir_left_link">
+			<pose>0.16 0 0.19649999999999998 0 0 0</pose>
+			<inertial>
+				<inertia>
+					<ixx>0.00000100</ixx>
+					<iyy>0.00000100</iyy>
+					<izz>0.00000100</izz>
+				</inertia>
+				<mass>0.00001000</mass>
+			</inertial>
+			<visual name="short_ir_left_link_vis">
+				<geometry>
+					<box>
+						<size>0.02 0.02 0.02</size>
+					</box>
+				</geometry>
+			</visual>
+			<collision name="short_ir_left_link_col">
+				<geometry>
+					<box>
+						<size>0.02 0.02 0.02</size>
+					</box>
+				</geometry>
+			</collision>
+			<sensor name="short_ir_left_sensor" type="ray">
+				<visualize>false</visualize>
+				<update_rate>50</update_rate>
+				<pose>0.02 0 0 0 0 0</pose>
+				<plugin filename="libgazebo_ros_range.so" name="short_plugin_left">
+					<gaussianNoise>0.0</gaussianNoise>
+					<alwaysOn>true</alwaysOn>
+					<updateRate>50</updateRate>
+					<topicName>/wheely/sensor/ir_shrt_left</topicName>
+					<frameName>short_ir_left_link</frameName>
+					<radiation>infrared</radiation>
+					<fov>0.2967</fov>
+				</plugin>
+				<ray>
+					<scan>
+						<horizontal>
+							<samples>180</samples>
+							<resolution>1</resolution>
+							<min_angle>-1.2217304763960306</min_angle>
+							<max_angle>1.2217304763960306</max_angle>
+						</horizontal>
+						<vertical>
+							<samples>1</samples>
+							<resolution>1</resolution>
+							<min_angle>0</min_angle>
+							<max_angle>0</max_angle>
+						</vertical>
+					</scan>
+					<range>
+						<min>0.01</min>
+						<max>3</max>
+						<resolution>0.01</resolution>
+					</range>
+				</ray>
+				<always_on>true</always_on>
+			</sensor>
+		</link>
+		<joint name="short_ir_left_jt" type="fixed">
+			<pose>-0.01 0 0 0 0 0</pose>
+			<child>short_ir_left_link</child>
+			<parent>body_link</parent>
+		</joint>
+		<link name="short_ir_right_link">
+			<pose>-0.16 0 0.19649999999999998 0 0 0</pose>
+			<inertial>
+				<inertia>
+					<ixx>0.00000100</ixx>
+					<iyy>0.00000100</iyy>
+					<izz>0.00000100</izz>
+				</inertia>
+				<mass>0.00001000</mass>
+			</inertial>
+			<visual name="short_ir_right_link_vis">
+				<geometry>
+					<box>
+						<size>0.02 0.02 0.02</size>
+					</box>
+				</geometry>
+			</visual>
+			<collision name="short_ir_right_link_col">
+				<geometry>
+					<box>
+						<size>0.02 0.02 0.02</size>
+					</box>
+				</geometry>
+			</collision>
+			<sensor name="short_ir_right_sensor" type="ray">
+				<visualize>false</visualize>
+				<update_rate>50</update_rate>
+				<pose>-0.02 0 0 0 0 -3.141592653589793</pose>
+				<plugin filename="libgazebo_ros_range.so" name="short_plugin_right">
+					<gaussianNoise>0.0</gaussianNoise>
+					<alwaysOn>true</alwaysOn>
+					<updateRate>50</updateRate>
+					<topicName>/wheely/sensor/ir_shrt_right</topicName>
+					<frameName>short_ir_right_link</frameName>
+					<radiation>infrared</radiation>
+					<fov>0.2967</fov>
+				</plugin>
+				<ray>
+					<scan>
+						<horizontal>
+							<samples>180</samples>
+							<resolution>1</resolution>
+							<min_angle>-1.2217304763960306</min_angle>
+							<max_angle>1.2217304763960306</max_angle>
+						</horizontal>
+						<vertical>
+							<samples>1</samples>
+							<resolution>1</resolution>
+							<min_angle>0</min_angle>
+							<max_angle>0</max_angle>
+						</vertical>
+					</scan>
+					<range>
+						<min>0.01</min>
+						<max>3</max>
+						<resolution>0.01</resolution>
+					</range>
+				</ray>
+				<always_on>true</always_on>
+			</sensor>
+		</link>
+		<joint name="short_ir_right_jt" type="fixed">
+			<pose>0.01 0 0 0 0 0</pose>
+			<child>short_ir_right_link</child>
 			<parent>body_link</parent>
 		</joint>
 	</model>
