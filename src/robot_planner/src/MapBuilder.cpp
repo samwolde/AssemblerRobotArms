@@ -70,12 +70,19 @@ namespace wheely_planner
     }
     void MapBuilder::UpdateMap(){
         robot_lib::Sensor sensor;
+        std::unordered_map<Index,bool,IndexKeyHasher> init;
+
         ROS_INFO("UpdatingMap...");
-        for (size_t j = 0; j < 2; j++)
+        /**
+         * Perform 4 scans 2 at 0 degrees and 2 at 180 degrees,
+         * In order for a cell to be occupied must exist in two of the scans.
+         */
+        for (size_t j = 0; j < 4; j++)
         {
             for (size_t i = 0; i < laserScan.ranges.size(); i++)
             {
-                double angle = laserScan.angle_min + i * laserScan.angle_increment + j * M_PI;
+                double sens_angle =  j < 2 ? 0 : M_PI;
+                double angle = laserScan.angle_min + i * laserScan.angle_increment + sens_angle;
                 //change the range reading to coordinates of the world frame
                 //1st transform from the sensor coordinates to robots
                 Coordinate_t c = new(Coordinate);
@@ -86,16 +93,29 @@ namespace wheely_planner
                 c->y = 0;
                 Tf_From_Sensor_Robo(c,angle);       
                 Tf_From_Robo_World(c);
-                // gridMap->storePtForVis(c, &marker);
-                //Register on the gridMap
-                localMap->setCellStatus(c->x, c->y);
-                // gridMap->setCellStatus(c->x,c->y);
+                //Register on the gridMap, if point exists on both scans
+                Index * index = localMap->computeCellIndex(c->x,c->y);            
+                if ( !index ) continue;
+                // //If first scan 
+                if ( j % 2 == 0 && init.find(*index) == init.end() ){
+                    init[*index] = true;
+                }
+                else if( j%2 == 1 ){
+                    //Filter scans they must exist in both scans inorder to be valid
+                    if ( !(init.find(*index) == init.end() )){
+                        localMap->setCellStatus(index->cx,index->cy);
+                    }
+                }
+                delete index;
                 delete c;
             }
-            sensor.request.angle = (1 - j) * 180;
+            if ( j %2 == 1) {
+                //Compare the two scans setCellStatus of common elements
+                init.clear();
+            }
+            sensor.request.angle = j < 1 || j == 3 ? 0 : 180;
             sensorTurn.call(sensor);
         }
-        
         localMap->EnlargeObstacles(gridMap);
         localMap->visualizeMap(COLOR_DARK_RED,5);
         gridMap->visualizeMap();

@@ -40,6 +40,12 @@ struct Index{
     }
     u_int i,j;      //Index to the grid map
     double cx,cy; //Centers
+
+    bool operator==(Index const &other)const{
+        auto in_x = fabs(cx - other.cx) <=EPSILON;
+        auto in_y = fabs(cy - other.cy) <=EPSILON;
+        return in_x && in_y;   
+    }
 };
 struct Coordinate
 {
@@ -83,6 +89,20 @@ struct CellKeyHasher
         using boost::hash_combine;
         int trunced_x = (int) trunc(c.center.x * 1000);
         int trunced_y = (int) trunc(c.center.y * 1000);
+        std::size_t seed = (trunced_x) ^  (trunced_y);
+        hash_combine(seed,hash_value(trunced_x));
+        hash_combine(seed,hash_value(trunced_y));
+        return seed;
+    }
+};
+struct IndexKeyHasher
+{
+    std::size_t operator()(const Index& i)const
+    {
+        using boost::hash_value;
+        using boost::hash_combine;
+        int trunced_x = (int) trunc(i.cx * 1000);
+        int trunced_y = (int) trunc(i.cy * 1000);
         std::size_t seed = (trunced_x) ^  (trunced_y);
         hash_combine(seed,hash_value(trunced_x));
         hash_combine(seed,hash_value(trunced_y));

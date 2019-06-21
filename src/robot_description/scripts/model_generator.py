@@ -182,7 +182,7 @@ ir_joint_pose = Pose(Location(0,0,-0.06/2), Orientation(0,0,0))
 ir_joint = RevoluteJoint("IR_body_joint", ir_joint_pose,"IR_link","body_link",None,None,Orientation(0,0,1))
 
 ir_hori_param = {
-    "samples":360 * 4,
+    "samples":360 * 3,
     "resolution":"1",
     "min_angle":-math.radians(90),
     "max_angle":math.radians(90)
@@ -194,7 +194,6 @@ ir_vert_param = {
     "max_angle":"0"
 }
 ir_plugin = Plugin("gazebo_ros_range", "libgazebo_ros_laser.so", {
-    "gaussianNoise":0.0,
     "alwaysOn":"true",
     "updateRate":50,
     "topicName":"wheely/sensor/ir_laser",
@@ -219,8 +218,8 @@ wheel_ctrl = Plugin("wheel_ctr","libwheel_plugin.so",
     "odometrySubTopic":"odom",
     #Tweak the below parameteres if the turning angle overshoots.
     #Or the car is slowly turning.
-    "kp":2.6,                   #Increase kp if car turn rate is slow, decrease if turning angle overshoots too often
-    "ki":4.3,
+    "kp":3,                   #Increase kp if car turn rate is slow, decrease if turning angle overshoots too often
+    "ki":4.5,
     "kd":1.2,
     "dt":0.01,
     # turns within goal_radian +- turn_accuracy, higher accuracy higher turning time

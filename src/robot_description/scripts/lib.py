@@ -184,13 +184,25 @@ class IRSensor(_Sensor):
         hor = sdf_doc.createElement("horizontal")
         ver = sdf_doc.createElement("vertical")
         range_el = sdf_doc.createElement("range")
-
+        noise = sdf_doc.createElement("noise")
+        n_type = sdf_doc.createElement("type")
+        n_mean = sdf_doc.createElement("mean")
+        n_stddev = sdf_doc.createElement("stddev")
+        n_type.appendChild(sdf_doc.createTextNode("gaussian"))
+        n_mean.appendChild(sdf_doc.createTextNode("0.0"))
+        n_stddev.appendChild(sdf_doc.createTextNode("0.01"))
+        noise.appendChild(n_type)
+        noise.appendChild(n_mean)
+        noise.appendChild(n_stddev)
+        
         scan.appendChild(hor)
         if ( vert != None):
             scan.appendChild(ver)
 
         ray.appendChild(scan)
         ray.appendChild(range_el)
+        ray.appendChild(noise)
+
         self.appendChild(ray)
         for h in hr:
             t = sdf_doc.createElement(h)

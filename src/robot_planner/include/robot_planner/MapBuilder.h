@@ -37,6 +37,7 @@ namespace wheely_planner{
         /*Take N samples turning a 360 degrees*/
         void UpdateMap();
         bool CheckBlocked(Coordinate_t);
+        void filterScans(std::vector<Index*>*,std::unordered_map<Index,bool,IndexKeyHasher>*);
         //For coordinate transformations.
         void Tf_From_Sensor_Robo(Coordinate_t c, double angle);
         void Tf_From_Robo_World(Coordinate_t c);

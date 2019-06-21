@@ -22,7 +22,7 @@
 #include <eigen3/Eigen/Core>
 #include <thread>
 
-#define CLOSE_RANGE 0.23
+#define CLOSE_RANGE 0.24
 #define FRONT "short_ir_front_link"
 #define REAR "short_ir_rear_link"
 #define LEFT "short_ir_left_link"

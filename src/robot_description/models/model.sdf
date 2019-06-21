@@ -442,8 +442,8 @@
 			<prefix>wheely/steering</prefix>
 			<velPubTopic>cmd_wheel</velPubTopic>
 			<odometrySubTopic>odom</odometrySubTopic>
-			<kp>2.6</kp>
-			<ki>4.3</ki>
+			<kp>3</kp>
+			<ki>4.5</ki>
 			<kd>1.2</kd>
 			<dt>0.01</dt>
 			<turnAccuracy>0.008</turnAccuracy>
@@ -496,7 +496,6 @@
 				<update_rate>50</update_rate>
 				<pose>0 -0.02 0.03 0 0 -1.5707963267948966</pose>
 				<plugin filename="libgazebo_ros_laser.so" name="gazebo_ros_range">
-					<gaussianNoise>0.0</gaussianNoise>
 					<alwaysOn>true</alwaysOn>
 					<updateRate>50</updateRate>
 					<topicName>wheely/sensor/ir_laser</topicName>
@@ -507,7 +506,7 @@
 				<ray>
 					<scan>
 						<horizontal>
-							<samples>1440</samples>
+							<samples>1080</samples>
 							<resolution>1</resolution>
 							<min_angle>-1.5707963267948966</min_angle>
 							<max_angle>1.5707963267948966</max_angle>
@@ -518,6 +517,11 @@
 						<max>30.0</max>
 						<resolution>0.01</resolution>
 					</range>
+					<noise>
+						<type>gaussian</type>
+						<mean>0.0</mean>
+						<stddev>0.01</stddev>
+					</noise>
 				</ray>
 				<always_on>true</always_on>
 			</sensor>
@@ -598,6 +602,11 @@
 						<max>3</max>
 						<resolution>0.01</resolution>
 					</range>
+					<noise>
+						<type>gaussian</type>
+						<mean>0.0</mean>
+						<stddev>0.01</stddev>
+					</noise>
 				</ray>
 				<always_on>true</always_on>
 			</sensor>
@@ -664,6 +673,11 @@
 						<max>3</max>
 						<resolution>0.01</resolution>
 					</range>
+					<noise>
+						<type>gaussian</type>
+						<mean>0.0</mean>
+						<stddev>0.01</stddev>
+					</noise>
 				</ray>
 				<always_on>true</always_on>
 			</sensor>
@@ -730,6 +744,11 @@
 						<max>3</max>
 						<resolution>0.01</resolution>
 					</range>
+					<noise>
+						<type>gaussian</type>
+						<mean>0.0</mean>
+						<stddev>0.01</stddev>
+					</noise>
 				</ray>
 				<always_on>true</always_on>
 			</sensor>
@@ -796,6 +815,11 @@
 						<max>3</max>
 						<resolution>0.01</resolution>
 					</range>
+					<noise>
+						<type>gaussian</type>
+						<mean>0.0</mean>
+						<stddev>0.01</stddev>
+					</noise>
 				</ray>
 				<always_on>true</always_on>
 			</sensor>
