@@ -5,11 +5,11 @@ namespace wheely_planner
     MapBuilder::MapBuilder(ros::NodeHandlePtr rosNode, GridMap* g,PathPlanner* pathPlanner,double sensor_of, double sample){
         sensorTurn = rosNode->serviceClient<robot_lib::Sensor>("/wheely/ir_sensor/cmd_turn");
         updateMapSub = rosNode->subscribe("/wheely/slam/BuildMap",10,&MapBuilder::BuildMap,this);
-        mapSave = rosNode->subscribe("/wheely/slam/saveMap", 10 , &GridMap::saveMap,g );
-        sensor_offset = sensor_of;
-        gridMap = g;
-        rosNode->getParam("robo_radius",robo_radius);
         localMap = new GridMap(g);
+        mapSave = rosNode->subscribe("/wheely/slam/saveMap", 10 , &GridMap::saveMap,localMap );
+        gridMap = g;
+        sensor_offset = sensor_of;
+        rosNode->getParam("robo_radius",robo_radius);
         sampleSize = sample;
         this->pathPlanner = pathPlanner;
     }
@@ -37,8 +37,6 @@ namespace wheely_planner
         ROS_INFO("YAY.. DONE BUILDING MAP.");
         localMap->visualizeMap(COLOR_DARK_RED,5);
         gridMap->visualizeMap();
-        pause();
-        // 
     }   
     bool MapBuilder::CheckBlocked(Coordinate_t goal_pt){
         static auto last_blocked = ros::Time::now();

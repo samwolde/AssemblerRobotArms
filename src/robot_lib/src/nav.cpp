@@ -64,11 +64,6 @@ void nav::shortSensorMsg(sensor_msgs::RangeConstPtr range){
     if ( !range->header.frame_id.compare(RIGHT) ){/* count[1]++*/; SET_RIGHT_RANGE(this->range,range->range)}
     if ( !range->header.frame_id.compare(LEFT) ){ /*count[2]++;*/ SET_LEFT_RANGE(this->range,range->range)}
     if ( !range->header.frame_id.compare(REAR) ){ /*count[3]++;*/ SET_REAR_RANGE(this->range,range->range)}
-//     ROS_INFO_DELAYED_THROTTLE(6,"fr%d, right %d, left %d, rear %d", count[0], count[1], count[2], count[3]);
-//     ROS_INFO_DELAYED_THROTTLE(2,"range front :%f,%s:%f,%s:%f ,%s:%f \n", FRONT_RANGE
-//  , "range right",RIGHT_RANGE
-//  , "range left",LEFT_RANGE
-//  , "range rear",REAR_RANGE);
 }
 /* Adjust the orientation betweeen The robots current pose
    and the destination vector dest_vect

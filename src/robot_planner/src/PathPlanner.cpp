@@ -60,7 +60,7 @@ namespace wheely_planner
                 break;
             }
             //process adjacent cells that are open 
-            std::vector<Cell> neighbors = gridMap->getAdjacentCells_24(&c.center);
+            std::vector<Cell> neighbors = gridMap->getAdjacentCells_8(&c.center);
             for (auto  neighbor: neighbors)
             {
                 double n_cost = c.g + uniform_cost;

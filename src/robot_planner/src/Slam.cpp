@@ -134,7 +134,8 @@ static int mapFilter(const struct dirent* dir_ent)
     //Skip . and ..
     if (!strcmp(dir_ent->d_name, ".") || !strcmp(dir_ent->d_name, "..")) return 0;
     std::string fname = dir_ent->d_name;
-    if (fname.find_last_of(".map") != std::string::npos ) {
+    if (!fname.compare(fname.length()-4,4,".map")) {
+        ROS_INFO("FOUND .MAP ??");
         return 1;
     }
     return 0;

@@ -442,11 +442,11 @@
 			<prefix>wheely/steering</prefix>
 			<velPubTopic>cmd_wheel</velPubTopic>
 			<odometrySubTopic>odom</odometrySubTopic>
-			<kp>1.5</kp>
-			<ki>6</ki>
-			<kd>1.5</kd>
+			<kp>2.6</kp>
+			<ki>4.3</ki>
+			<kd>1.2</kd>
 			<dt>0.01</dt>
-			<turnAccuracy>0.01</turnAccuracy>
+			<turnAccuracy>0.008</turnAccuracy>
 		</plugin>
 		<plugin filename="libgazebo_ros_skid_steer_drive.so" name="skid_steer_controller">
 			<alwaysOn>true</alwaysOn>

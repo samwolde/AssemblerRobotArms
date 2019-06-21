@@ -40,7 +40,7 @@ GridMap::GridMap(MapFile map,double robo_radius,ros::Publisher* _pub):pub(_pub){
         return;
     }
     ROS_INFO("Read Map Data");
-
+    // if ( sscanf())
     //Extract header info
     if ( sscanf(mapData, "%zu\n%lf\n",&mapSize, &cellSize) == EOF) {ROS_INFO("Map File Bad Format.");return;}
     auto i =0;
