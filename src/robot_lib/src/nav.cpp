@@ -127,8 +127,8 @@ bool nav::controlSpeed(Eigen::Vector3d dest,bool isBegin, bool isFinalDest,bool 
             return ret;
         }
         auto current = odometry.twist.twist.linear.x;
-        if( isBegin || current <= 1.35){
-            str.request.val = 1.35;
+        if( isBegin || current <= 1.5){
+            str.request.val = 1.5;
             if (!mvFrwdC.call(str)){
                 return false;
             };
@@ -138,6 +138,9 @@ bool nav::controlSpeed(Eigen::Vector3d dest,bool isBegin, bool isFinalDest,bool 
     }
     return false;
 }
+/**
+ * Check if the robot is bloked in any of the four direction and unblock it.
+ */
 bool nav::checkForObstacle(){
     static const double scale = 1.4;
     static const double turnAngle = 30;
@@ -165,9 +168,9 @@ bool nav::checkForObstacle(){
                 break;
             }
             //Go back enough to unblock the vehicle
-            s.request.val =( scale + 0.1 ) * CLOSE_RANGE;
+            s.request.val =2 * ( scale + 0.1 ) * CLOSE_RANGE;
             mvBack.call(s);
-            ros::Duration(1.3).sleep();
+            ros::Duration(0.6).sleep();
             brakeC.call(s);
             ROS_INFO("backup space %f, turn angle %f, requ speed %f",backUpspace, turnAngle,s.request.val );
 
@@ -187,9 +190,9 @@ bool nav::checkForObstacle(){
             }
             s.request.val =turnAngle;
             turnLC.call(s);
-            s.request.val  = scale * CLOSE_RANGE + 0.1;
+            s.request.val =2 * ( scale + 0.1 ) * CLOSE_RANGE;            
             mvFrwdC.call(s);
-            sleep(1);
+            ros::Duration(0.6).sleep();            
             brakeC.call(s);
             s.request.val =turnAngle;
             turnRC.call(s);
@@ -210,9 +213,9 @@ bool nav::checkForObstacle(){
             }
             s.request.val =turnAngle;
             turnRC.call(s);
-            s.request.val  = scale * CLOSE_RANGE + 0.1;
+            s.request.val =2 * ( scale + 0.1 ) * CLOSE_RANGE;            
             mvFrwdC.call(s);
-            sleep(1);
+            ros::Duration(0.6).sleep();  
             brakeC.call(s);
             s.request.val =turnAngle;
             turnLC.call(s);

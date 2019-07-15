@@ -218,9 +218,9 @@ wheel_ctrl = Plugin("wheel_ctr","libwheel_plugin.so",
     "odometrySubTopic":"odom",
     #Tweak the below parameteres if the turning angle overshoots.
     #Or the car is slowly turning.
-    "kp":3,                   #Increase kp if car turn rate is slow, decrease if turning angle overshoots too often
-    "ki":4.5,
-    "kd":1.2,
+    "kp":4,                   #Increase kp if car turn rate is slow, decrease if turning angle overshoots too often
+    "ki":4,
+    "kd":2,
     "dt":0.01,
     # turns within goal_radian +- turn_accuracy, higher accuracy higher turning time
     "turnAccuracy":0.008

@@ -442,9 +442,9 @@
 			<prefix>wheely/steering</prefix>
 			<velPubTopic>cmd_wheel</velPubTopic>
 			<odometrySubTopic>odom</odometrySubTopic>
-			<kp>3</kp>
-			<ki>4.5</ki>
-			<kd>1.2</kd>
+			<kp>4</kp>
+			<ki>4</ki>
+			<kd>2</kd>
 			<dt>0.01</dt>
 			<turnAccuracy>0.008</turnAccuracy>
 		</plugin>
