@@ -117,9 +117,9 @@ class RectangularLink(Link):
 
     def __init__(self, name, pose:Pose, mass,size, inertial):
         super().__init__(name,pose, mass, inertial)
-        self.col_vis = RectangularColVis(name, size)
-        self.appendChild(self.col_vis.col_vis[0])
-        self.appendChild(self.col_vis.col_vis[1])
+        self.vis_col = RectangularColVis(name, size)
+        self.appendChild(self.vis_col.vis_col[0])
+        self.appendChild(self.vis_col.vis_col[1])
 
 
 #Create A cylinderical link.
@@ -127,9 +127,9 @@ class CylindericalLink(Link):
 
     def __init__(self, name, pose:Pose,leng,mass,rad, inertial):
         super().__init__(name,pose, mass, inertial)
-        self.col_vis = CylinderColVis(name, rad,leng)
-        self.appendChild(self.col_vis.col_vis[0])
-        self.appendChild(self.col_vis.col_vis[1])
+        self.vis_col = CylinderColVis(name, rad,leng)
+        self.appendChild(self.vis_col.vis_col[0])
+        self.appendChild(self.vis_col.vis_col[1])
 
 class Plugin(DOM.Element):
     def __init__(self, name:str, filename:str,parameters:dict):
@@ -294,7 +294,7 @@ class CylinderColVis():
         col.appendChild(geo)
         vis.appendChild(geo2)
 
-        self.col_vis = [vis, col]
+        self.vis_col = [vis, col]
 
 '''
     Create A rectangular Collision and Visual xml tags
@@ -324,8 +324,24 @@ class RectangularColVis():
         geo2 = geo.cloneNode(True)
         vis.appendChild(geo)
         col.appendChild(geo2)
-        self.col_vis = [vis, col]
+        self.vis_col = [vis, col]
 
+class Material(DOM.Element):
+    def __init__(self,vals:dict):
+        super().__init__("material")
+        sdf = Sdf.createSdfDoc()
+        
+        props = {
+            "a"  : sdf.createElement("ambient"),
+            "d"  : sdf.createElement("diffuse"),
+            "s" : sdf.createElement("specular"),
+            "e" : sdf.createElement("emissive")
+        }
+
+        for p in vals.keys():
+            text = str(vals[p][0]) +" "+ str(vals[p][1]) +" "+ str(vals[p][2]) +" "+ str(vals[p][3]) 
+            props[p].appendChild(sdf.createTextNode(text))
+            self.appendChild(props[p])   
 
 class Inertial(DOM.Element):
     def __init__(self, mass, inertial):
@@ -353,7 +369,6 @@ class Inertial(DOM.Element):
         self.appendChild(self.mass)
 
 #Generic Joint 
-#TODO:
 class Joint(DOM.Element):
     def __init__(self,name:str, type:str,  pose:Pose, child:str, parent:str):
         super().__init__("joint")

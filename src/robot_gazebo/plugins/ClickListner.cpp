@@ -73,7 +73,7 @@ public:
         if(this->userCam){
             ignition::math::Vector3d position_clicked;
             scene->FirstContact(this->userCam, mouseClicked, position_clicked);
-            printf("World Position clicked %f,%f\n",position_clicked.X(),position_clicked.Y());
+            printf("[%f,%f],",position_clicked.X(),position_clicked.Y());
             fflush(NULL);
             geometry_msgs::Point pt ;
             pt.x  = position_clicked.X();

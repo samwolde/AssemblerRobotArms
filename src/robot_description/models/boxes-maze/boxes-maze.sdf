@@ -1,0 +1,486 @@
+<?xml version="1.0" ?>
+<sdf version="1.6">
+	<model name="boxes-maze">
+		<link name="box-1">
+			<pose>-13.802956 -1.684998 0 0 0 0</pose>
+			<inertial>
+				<inertia>
+					<ixx>0.00050000</ixx>
+					<iyy>0.00050000</iyy>
+					<izz>0.00050000</izz>
+				</inertia>
+				<mass>0.10000000</mass>
+			</inertial>
+			<visual name="box-1_vis">
+				<geometry>
+					<cylinder>
+						<radius>0.125</radius>
+						<length>0.125</length>
+					</cylinder>
+				</geometry>
+				<material>
+					<ambient>1 0 0 1</ambient>
+					<diffuse>1 0 0 1</diffuse>
+					<specular>1 0 0 1</specular>
+					<emissive>0.1 0.1 0.1 1</emissive>
+				</material>
+			</visual>
+			<collision name="box-1_col">
+				<geometry>
+					<cylinder>
+						<radius>0.125</radius>
+						<length>0.125</length>
+					</cylinder>
+				</geometry>
+			</collision>
+		</link>
+		<link name="box-2">
+			<pose>-17.752222 -3.684369 0 0 0 0</pose>
+			<inertial>
+				<inertia>
+					<ixx>0.00050000</ixx>
+					<iyy>0.00050000</iyy>
+					<izz>0.00050000</izz>
+				</inertia>
+				<mass>0.10000000</mass>
+			</inertial>
+			<visual name="box-2_vis">
+				<geometry>
+					<box>
+						<size>0.25 0.25 0.25</size>
+					</box>
+				</geometry>
+				<material>
+					<ambient>0 0 1 1</ambient>
+					<diffuse>0 0 1 1</diffuse>
+					<specular>0 0 1 1</specular>
+					<emissive>0.1 0.1 0.1 1</emissive>
+				</material>
+			</visual>
+			<collision name="box-2_col">
+				<geometry>
+					<box>
+						<size>0.25 0.25 0.25</size>
+					</box>
+				</geometry>
+			</collision>
+		</link>
+		<link name="box-3">
+			<pose>-23.848755 -1.587422 0 0 0 0</pose>
+			<inertial>
+				<inertia>
+					<ixx>0.00050000</ixx>
+					<iyy>0.00050000</iyy>
+					<izz>0.00050000</izz>
+				</inertia>
+				<mass>0.10000000</mass>
+			</inertial>
+			<visual name="box-3_vis">
+				<geometry>
+					<box>
+						<size>0.25 0.25 0.25</size>
+					</box>
+				</geometry>
+				<material>
+					<ambient>0.26 0.84 0.96 1</ambient>
+					<diffuse>0.26 0.84 0.96 1</diffuse>
+					<specular>0.26 0.84 0.96 1</specular>
+					<emissive>0.1 0.1 0.1 1</emissive>
+				</material>
+			</visual>
+			<collision name="box-3_col">
+				<geometry>
+					<box>
+						<size>0.25 0.25 0.25</size>
+					</box>
+				</geometry>
+			</collision>
+		</link>
+		<link name="box-4">
+			<pose>-23.848755 -9.487605 0 0 0 0</pose>
+			<inertial>
+				<inertia>
+					<ixx>0.00050000</ixx>
+					<iyy>0.00050000</iyy>
+					<izz>0.00050000</izz>
+				</inertia>
+				<mass>0.10000000</mass>
+			</inertial>
+			<visual name="box-4_vis">
+				<geometry>
+					<box>
+						<size>0.25 0.25 0.25</size>
+					</box>
+				</geometry>
+				<material>
+					<ambient>0.26 0.84 0.96 1</ambient>
+					<diffuse>0.26 0.84 0.96 1</diffuse>
+					<specular>0.26 0.84 0.96 1</specular>
+					<emissive>0.1 0.1 0.1 1</emissive>
+				</material>
+			</visual>
+			<collision name="box-4_col">
+				<geometry>
+					<box>
+						<size>0.25 0.25 0.25</size>
+					</box>
+				</geometry>
+			</collision>
+		</link>
+		<link name="box-5">
+			<pose>-10.633201 -9.195015 0 0 0 0</pose>
+			<inertial>
+				<inertia>
+					<ixx>0.00050000</ixx>
+					<iyy>0.00050000</iyy>
+					<izz>0.00050000</izz>
+				</inertia>
+				<mass>0.10000000</mass>
+			</inertial>
+			<visual name="box-5_vis">
+				<geometry>
+					<cylinder>
+						<radius>0.125</radius>
+						<length>0.125</length>
+					</cylinder>
+				</geometry>
+				<material>
+					<ambient>0.26 0.84 0.96 1</ambient>
+					<diffuse>0.26 0.84 0.96 1</diffuse>
+					<specular>0.26 0.84 0.96 1</specular>
+					<emissive>0.1 0.1 0.1 1</emissive>
+				</material>
+			</visual>
+			<collision name="box-5_col">
+				<geometry>
+					<cylinder>
+						<radius>0.125</radius>
+						<length>0.125</length>
+					</cylinder>
+				</geometry>
+			</collision>
+		</link>
+		<link name="box-6">
+			<pose>-13.461333 -9.195015 0 0 0 0</pose>
+			<inertial>
+				<inertia>
+					<ixx>0.00050000</ixx>
+					<iyy>0.00050000</iyy>
+					<izz>0.00050000</izz>
+				</inertia>
+				<mass>0.10000000</mass>
+			</inertial>
+			<visual name="box-6_vis">
+				<geometry>
+					<box>
+						<size>0.25 0.25 0.25</size>
+					</box>
+				</geometry>
+				<material>
+					<ambient>0 0 1 1</ambient>
+					<diffuse>0 0 1 1</diffuse>
+					<specular>0 0 1 1</specular>
+					<emissive>0.1 0.1 0.1 1</emissive>
+				</material>
+			</visual>
+			<collision name="box-6_col">
+				<geometry>
+					<box>
+						<size>0.25 0.25 0.25</size>
+					</box>
+				</geometry>
+			</collision>
+		</link>
+		<link name="box-7">
+			<pose>-18.191462 -7.049313 0 0 0 0</pose>
+			<inertial>
+				<inertia>
+					<ixx>0.00050000</ixx>
+					<iyy>0.00050000</iyy>
+					<izz>0.00050000</izz>
+				</inertia>
+				<mass>0.10000000</mass>
+			</inertial>
+			<visual name="box-7_vis">
+				<geometry>
+					<cylinder>
+						<radius>0.125</radius>
+						<length>0.125</length>
+					</cylinder>
+				</geometry>
+				<material>
+					<ambient>0 0 1 1</ambient>
+					<diffuse>0 0 1 1</diffuse>
+					<specular>0 0 1 1</specular>
+					<emissive>0.1 0.1 0.1 1</emissive>
+				</material>
+			</visual>
+			<collision name="box-7_col">
+				<geometry>
+					<cylinder>
+						<radius>0.125</radius>
+						<length>0.125</length>
+					</cylinder>
+				</geometry>
+			</collision>
+		</link>
+		<link name="box-8">
+			<pose>-7.684233 -9.690165 0 0 0 0</pose>
+			<inertial>
+				<inertia>
+					<ixx>0.00050000</ixx>
+					<iyy>0.00050000</iyy>
+					<izz>0.00050000</izz>
+				</inertia>
+				<mass>0.10000000</mass>
+			</inertial>
+			<visual name="box-8_vis">
+				<geometry>
+					<box>
+						<size>0.25 0.25 0.25</size>
+					</box>
+				</geometry>
+				<material>
+					<ambient>0.96 0.94 0.26 1</ambient>
+					<diffuse>0.96 0.94 0.26 1</diffuse>
+					<specular>0.96 0.94 0.26 1</specular>
+					<emissive>0.1 0.1 0.1 1</emissive>
+				</material>
+			</visual>
+			<collision name="box-8_col">
+				<geometry>
+					<box>
+						<size>0.25 0.25 0.25</size>
+					</box>
+				</geometry>
+			</collision>
+		</link>
+		<link name="box-9">
+			<pose>-5.093814 2.435014 0 0 0 0</pose>
+			<inertial>
+				<inertia>
+					<ixx>0.00050000</ixx>
+					<iyy>0.00050000</iyy>
+					<izz>0.00050000</izz>
+				</inertia>
+				<mass>0.10000000</mass>
+			</inertial>
+			<visual name="box-9_vis">
+				<geometry>
+					<box>
+						<size>0.25 0.25 0.25</size>
+					</box>
+				</geometry>
+				<material>
+					<ambient>0.96 0.94 0.26 1</ambient>
+					<diffuse>0.96 0.94 0.26 1</diffuse>
+					<specular>0.96 0.94 0.26 1</specular>
+					<emissive>0.1 0.1 0.1 1</emissive>
+				</material>
+			</visual>
+			<collision name="box-9_col">
+				<geometry>
+					<box>
+						<size>0.25 0.25 0.25</size>
+					</box>
+				</geometry>
+			</collision>
+		</link>
+		<link name="box-10">
+			<pose>4.694657 -8.964105 0 0 0 0</pose>
+			<inertial>
+				<inertia>
+					<ixx>0.00050000</ixx>
+					<iyy>0.00050000</iyy>
+					<izz>0.00050000</izz>
+				</inertia>
+				<mass>0.10000000</mass>
+			</inertial>
+			<visual name="box-10_vis">
+				<geometry>
+					<cylinder>
+						<radius>0.125</radius>
+						<length>0.125</length>
+					</cylinder>
+				</geometry>
+				<material>
+					<ambient>0.26 0.84 0.96 1</ambient>
+					<diffuse>0.26 0.84 0.96 1</diffuse>
+					<specular>0.26 0.84 0.96 1</specular>
+					<emissive>0.1 0.1 0.1 1</emissive>
+				</material>
+			</visual>
+			<collision name="box-10_col">
+				<geometry>
+					<cylinder>
+						<radius>0.125</radius>
+						<length>0.125</length>
+					</cylinder>
+				</geometry>
+			</collision>
+		</link>
+		<link name="box-11">
+			<pose>4.62529 6.112346 0 0 0 0</pose>
+			<inertial>
+				<inertia>
+					<ixx>0.00050000</ixx>
+					<iyy>0.00050000</iyy>
+					<izz>0.00050000</izz>
+				</inertia>
+				<mass>0.10000000</mass>
+			</inertial>
+			<visual name="box-11_vis">
+				<geometry>
+					<cylinder>
+						<radius>0.125</radius>
+						<length>0.125</length>
+					</cylinder>
+				</geometry>
+				<material>
+					<ambient>1 0 0 1</ambient>
+					<diffuse>1 0 0 1</diffuse>
+					<specular>1 0 0 1</specular>
+					<emissive>0.1 0.1 0.1 1</emissive>
+				</material>
+			</visual>
+			<collision name="box-11_col">
+				<geometry>
+					<cylinder>
+						<radius>0.125</radius>
+						<length>0.125</length>
+					</cylinder>
+				</geometry>
+			</collision>
+		</link>
+		<link name="box-12">
+			<pose>4.41682 2.152175 0 0 0 0</pose>
+			<inertial>
+				<inertia>
+					<ixx>0.00050000</ixx>
+					<iyy>0.00050000</iyy>
+					<izz>0.00050000</izz>
+				</inertia>
+				<mass>0.10000000</mass>
+			</inertial>
+			<visual name="box-12_vis">
+				<geometry>
+					<box>
+						<size>0.25 0.25 0.25</size>
+					</box>
+				</geometry>
+				<material>
+					<ambient>0 0 1 1</ambient>
+					<diffuse>0 0 1 1</diffuse>
+					<specular>0 0 1 1</specular>
+					<emissive>0.1 0.1 0.1 1</emissive>
+				</material>
+			</visual>
+			<collision name="box-12_col">
+				<geometry>
+					<box>
+						<size>0.25 0.25 0.25</size>
+					</box>
+				</geometry>
+			</collision>
+		</link>
+		<link name="box-13">
+			<pose>7.09198 6.781821 0 0 0 0</pose>
+			<inertial>
+				<inertia>
+					<ixx>0.00050000</ixx>
+					<iyy>0.00050000</iyy>
+					<izz>0.00050000</izz>
+				</inertia>
+				<mass>0.10000000</mass>
+			</inertial>
+			<visual name="box-13_vis">
+				<geometry>
+					<cylinder>
+						<radius>0.125</radius>
+						<length>0.125</length>
+					</cylinder>
+				</geometry>
+				<material>
+					<ambient>0.96 0.26 0.90 1</ambient>
+					<diffuse>0.96 0.26 0.90 1</diffuse>
+					<specular>0.96 0.26 0.90 1</specular>
+					<emissive>0.1 0.1 0.1 1</emissive>
+				</material>
+			</visual>
+			<collision name="box-13_col">
+				<geometry>
+					<cylinder>
+						<radius>0.125</radius>
+						<length>0.125</length>
+					</cylinder>
+				</geometry>
+			</collision>
+		</link>
+		<link name="box-14">
+			<pose>14.245543 0.066458 0 0 0 0</pose>
+			<inertial>
+				<inertia>
+					<ixx>0.00050000</ixx>
+					<iyy>0.00050000</iyy>
+					<izz>0.00050000</izz>
+				</inertia>
+				<mass>0.10000000</mass>
+			</inertial>
+			<visual name="box-14_vis">
+				<geometry>
+					<cylinder>
+						<radius>0.125</radius>
+						<length>0.125</length>
+					</cylinder>
+				</geometry>
+				<material>
+					<ambient>0 1 0 1</ambient>
+					<diffuse>0 1 0 1</diffuse>
+					<specular>0 1 0 1</specular>
+					<emissive>0.1 0.1 0.1 1</emissive>
+				</material>
+			</visual>
+			<collision name="box-14_col">
+				<geometry>
+					<cylinder>
+						<radius>0.125</radius>
+						<length>0.125</length>
+					</cylinder>
+				</geometry>
+			</collision>
+		</link>
+		<link name="box-15">
+			<pose>14.962285 4.533116 0 0 0 0</pose>
+			<inertial>
+				<inertia>
+					<ixx>0.00050000</ixx>
+					<iyy>0.00050000</iyy>
+					<izz>0.00050000</izz>
+				</inertia>
+				<mass>0.10000000</mass>
+			</inertial>
+			<visual name="box-15_vis">
+				<geometry>
+					<cylinder>
+						<radius>0.125</radius>
+						<length>0.125</length>
+					</cylinder>
+				</geometry>
+				<material>
+					<ambient>1 0 0 1</ambient>
+					<diffuse>1 0 0 1</diffuse>
+					<specular>1 0 0 1</specular>
+					<emissive>0.1 0.1 0.1 1</emissive>
+				</material>
+			</visual>
+			<collision name="box-15_col">
+				<geometry>
+					<cylinder>
+						<radius>0.125</radius>
+						<length>0.125</length>
+					</cylinder>
+				</geometry>
+			</collision>
+		</link>
+	</model>
+</sdf>
