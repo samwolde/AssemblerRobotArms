@@ -14,6 +14,7 @@ namespace wheely_planner
         gridMap = new GridMap(mapSize,cellSize,robo_radius,&marker_pub);
         pathPlanner  = new PathPlanner(rosNode,gridMap,kh);
         mapBuilder = new MapBuilder(rosNode,gridMap,pathPlanner, sensor_offset,sampleSize);
+        objectPicker = new ObjectPick(*mapBuilder, rosNode);
     }
     Slam::Slam(MapFile map){
         ROS_INFO("Slam Node Started");
@@ -22,6 +23,7 @@ namespace wheely_planner
         gridMap = new GridMap(map,robo_radius,&marker_pub);
         pathPlanner  = new PathPlanner(rosNode,gridMap,kh);
         mapBuilder = new MapBuilder(rosNode,gridMap,pathPlanner, sensor_offset,sampleSize);
+        objectPicker = new ObjectPick(*mapBuilder, rosNode);
     }
     void Slam::init(){
         rosNode.reset(new ros::NodeHandle("~"));
@@ -85,6 +87,7 @@ namespace wheely_planner
         z = odom->pose.pose.position.z;   
         mapBuilder->SetXYZ_Yaw(x,y,z,yaw);
         pathPlanner->setXY(x,y);
+        objectPicker->setXY(x,y);
         // ROS_INFO("x: %f,y: %f,z: %f, yaw: %f", x,y,z,yaw);
     }
     void Slam::odomQueueCb(){

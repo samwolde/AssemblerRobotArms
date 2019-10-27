@@ -76,7 +76,7 @@ generate_messages(
    std_msgs
 )
 
-add_executable(Slam  src/Slam.cpp src/GridMap.cpp src/MapBuilder.cpp src/PathPlanner.cpp)
+add_executable(Slam  src/Slam.cpp src/GridMap.cpp src/MapBuilder.cpp src/PathPlanner.cpp src/ObjectPick.cpp)
 target_link_libraries(Slam ${catkin_LIBRARIES} ${roscpp_LIBRARIES} ${GAZEBO_LIBRARIES})
 add_dependencies(Slam robot_planner_gencpp)
 

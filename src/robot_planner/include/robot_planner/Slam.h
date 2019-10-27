@@ -12,6 +12,7 @@
 #include <iostream>
 #include <regex>
 #include <ignition/math/Vector3.hh>
+#include <robot_planner/ObjectPick.h>
 #include "stdio.h"
 #include "ros/ros.h"
 #include "ros/callback_queue.h"
@@ -50,6 +51,7 @@ class Slam{
         GridMap* gridMap;
         MapBuilder* mapBuilder;
         PathPlanner* pathPlanner;
+        ObjectPick*  objectPicker;
         int sampleSize,kh,mapSize;
         double roll,  pitch, yaw,x,y,z,sensor_offset,robo_radius,cellSize/*Change this if robots height(along the Y-axis changes)*/;
         double sensor_angle;

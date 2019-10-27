@@ -64,6 +64,8 @@ add_message_files(
 ## Generate services in the 'srv' folder
 add_service_files(
    FILES
+   MoveFrwd.srv
+   PickObject.srv
    GoTo.srv
    MinTour.srv
    Steering.srv
@@ -121,8 +123,8 @@ add_dependencies(nav robot_lib_gencpp)
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
-#  INCLUDE_DIRS include
-#  LIBRARIES robot_lib
+   INCLUDE_DIRS include/${PROJECT_NAME}
+#  LIBRARIES ObjectPick
 CATKIN_DEPENDS roscpp std_msgs message_runtime geometry_msgs
 #  DEPENDS system_lib
 
