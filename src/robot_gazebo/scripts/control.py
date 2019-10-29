@@ -16,8 +16,8 @@ def main():
     scanEnv = ScanEnvironment()
     gripperControl = GripperControl()
 
-    print("Arm control node initiated")
-    
+    print("Arm and gripper control node initiated")
+    print("Kinematics computing node initiated")
     try:
         rospy.spin()
     

@@ -110,6 +110,7 @@ class ScanEnvironment:
             self.armAnglesCmdPub.publish(armAngles)
             time.sleep(speed)
 
+        return detObjLoc
         # if len(detObjLoc) > 0:
         #     self.pickObject(detObjLoc)
 

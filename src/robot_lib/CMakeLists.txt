@@ -79,6 +79,7 @@ add_service_files(
    MoveArmStraight.srv
    PickObj.srv
    ObjDistanceSrv.srv
+   BeginWork.srv
 )
 
 ## Generate actions in the 'action' folder
