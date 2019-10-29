@@ -2,47 +2,118 @@
 import rospy
 
 from robot_lib.msg import ArmAngles
-from geometry_msgs.msg import Vector3
+from geometry_msgs.msg import Vector3, Point
+from std_msgs.msg import Bool
+from gazebo_msgs.srv import GetJointProperties
 
-from robot_lib.srv import MoveArm, MoveArmResponse
+from robot_lib.srv import MoveArm, MoveArmResponse, InverseKinematics, InverseKinematicsResponse,ForwardKinematics, GetArmAngles, ObserveEnv, ArmAnglesSrv, AlignGripper,MoveGripper, PickObj, MoveArmStraight, ObjDistanceSrv
+from sensor_msgs.msg import Range
 
 import constants as Constant
 import math
+import time
+
+import extra_lib as ext_lib
+import threading
 
 class ArmControl:
-    def changeArmPosition(self, desiredPose):
-        finArmAngles = self.moveArm(desiredPose)
+    def __init__(self):
+        self.armAngles = ArmAngles(0,20,45,45)
+        self.colDetTime = 0
+        self.currentDistance = 0
 
-        if finArmAngles:
-            finArmAngles = self.getBestAngles(desiredPose, finArmAngles)
-        else:
+        self.moveArm = rospy.Service('/' + Constant.ROBOT_NAME + '/arm/move_arm', MoveArm, self.moveArm)
+        self.moveArmSrv = rospy.ServiceProxy('/' + Constant.ROBOT_NAME + '/arm/move_arm', MoveArm)
+        self.getArmAnglesSrv = rospy.Service('/' + Constant.ROBOT_NAME + '/arm/get_arm_angles', GetArmAngles, self.getArmAngles)
+        self.armAnglesCmdPub = rospy.Publisher('/' + Constant.ROBOT_NAME + '/arm/angles_cmd', ArmAngles, queue_size=10)
+        self.armAnglesCmdSrv = rospy.Service('/' + Constant.ROBOT_NAME + '/arm/angles_cmd/srv', ArmAnglesSrv, self.pubArmAngles)
+        
+        self.moveArmStraight = rospy.Service('/' + Constant.ROBOT_NAME + '/arm/move_arm/straight', MoveArmStraight, self.moveArmStraight)
+        self.moveArmStraightSrv = rospy.ServiceProxy('/' + Constant.ROBOT_NAME + '/arm/move_arm/straight', MoveArmStraight)
+
+        self.ikSrv = rospy.ServiceProxy('/' + Constant.ROBOT_NAME + '/lib/ik_srv', InverseKinematics)
+        self.fkSrv = rospy.ServiceProxy('/' + Constant.ROBOT_NAME + '/lib/fk_srv', ForwardKinematics)
+        self.getArmAnglesSrv = rospy.ServiceProxy('/' + Constant.ROBOT_NAME + '/arm/get_arm_angles', GetArmAngles)
+        self.alignGripperSrv = rospy.ServiceProxy('/' + Constant.ROBOT_NAME + '/gripper/align', AlignGripper)
+
+        self.getJointProp = rospy.ServiceProxy("/gazebo/get_joint_properties", GetJointProperties)
+
+        self.gripperColCheckSub = rospy.Subscriber('/'+ Constant.ROBOT_NAME + '/gripper/collision/check', Bool, self.checkCollision)
+        self.toggleGripper = rospy.ServiceProxy('/' + Constant.ROBOT_NAME + '/gripper/toggle', MoveGripper)
+        self.objDistance = rospy.ServiceProxy('/' + Constant.ROBOT_NAME + '/object/distance_srv', ObjDistanceSrv)
+
+        self.loadObj = rospy.Service('/' + Constant.ROBOT_NAME + '/arm/pick', PickObj, self.pickObj)
+
+        self.objDistance = rospy.Subscriber('/' + Constant.ROBOT_NAME + '/object/distance', Range, self.objDistanceCallback)
+
+
+    def pubArmAngles(self, message):
+        try:
+            self.armAnglesCmdPub.publish(message.angles)
+            return True
+        except Exception:
             return False
 
-        finalArmAngles = ArmAngles()
-        finalArmAngles.armBase_armBaseTop = self.radToDeg(finArmAngles[0])
-        finalArmAngles.armBaseTop_arm1 = self.radToDeg(finArmAngles[1])
-        finalArmAngles.arm1_arm2 = self.radToDeg(finArmAngles[2])
-        finalArmAngles.arm2_gripper = self.radToDeg(finArmAngles[3])
+    def getArmAngles(self, req):
+        angles = ArmAngles()
+        angles.armBase_armBaseTop = ext_lib.radToDeg(self.getJointProp("armBase_armBaseTop").position[0])
+        angles.armBaseTop_arm1 = ext_lib.radToDeg(self.getJointProp("armBaseTop_arm1").position[0])
+        angles.arm1_arm2 = ext_lib.radToDeg(self.getJointProp("arm1_arm2").position[0])
+        angles.arm2_gripper = ext_lib.radToDeg(self.getJointProp("palm_joint").position[0])
 
-        print(finalArmAngles)
-        return finalArmAngles
+        self.armAngles = angles
+        return angles
 
-    def getBestAngles(self, finalPose, candidateAngles):
-        if abs(candidateAngles[0][0]) > math.pi:
-            minBase = candidateAngles[0][1]
-        else:
-            minBase = candidateAngles[0][0]
-        # minBase - 90 deg --> since rotation starts from y-axis this moves the start to x-axis
-        return (minBase - (math.pi/2), -((math.pi/2)-candidateAngles[1][1][0]), -candidateAngles[1][1][1], -(math.sqrt(candidateAngles[1][1][2]**2)))
+    def moveArm(self, request):
+        if self.isPositionReachable(request):
+            desiredPose = Point(request.x,request.y,request.z)
+            finalArmAngles = self.changeArmPosition(desiredPose)
+            # print(finalArmAngles)
+            if request.slow:
+                if finalArmAngles is not None:
+                    steps = self.getSteps(finalArmAngles)
 
-    def getCurrentArmAngles(self):
-        ang = ArmAngles()
-        ang.armBase_armBaseTop = 10
-        ang.armBaseTop_arm1 = 10
-        ang.arm1_arm2 = 10
-        ang.arm2_gripper = 10
+                    for i in range(Constant.ARM_STEP):
+                        self.increaseArmStep(steps)
+                        self.armAnglesCmdPub.publish(self.armAngles)
+                        time.sleep(0.05)
 
-        return ang
+                        if i + 1 >= Constant.ARM_STEP:
+                            return True
+            else:
+                self.armAnglesCmdPub.publish(finalArmAngles)
+                self.armAngles = finalArmAngles
+                return True
+
+        return False
+
+    def changeArmPosition(self, desiredPose):
+        angles = self.ikSrv(desiredPose).angles
+        leng = len(angles)
+
+        if angles and leng>0:
+            finArmAngles = ext_lib.armAnglesToDeg(self.getBestAngle(angles))
+            if self.isAngleValid(finArmAngles):
+                return finArmAngles
+            else:
+                print(finArmAngles)
+                print("Invalid angle Position unreachable")
+
+        return None
+
+    def getSteps(self, fAng):
+        iAng = self.getArmAngles(True)
+        return ((fAng.armBase_armBaseTop-iAng.armBase_armBaseTop)/Constant.ARM_STEP, (fAng.armBaseTop_arm1-iAng.armBaseTop_arm1)/Constant.ARM_STEP,
+                (fAng.arm1_arm2-iAng.arm1_arm2)/Constant.ARM_STEP, (fAng.arm2_gripper-iAng.arm2_gripper)/Constant.ARM_STEP)
+
+    def increaseArmStep(self, steps):
+        self.armAngles.armBase_armBaseTop += steps[0]
+        self.armAngles.armBaseTop_arm1 += steps[1]
+        self.armAngles.arm1_arm2 += steps[2]
+        self.armAngles.arm2_gripper = (90-self.armAngles.armBaseTop_arm1) - self.armAngles.arm1_arm2
+
+    def getBestAngle(self, angles):
+        return angles[0]
 
     def isPositionReachable(self, finalPose):
         totArmLength = Constant.ARM_1 + Constant.ARM_2
@@ -57,89 +128,92 @@ class ArmControl:
 
         return True
 
-    def getInitHeight(self):
-        x = Constant.MAIN_LENGTH
-
-        return x/10 + x/6 + x/6 + x/20 + x/16 
-
-    def getBestBaseAng(self, finalPose, finalBaseAngle):
-        if finalPose.x >= 0 and finalPose.y >= 0:
-            return finalBaseAngle
-
-        elif finalPose.x < 0 and finalPose.y >= 0:
-            return math.pi - finalBaseAngle
-
-        elif finalPose.x < 0 and finalPose.y < 0:
-            return math.pi + finalBaseAngle
-
-        else:
-            return -1 * finalBaseAngle
-
-    def getArmBaseAng(self, finalPose):
-        # return self.getBestBaseAng(finalPose, math.atan2(finalPose.y, finalPose.x))
-        return math.atan2(finalPose.y, finalPose.x)
-
-    def moveArm(self, finalPose):
-        if self.isPositionReachable(finalPose):
-            armBaseAng = self.getArmBaseAng(finalPose)
-
-            ny = float(finalPose.z)
-            nx = math.sqrt(finalPose.x**2 + finalPose.y**2)
-
-            beta = math.acos(((Constant.ARM_1 ** 2) + (Constant.ARM_2 ** 2) - (nx ** 2) - (ny**2))/(2.0 * Constant.ARM_1 * Constant.ARM_2))
-            alpha = math.acos(((nx**2) + (ny**2) + (Constant.ARM_1**2) - (Constant.ARM_2**2))/(2.0 * Constant.ARM_1 * math.sqrt((nx**2) + (ny**2))))
-            gamma = math.atan2(ny, nx)
-
-            if armBaseAng < 0:
-                baseAngles = [armBaseAng + (2*math.pi), armBaseAng]
-            else:
-                baseAngles = [armBaseAng, armBaseAng - (2*math.pi)]
-            
-            armAngles = [(gamma-alpha, beta-math.pi, (gamma-alpha+beta-math.pi)), (gamma+alpha, math.pi-beta, (math.pi-beta - gamma-alpha))]
-
-            return (baseAngles, armAngles)
+    def isAngleValid(self, angles, limit=Constant.ARM_ANGLE_LIMIT):
+        angles = [angles.armBase_armBaseTop, angles.armBaseTop_arm1, angles.arm1_arm2, angles.arm2_gripper]
+        for i in range(len(angles)):
+            if angles[i] < limit[i][0] or angles[i] > limit[i][1]:
+                return False
         
-        else:
-            print("Position unreachable")
-            return False
-
-    def radToDeg(self, rad):
-        return rad * 180 / math.pi
-
-armControl = ArmControl()
-pub = None
-
-def main():
-    global pub
-    rospy.init_node('IK')
-    
-    service = rospy.Service('/' + Constant.ROBOT_NAME + '/arm/move_arm', MoveArm, moveArm)
-    # sub = rospy.Subscriber('/my_car/arm_effector/pose', Vector3, callback)
-    pub = rospy.Publisher('/' + Constant.ROBOT_NAME + '/arm/angles_cmd', ArmAngles, queue_size=10)
-
-    rospy.spin()
-    
-def defaultPose():
-    global pub
-    desiredPose = Vector3(2.0/3, 2.0/3, 0)
-
-    pub.publish(armControl.changeArmPosition(desiredPose))
-
-def moveArm(request):
-    import time
-    global pub
-
-    desiredPose = Vector3(request.x,request.y,request.z)
-    
-    armAngles = armControl.changeArmPosition(desiredPose)
-
-    if armAngles:
-        pub.publish(armAngles)
-        
-        time.sleep(2)
         return True
 
-    return False        
 
-if __name__=='__main__':
-    main()
+    def moveArmStraight(self, forward):
+        print(forward)
+        step = Constant.STRAIGHT_ARM_STEP
+        if not forward.forward:
+            step = -Constant.STRAIGHT_ARM_STEP
+        z = 0
+        for i in range(1):
+            angles = self.getArmAnglesSrv(True).angles
+            angles = ext_lib.armAnglesToRad(angles)
+            point = self.fkSrv(angles).point
+            z = point.z
+            print("Old point")
+            print(point)
+            hyp = math.sqrt((point.x**2) + (point.y**2))
+            nHyp = hyp + step
+            
+            sinVal = point.y/hyp
+            cosVal = point.x/hyp
+            
+            nx = cosVal * nHyp
+            ny = sinVal * nHyp
+
+            point.x = nx
+            point.y = ny
+            point.z = z+0.01
+
+            try:
+                if self.isPositionReachable(point):
+                    print("Reachable")
+                    self.moveArmSrv(point.x, point.y, point.z, True)
+                    time.sleep(0.05)
+                    return True 
+
+                return False
+                # angles = self.ikSrv(point).angles
+                print("New point")
+                print(point)
+                # angles = ext_lib.armAnglesToDeg(angles[0])
+                # # self.setArmAngles(angles)
+
+                # self.armAnglesCmdPub.publish(angles)
+
+            except Exception, e:
+                print(e)
+                return False
+
+    def checkCollision(self, msg):
+        if msg:
+            self.colDetTime = time.time()
+
+    def objDistanceCallback(self, message):
+        self.currentDistance = message.range
+
+    def pickObj(self, msg):
+        if msg.fromStart:
+            self.moveArmSrv(0, 0.1, -0.1, True)
+
+        self.alignGripperSrv(False)
+
+        while True:
+            if time.time() - self.colDetTime < 1:
+                if self.toggleGripper('catch').reached:
+                    # raw_input("Load stuff??")
+                    time.sleep(0.5)
+                    self.moveArmSrv(0, -0.1, 0.1, True)
+                    self.toggleGripper('release')
+                    print("Object loaded")
+                    return True
+                
+                else:
+                    self.toggleGripper('release')
+
+            if not self.moveArmStraightSrv(True).reached:
+                print("Maximum arm extension reached")
+                self.moveArmStraightSrv(False)      # First retract arm
+                # self.moveFwd(self.currentDistance)    # move the vehicle fwd by given distance
+                print("Maximum arm extension reached: ", self.currentDistance)
+                return
+
+        

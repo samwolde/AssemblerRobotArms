@@ -50,8 +50,8 @@ namespace gazebo
             {
                 ROS_INFO("Starting GripperPlugin");
             }
-
-            this->pid = common::PID(5, 0, 0);
+            std::cout << "Gripper plugin started" << std::endl;
+            this->pid = common::PID(1, 0.1, 0.01);
             
             std::string move_fingers   = "/" + this->model->GetName() + "/gripper/move_fingers";
 
@@ -61,12 +61,10 @@ namespace gazebo
             this->jointController->Reset();
             this->jointController->AddJoint(model->GetJoint("finger_one_joint"));
             this->jointController->AddJoint(model->GetJoint("finger_two_joint"));
-            this->jointController->AddJoint(model->GetJoint("finger_three_joint"));
-            this->jointController->AddJoint(model->GetJoint("finger_four_joint"));
-            this->jointController->AddJoint(model->GetJoint("finger_one_tip_joint"));
-            this->jointController->AddJoint(model->GetJoint("finger_two_tip_joint"));
-            this->jointController->AddJoint(model->GetJoint("finger_three_tip_joint"));
-            this->jointController->AddJoint(model->GetJoint("finger_four_tip_joint"));
+
+            // default angles
+            this->SetAngle("finger_one_joint",      30);
+            this->SetAngle("finger_two_joint",      -30);
 
             ros::SubscribeOptions so =
                 ros::SubscribeOptions::create<robot_lib::GripperAngles>
@@ -97,12 +95,6 @@ namespace gazebo
         {
             this->SetAngle("finger_one_joint",      _msg->palm_finger1);
             this->SetAngle("finger_two_joint",      _msg->palm_finger2);
-            this->SetAngle("finger_three_joint",    _msg->palm_finger3);
-            this->SetAngle("finger_four_joint",     _msg->palm_finger4);
-            this->SetAngle("finger_one_tip_joint",  _msg->finger1_tip);
-            this->SetAngle("finger_two_tip_joint",  _msg->finger2_tip);
-            this->SetAngle("finger_three_tip_joint",_msg->finger3_tip);
-            this->SetAngle("finger_four_tip_joint", _msg->finger4_tip);
         }
 
         private: void SetAngle(std::string joint_name, float degree)

@@ -33,7 +33,7 @@ namespace gazebo
             }
 
             this->rosNode.reset(new ros::NodeHandle("gazebo_client"));
-            this->data_pub = this->rosNode->advertise<std_msgs::String>("/robot/gripper/collision", 1000);
+            this->data_pub = this->rosNode->advertise<std_msgs::String>("/wheely/gripper/collision", 1000);
 
             this->parentSensor = std::dynamic_pointer_cast<sensors::ContactSensor>(_sensor);
 
@@ -56,8 +56,8 @@ namespace gazebo
 
             for (unsigned int i = 0; i < contacts.contact_size(); ++i)
             {
-                // ss << contacts.contact(i).collision1() << "-" << contacts.contact(i).collision2() << "=";
-                ss << contacts.contact(i).collision1() << " ";
+                ss << contacts.contact(i).collision1() << "-" << contacts.contact(i).collision2() << "=";
+                // ss << contacts.contact(i).collision1() << " ";
                 msg.data = ss.str();
                 this->data_pub.publish(msg);
             }

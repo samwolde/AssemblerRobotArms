@@ -7,18 +7,19 @@
         <arg name="world_name" value="$(find robot_gazebo)/worlds/robot.world" />
     </include>
     
-    <node name="robot_sdf" pkg="gazebo_ros" type="spawn_model" args="-file $(find robot_description)/models/model.sdf -sdf -model robot">
+    <node name="robot_sdf" pkg="gazebo_ros" type="spawn_model" args="-file $(find robot_description)/models/model.sdf -sdf -model wheely">
     </node>
     
-    <node name="boxes_sdf" pkg="gazebo_ros" type="spawn_model" args="-file $(find robot_description)/models/boxes.sdf -sdf -model boxes">
-    </node>
+    <!-- <node name="boxes_sdf" pkg="gazebo_ros" type="spawn_model" args="-file $(find robot_description)/models/boxes.sdf -sdf -model boxes">
+    </node> -->
 
     <node name="maze_sdf" pkg="gazebo_ros" type="spawn_model" args="-file $(find robot_description)/models/maze.sdf -sdf -model maze">
     </node>
     
-    <node name="IK" pkg="robot_gazebo" type="arm_control.py" output="screen" />
+    <!-- <node name="IK" pkg="robot_gazebo" type="arm_control.py" output="screen" /> -->
 
-    <node name="gripper_controller" pkg="robot_gazebo" type="gripper_control.py" output="screen" />
+    <!-- <node name="gripper_controller" pkg="robot_gazebo" type="gripper_control.py" output="screen" /> -->
+    
     <node name="nav" pkg="robot_lib" type="nav" output="screen" />
     
 </launch>

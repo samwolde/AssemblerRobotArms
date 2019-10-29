@@ -65,10 +65,20 @@ add_message_files(
 add_service_files(
    FILES
    GoTo.srv
+   GoToPlanned.srv
    MinTour.srv
    Steering.srv
    MoveArm.srv
    MoveGripper.srv
+   GetArmAngles.srv
+   InverseKinematics.srv
+   ForwardKinematics.srv
+   ObserveEnv.srv
+   ArmAnglesSrv.srv
+   AlignGripper.srv
+   MoveArmStraight.srv
+   PickObj.srv
+   ObjDistanceSrv.srv
 )
 
 ## Generate actions in the 'action' folder
