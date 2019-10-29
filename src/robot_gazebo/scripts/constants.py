@@ -56,3 +56,6 @@ STRAIGHT_ARM_STEP = 0.01 * 3
 
 # Object detection rate
 OBJ_DET_RATE = 40
+
+# list of points in the house defining the different rooms
+MAZE_ROOMS = [[2.78,0],[1.1,6.7]]

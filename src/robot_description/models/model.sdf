@@ -1,6 +1,6 @@
 <?xml version="1.0" ?>
 <sdf version="1.6">
-	<model name="wheely">
+	<model name="robot">
 		<link name="body_link">
 			<pose>0 0 0.19649999999999998 0 0 0</pose>
 			<inertial>
@@ -438,8 +438,6 @@
 			<child>axel_3</child>
 			<parent>susp_3</parent>
 		</joint>
-<<<<<<< HEAD
-=======
 		<link name="arm_base">
 			<pose>0 -0.27 0.22149999999999997 0 0 0</pose>
 			<inertial>
@@ -597,13 +595,12 @@
 				</limit>
 			</axis>
 		</joint>
->>>>>>> d7d9a67bf451c0d7c955bbcba09eaa427e434084
 		<plugin filename="libwheel_plugin.so" name="wheel_ctr">
 			<prefix>wheely/steering</prefix>
 			<velPubTopic>cmd_wheel</velPubTopic>
 			<odometrySubTopic>odom</odometrySubTopic>
-			<kp>4</kp>
-			<ki>4</ki>
+			<kp>5</kp>
+			<ki>5</ki>
 			<kd>2</kd>
 			<dt>0.01</dt>
 			<turnAccuracy>0.008</turnAccuracy>
@@ -625,17 +622,6 @@
 			<broadcastTF>1</broadcastTF>
 			<robotBaseFrame>body_link</robotBaseFrame>
 		</plugin>
-<<<<<<< HEAD
-		<link name="IR_link">
-			<pose>0 -0.27999999999999997 0.25149999999999995 0 0 0</pose>
-			<inertial>
-				<inertia>
-					<ixx>0.00000100</ixx>
-					<iyy>0.00000100</iyy>
-					<izz>0.00000100</izz>
-				</inertia>
-				<mass>0.00001000</mass>
-=======
 		<link name="palm">
 			<pose>0 -0.27 0.5665 0 0 0</pose>
 			<inertial>
@@ -700,14 +686,6 @@
 						<size>0.015 0.015 0.0375</size>
 					</box>
 				</geometry>
-				<surface>
-					<friction>
-					<ode>
-						<mu>200</mu>
-						<mu2>200</mu2>
-					</ode>
-					</friction>
-				</surface>
 			</collision>
 			<sensor name="finger_one_sensor" type="contact">
 				<contact>
@@ -758,14 +736,6 @@
 						<size>0.015 0.015 0.0375</size>
 					</box>
 				</geometry>
-				<surface>
-					<friction>
-					<ode>
-						<mu>200</mu>
-						<mu2>200</mu2>
-					</ode>
-					</friction>
-				</surface>
 			</collision>
 			<sensor name="finger_two_sensor" type="contact">
 				<contact>
@@ -819,16 +789,16 @@
 			</collision>
 			<sensor name='camera1' type='camera'>
 				<camera name="head">
-					<horizontal_fov>1.3962634</horizontal_fov>
-					<image>
-						<width>800</width>
-						<height>800</height>
-						<format>R8G8B8</format>
-					</image>
-					<clip>
+				  <horizontal_fov>1.3962634</horizontal_fov>
+				  <image>
+					<width>800</width>
+					<height>800</height>
+					<format>R8G8B8</format>
+				  </image>
+				  <clip>
 					<near>0.02</near>
 					<far>300</far>
-					</clip>
+				  </clip>
 				</camera>
 				<always_on>1</always_on>
 				<update_rate>30</update_rate>
@@ -847,7 +817,7 @@
 					<distortionT1>0.0</distortionT1>
 					<distortionT2>0.0</distortionT2>
 				</plugin>
-			</sensor>
+			  </sensor>
 		</link>
 		<joint name="camera_link_joint" type="fixed">
 			<pose>0 0 0 0 0 0</pose>
@@ -883,36 +853,36 @@
 				<update_rate>500</update_rate>
 				<visualize>true</visualize>
 				<ray>
-				<scan>
+				  <scan>
 					<horizontal>
-					<samples>1</samples>
-					<resolution>1</resolution>
-					<min_angle>-0</min_angle>
-					<max_angle>0</max_angle>
+					  <samples>1</samples>
+					  <resolution>1</resolution>
+					  <min_angle>-0</min_angle>
+					  <max_angle>0</max_angle>
 					</horizontal>
-				</scan>
-				<range>
+				  </scan>
+				  <range>
 					<min>0.06</min> 
 					<max>35</max>  
 					<resolution>0.01</resolution>
-				</range>
-				<noise>
+				  </range>
+				  <noise>
 					<type>gaussian</type>
 					<mean>0.0</mean>
 					<stddev>0.01</stddev>
-				</noise>
+				  </noise>
 				</ray>
 				<plugin name="objDistanceController" filename="libgazebo_ros_range.so">
-					<robotNamespace>wheely</robotNamespace>
-					<gaussianNoise>0.005</gaussianNoise>
-					<alwaysOn>true</alwaysOn>
-					<updateRate>500</updateRate>
-					<topicName>/wheely/object/distance</topicName>
-					<frameName>objDistanceSensor_link</frameName>
-					<fov>0</fov>
-					<radiation>ultrasound</radiation>
+				  <robotNamespace>wheely</robotNamespace>
+				  <gaussianNoise>0.005</gaussianNoise>
+				  <alwaysOn>true</alwaysOn>
+				  <updateRate>500</updateRate>
+				  <topicName>/wheely/object/distance</topicName>
+				  <frameName>objDistanceSensor_link</frameName>
+				  <fov>0</fov>
+				  <radiation>ultrasound</radiation>
 				</plugin>
-			</sensor>
+			  </sensor>
 		</link>
 		<joint name="objDistanceSensor_link_joint" type="fixed">
 			<pose>0 0 0 0 0 0</pose>
@@ -928,109 +898,31 @@
 					<izz>0.00000625</izz>
 				</inertia>
 				<mass>0.16666667</mass>
->>>>>>> d7d9a67bf451c0d7c955bbcba09eaa427e434084
 			</inertial>
-			<visual name="IR_link_vis">
+			<visual name="finger_one_tip_vis">
 				<geometry>
-<<<<<<< HEAD
-					<cylinder>
-						<radius>0.02</radius>
-						<length>0.06</length>
-					</cylinder>
-=======
 					<box>
 						<size>0.015 0.015 0.0375</size>
 					</box>
->>>>>>> d7d9a67bf451c0d7c955bbcba09eaa427e434084
 				</geometry>
 			</visual>
-			<collision name="IR_link_col">
+			<collision name="finger_one_tip_col">
 				<geometry>
-<<<<<<< HEAD
-					<cylinder>
-						<radius>0.02</radius>
-						<length>0.06</length>
-					</cylinder>
-=======
 					<box>
 						<size>0.015 0.015 0.0375</size>
 					</box>
->>>>>>> d7d9a67bf451c0d7c955bbcba09eaa427e434084
 				</geometry>
-				<surface>
-					<friction>
-					<ode>
-						<mu>200</mu>
-						<mu2>200</mu2>
-					</ode>
-					</friction>
-				</surface>
 			</collision>
-			<sensor name="ir_sensor" type="ray">
-				<visualize>false</visualize>
-				<update_rate>50</update_rate>
-				<pose>0 -0.02 0.03 0 0 -1.5707963267948966</pose>
-				<plugin filename="libgazebo_ros_laser.so" name="gazebo_ros_range">
-					<alwaysOn>true</alwaysOn>
-					<updateRate>50</updateRate>
-					<topicName>wheely/sensor/ir_laser</topicName>
-					<frameName>IR_link</frameName>
-					<radiation>infrared</radiation>
-					<fov>0.2967</fov>
-				</plugin>
-				<ray>
-					<scan>
-						<horizontal>
-							<samples>1080</samples>
-							<resolution>1</resolution>
-							<min_angle>-1.5707963267948966</min_angle>
-							<max_angle>1.5707963267948966</max_angle>
-						</horizontal>
-					</scan>
-					<range>
-						<min>0.1</min>
-						<max>30.0</max>
-						<resolution>0.01</resolution>
-					</range>
-					<noise>
-						<type>gaussian</type>
-						<mean>0.0</mean>
-						<stddev>0.01</stddev>
-					</noise>
-				</ray>
-				<always_on>true</always_on>
+			<sensor name="finger_one_tip_sensor" type="contact">
+				<contact>
+					<collision>finger_one_tip_col</collision>
+				</contact>
+				<always_on>1</always_on>
+				<update_rate>30</update_rate>
+				<visualize>true</visualize>
+				<plugin filename="libcontact_plugin.so" name="my_plugin"/>
 			</sensor>
 		</link>
-<<<<<<< HEAD
-		<joint name="IR_body_joint" type="revolute">
-			<pose>0 0 -0.03 0 0 0</pose>
-			<child>IR_link</child>
-			<parent>body_link</parent>
-			<axis>
-				<xyz>0 0 1</xyz>
-				<dynamics>
-					<friction>0.05</friction>
-					<damping>0.03</damping>
-				</dynamics>
-			</axis>
-			<physics>
-				<ode>
-					<cfm_damping>1</cfm_damping>
-					<implicit_spring_damper>1</implicit_spring_damper>
-				</ode>
-			</physics>
-		</joint>
-		<plugin filename="libIR_sensor.so" name="IR_sensor_ctrl"/>
-		<link name="short_ir_front_link">
-			<pose>0 -0.31 0.19649999999999998 0 0 0</pose>
-			<inertial>
-				<inertia>
-					<ixx>0.00000100</ixx>
-					<iyy>0.00000100</iyy>
-					<izz>0.00000100</izz>
-				</inertia>
-				<mass>0.00001000</mass>
-=======
 		<joint name="finger_one_tip_joint" type="fixed">
 			<pose>0 0 -0.015 0 0 0</pose>
 			<child>finger_one_tip</child>
@@ -1045,89 +937,31 @@
 					<izz>0.00000625</izz>
 				</inertia>
 				<mass>0.16666667</mass>
->>>>>>> d7d9a67bf451c0d7c955bbcba09eaa427e434084
 			</inertial>
-			<visual name="short_ir_front_link_vis">
+			<visual name="finger_two_tip_vis">
 				<geometry>
 					<box>
-<<<<<<< HEAD
-						<size>0.02 0.02 0.02</size>
-=======
 						<size>0.015 0.015 0.0375</size>
->>>>>>> d7d9a67bf451c0d7c955bbcba09eaa427e434084
 					</box>
 				</geometry>
 			</visual>
-			<collision name="short_ir_front_link_col">
+			<collision name="finger_two_tip_col">
 				<geometry>
 					<box>
-<<<<<<< HEAD
-						<size>0.02 0.02 0.02</size>
-=======
 						<size>0.015 0.015 0.0375</size>
->>>>>>> d7d9a67bf451c0d7c955bbcba09eaa427e434084
 					</box>
 				</geometry>
-				<surface>
-					<friction>
-						<ode>
-							<mu>200</mu>
-							<mu2>200</mu2>
-						</ode>
-					</friction>
-				</surface>
 			</collision>
-			<sensor name="short_ir_front_sensor" type="ray">
-				<visualize>false</visualize>
-				<update_rate>50</update_rate>
-				<pose>0 -0.02 0 0 0 -1.5707963267948966</pose>
-				<plugin filename="libgazebo_ros_range.so" name="short_plugin_front">
-					<gaussianNoise>0.0</gaussianNoise>
-					<alwaysOn>true</alwaysOn>
-					<updateRate>50</updateRate>
-					<topicName>/wheely/sensor/ir_shrt_front</topicName>
-					<frameName>short_ir_front_link</frameName>
-					<radiation>infrared</radiation>
-					<fov>0.2967</fov>
-				</plugin>
-				<ray>
-					<scan>
-						<horizontal>
-							<samples>180</samples>
-							<resolution>1</resolution>
-							<min_angle>-1.2217304763960306</min_angle>
-							<max_angle>1.2217304763960306</max_angle>
-						</horizontal>
-						<vertical>
-							<samples>1</samples>
-							<resolution>1</resolution>
-							<min_angle>0</min_angle>
-							<max_angle>0</max_angle>
-						</vertical>
-					</scan>
-					<range>
-						<min>0.01</min>
-						<max>3</max>
-						<resolution>0.01</resolution>
-					</range>
-					<noise>
-						<type>gaussian</type>
-						<mean>0.0</mean>
-						<stddev>0.01</stddev>
-					</noise>
-				</ray>
-				<always_on>true</always_on>
+			<sensor name="finger_two_tip_sensor" type="contact">
+				<contact>
+					<collision>finger_two_tip_col</collision>
+				</contact>
+				<always_on>1</always_on>
+				<update_rate>30</update_rate>
+				<visualize>true</visualize>
+				<plugin filename="libcontact_plugin.so" name="my_plugin"/>
 			</sensor>
 		</link>
-<<<<<<< HEAD
-		<joint name="short_ir_front_jt" type="fixed">
-			<pose>0 0.01 0 0 0 0</pose>
-			<child>short_ir_front_link</child>
-			<parent>body_link</parent>
-		</joint>
-		<link name="short_ir_rear_link">
-			<pose>0 0.31 0.19649999999999998 0 0 0</pose>
-=======
 		<joint name="finger_two_tip_joint" type="fixed">
 			<pose>0 0 -0.015 0 0 0</pose>
 			<child>finger_two_tip</child>
@@ -1137,7 +971,6 @@
 		<plugin filename="libarm_controller.so" name="arm_controller"/>
 		<link name="IR_link">
 			<pose>0 -0.27999999999999997 0.25149999999999995 0 0 0</pose>
->>>>>>> d7d9a67bf451c0d7c955bbcba09eaa427e434084
 			<inertial>
 				<inertia>
 					<ixx>0.00000100</ixx>
@@ -1146,32 +979,6 @@
 				</inertia>
 				<mass>0.00001000</mass>
 			</inertial>
-<<<<<<< HEAD
-			<visual name="short_ir_rear_link_vis">
-				<geometry>
-					<box>
-						<size>0.02 0.02 0.02</size>
-					</box>
-				</geometry>
-			</visual>
-			<collision name="short_ir_rear_link_col">
-				<geometry>
-					<box>
-						<size>0.02 0.02 0.02</size>
-					</box>
-				</geometry>
-			</collision>
-			<sensor name="short_ir_rear_sensor" type="ray">
-				<visualize>false</visualize>
-				<update_rate>50</update_rate>
-				<pose>0 0.02 0 0 0 1.5707963267948966</pose>
-				<plugin filename="libgazebo_ros_range.so" name="short_plugin_rear">
-					<gaussianNoise>0.0</gaussianNoise>
-					<alwaysOn>true</alwaysOn>
-					<updateRate>50</updateRate>
-					<topicName>/wheely/sensor/ir_shrt_rear</topicName>
-					<frameName>short_ir_rear_link</frameName>
-=======
 			<visual name="IR_link_vis">
 				<geometry>
 					<cylinder>
@@ -1197,30 +1004,12 @@
 					<updateRate>50</updateRate>
 					<topicName>wheely/sensor/ir_laser</topicName>
 					<frameName>IR_link</frameName>
->>>>>>> d7d9a67bf451c0d7c955bbcba09eaa427e434084
 					<radiation>infrared</radiation>
 					<fov>0.2967</fov>
 				</plugin>
 				<ray>
 					<scan>
 						<horizontal>
-<<<<<<< HEAD
-							<samples>180</samples>
-							<resolution>1</resolution>
-							<min_angle>-1.2217304763960306</min_angle>
-							<max_angle>1.2217304763960306</max_angle>
-						</horizontal>
-						<vertical>
-							<samples>1</samples>
-							<resolution>1</resolution>
-							<min_angle>0</min_angle>
-							<max_angle>0</max_angle>
-						</vertical>
-					</scan>
-					<range>
-						<min>0.01</min>
-						<max>3</max>
-=======
 							<samples>1080</samples>
 							<resolution>1</resolution>
 							<min_angle>-1.5707963267948966</min_angle>
@@ -1230,7 +1019,6 @@
 					<range>
 						<min>0.1</min>
 						<max>30.0</max>
->>>>>>> d7d9a67bf451c0d7c955bbcba09eaa427e434084
 						<resolution>0.01</resolution>
 					</range>
 					<noise>
@@ -1242,15 +1030,6 @@
 				<always_on>true</always_on>
 			</sensor>
 		</link>
-<<<<<<< HEAD
-		<joint name="short_ir_rear_jt" type="fixed">
-			<pose>0 -0.01 0 0 0 0</pose>
-			<child>short_ir_rear_link</child>
-			<parent>body_link</parent>
-		</joint>
-		<link name="short_ir_left_link">
-			<pose>0.16 0 0.19649999999999998 0 0 0</pose>
-=======
 		<joint name="IR_body_joint" type="revolute">
 			<pose>0 0 -0.03 0 0 0</pose>
 			<child>IR_link</child>
@@ -1272,7 +1051,6 @@
 		<plugin filename="libIR_sensor.so" name="IR_sensor_ctrl"/>
 		<link name="short_ir_front_link">
 			<pose>0 -0.31 0.19649999999999998 0 0 0</pose>
->>>>>>> d7d9a67bf451c0d7c955bbcba09eaa427e434084
 			<inertial>
 				<inertia>
 					<ixx>0.00000100</ixx>
@@ -1281,40 +1059,20 @@
 				</inertia>
 				<mass>0.00001000</mass>
 			</inertial>
-<<<<<<< HEAD
-			<visual name="short_ir_left_link_vis">
-=======
 			<visual name="short_ir_front_link_vis">
->>>>>>> d7d9a67bf451c0d7c955bbcba09eaa427e434084
 				<geometry>
 					<box>
 						<size>0.02 0.02 0.02</size>
 					</box>
 				</geometry>
 			</visual>
-<<<<<<< HEAD
-			<collision name="short_ir_left_link_col">
-=======
 			<collision name="short_ir_front_link_col">
->>>>>>> d7d9a67bf451c0d7c955bbcba09eaa427e434084
 				<geometry>
 					<box>
 						<size>0.02 0.02 0.02</size>
 					</box>
 				</geometry>
 			</collision>
-<<<<<<< HEAD
-			<sensor name="short_ir_left_sensor" type="ray">
-				<visualize>false</visualize>
-				<update_rate>50</update_rate>
-				<pose>0.02 0 0 0 0 0</pose>
-				<plugin filename="libgazebo_ros_range.so" name="short_plugin_left">
-					<gaussianNoise>0.0</gaussianNoise>
-					<alwaysOn>true</alwaysOn>
-					<updateRate>50</updateRate>
-					<topicName>/wheely/sensor/ir_shrt_left</topicName>
-					<frameName>short_ir_left_link</frameName>
-=======
 			<sensor name="short_ir_front_sensor" type="ray">
 				<visualize>false</visualize>
 				<update_rate>50</update_rate>
@@ -1325,7 +1083,6 @@
 					<updateRate>50</updateRate>
 					<topicName>/wheely/sensor/ir_shrt_front</topicName>
 					<frameName>short_ir_front_link</frameName>
->>>>>>> d7d9a67bf451c0d7c955bbcba09eaa427e434084
 					<radiation>infrared</radiation>
 					<fov>0.2967</fov>
 				</plugin>
@@ -1358,15 +1115,6 @@
 				<always_on>true</always_on>
 			</sensor>
 		</link>
-<<<<<<< HEAD
-		<joint name="short_ir_left_jt" type="fixed">
-			<pose>-0.01 0 0 0 0 0</pose>
-			<child>short_ir_left_link</child>
-			<parent>body_link</parent>
-		</joint>
-		<link name="short_ir_right_link">
-			<pose>-0.16 0 0.19649999999999998 0 0 0</pose>
-=======
 		<joint name="short_ir_front_jt" type="fixed">
 			<pose>0 0.01 0 0 0 0</pose>
 			<child>short_ir_front_link</child>
@@ -1374,7 +1122,6 @@
 		</joint>
 		<link name="short_ir_rear_link">
 			<pose>0 0.31 0.19649999999999998 0 0 0</pose>
->>>>>>> d7d9a67bf451c0d7c955bbcba09eaa427e434084
 			<inertial>
 				<inertia>
 					<ixx>0.00000100</ixx>
@@ -1383,40 +1130,20 @@
 				</inertia>
 				<mass>0.00001000</mass>
 			</inertial>
-<<<<<<< HEAD
-			<visual name="short_ir_right_link_vis">
-=======
 			<visual name="short_ir_rear_link_vis">
->>>>>>> d7d9a67bf451c0d7c955bbcba09eaa427e434084
 				<geometry>
 					<box>
 						<size>0.02 0.02 0.02</size>
 					</box>
 				</geometry>
 			</visual>
-<<<<<<< HEAD
-			<collision name="short_ir_right_link_col">
-=======
 			<collision name="short_ir_rear_link_col">
->>>>>>> d7d9a67bf451c0d7c955bbcba09eaa427e434084
 				<geometry>
 					<box>
 						<size>0.02 0.02 0.02</size>
 					</box>
 				</geometry>
 			</collision>
-<<<<<<< HEAD
-			<sensor name="short_ir_right_sensor" type="ray">
-				<visualize>false</visualize>
-				<update_rate>50</update_rate>
-				<pose>-0.02 0 0 0 0 -3.141592653589793</pose>
-				<plugin filename="libgazebo_ros_range.so" name="short_plugin_right">
-					<gaussianNoise>0.0</gaussianNoise>
-					<alwaysOn>true</alwaysOn>
-					<updateRate>50</updateRate>
-					<topicName>/wheely/sensor/ir_shrt_right</topicName>
-					<frameName>short_ir_right_link</frameName>
-=======
 			<sensor name="short_ir_rear_sensor" type="ray">
 				<visualize>false</visualize>
 				<update_rate>50</update_rate>
@@ -1427,7 +1154,6 @@
 					<updateRate>50</updateRate>
 					<topicName>/wheely/sensor/ir_shrt_rear</topicName>
 					<frameName>short_ir_rear_link</frameName>
->>>>>>> d7d9a67bf451c0d7c955bbcba09eaa427e434084
 					<radiation>infrared</radiation>
 					<fov>0.2967</fov>
 				</plugin>
@@ -1460,8 +1186,6 @@
 				<always_on>true</always_on>
 			</sensor>
 		</link>
-<<<<<<< HEAD
-=======
 		<joint name="short_ir_rear_jt" type="fixed">
 			<pose>0 -0.01 0 0 0 0</pose>
 			<child>short_ir_rear_link</child>
@@ -1604,7 +1328,6 @@
 				<always_on>true</always_on>
 			</sensor>
 		</link>
->>>>>>> d7d9a67bf451c0d7c955bbcba09eaa427e434084
 		<joint name="short_ir_right_jt" type="fixed">
 			<pose>0.01 0 0 0 0 0</pose>
 			<child>short_ir_right_link</child>

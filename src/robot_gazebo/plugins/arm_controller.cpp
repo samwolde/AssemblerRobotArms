@@ -69,9 +69,9 @@ public:
 
     // default arm position
     this->SetAngle("armBase_armBaseTop", 0, false);
-    this->SetAngle("armBaseTop_arm1", 20, false);
-    this->SetAngle("arm1_arm2", 45, false);
-    this->SetAngle("palm_joint", 45, false);
+    this->SetAngle("armBaseTop_arm1", -86, false);
+    this->SetAngle("arm1_arm2", 172, false);
+    this->SetAngle("palm_joint", 3.8, false);
     
     // Create the node
     this->node = transport::NodePtr(new transport::Node());

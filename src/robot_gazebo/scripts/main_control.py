@@ -2,7 +2,9 @@
 import rospy
 
 import time
-from robot_lib.srv import PickObj, ObserveEnv, BeginWork
+from robot_lib.srv import PickObj, ObserveEnv, BeginWork, GoTo,PickObject
+from geometry_msgs.msg import Point
+import constants as Constant
 
 '''
 Steps of action
@@ -15,24 +17,30 @@ Steps of action
 
 class MainControl:
     def __init__(self):
-        # self.moveToDestination = rospy.ServiceProxy('/' + Constant.ROBOT_NAME + '/move_to_destination', ObserveEnv)
+        self.goto = rospy.ServiceProxy('/' + Constant.ROBOT_NAME + '/nav/goto_srv', GoTo)
         self.scanEnv = rospy.ServiceProxy('/' + Constant.ROBOT_NAME + '/observe', ObserveEnv)
         self.loadObj = rospy.ServiceProxy('/' + Constant.ROBOT_NAME + '/arm/pick', PickObj)
-        # self.traverseObjs = rospy.ServiceProxy('/' + Constant.ROBOT_NAME + '/object_pick/angle', PickObject)
-
+        self.transformObjsLoc = rospy.ServiceProxy('/' + Constant.ROBOT_NAME + '/object_pick/angle', PickObject)
         self.startMainControl = rospy.Service('/' + Constant.ROBOT_NAME + '/begin', BeginWork, self.startWork)
 
     def startWork(self, arg):
-        pointsInMaze = []
+        print("Starting...")
+        pointsInMaze = Constant.MAZE_ROOMS
         for i in range(len(pointsInMaze)):
-            # self.moveToDestination(pointsInMaze[i][0], pointsInMaze[i][1])
+            finPt = Point(pointsInMaze[i][0], pointsInMaze[i][1], 0)
+            
+            self.goto([finPt],True)
             detObjLoc = self.scanEnv(True)
             
             if len(detObjLoc) > 0:
-                self.traverseObjs(detObjLoc[0], detObjLoc[1])
-                for i in range(len(detObjLoc[0]) - 1):
-                    self.traverseObjs([], [])
-
+                traPts = self.transformObjsLoc(detObjLoc[0], detObjLoc[1])
+                
+                for i in range(len(traPts)):
+                    self.goto([traPts[i]],True)
+                    self.loadObj(True)
+        print("Ending...")
+        
+        return True
 
 def main():
     rospy.init_node('MainControl')

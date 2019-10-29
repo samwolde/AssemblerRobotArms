@@ -1,12 +1,28 @@
 #include <robot_planner/ObjectPick.h>
 
 bool ObjectPick::alignNdGoSrv(robot_lib::PickObject::Request& req, robot_lib::PickObject::Response& res){
-    wheely_planner::Coordinate_t c = new wheely_planner::Coordinate(req.distance[0],0);
-    return (res.success = alignNdGo(c, req.angle[0]));
+    std::vector<geometry_msgs::Point> points;
+   for (size_t i = 0; i < req.angle.size(); i++)
+   {
+        wheely_planner::Coordinate_t c = new wheely_planner::Coordinate(req.distance[i],0);   
+        //Change the laser readings distance to the robot
+        //Coordinate system
+        Tf_From_Hand_Robo(c,req.angle[i]);       
+        //Change the robot coordinates to world coordinates.
+        mapBuilder.Tf_From_Robo_World(c);
+
+        geometry_msgs::Point pt;
+        pt.x = c->x;
+        pt.y = c->y;
+        points.push_back(pt);
+        free(c);
+   }
+   res.world_coordinates = points;
+   return true;
 }
 bool ObjectPick::moveFrwd(robot_lib::MoveFrwd::Request& req, robot_lib::MoveFrwd::Response& res){
     wheely_planner::Coordinate_t c = new wheely_planner::Coordinate(req.distance,0);
-    return (res.success = alignNdGo(c, 0));
+    // return (res.success = alignNdGo(c, 0));
 }
 bool ObjectPick::alignNdGo(wheely_planner::Coordinate_t c, double angle){
     //Change the laser readings distance to the robot

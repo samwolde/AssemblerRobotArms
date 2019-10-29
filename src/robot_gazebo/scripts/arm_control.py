@@ -6,7 +6,7 @@ from geometry_msgs.msg import Vector3, Point
 from std_msgs.msg import Bool
 from gazebo_msgs.srv import GetJointProperties
 
-from robot_lib.srv import MoveArm, MoveArmResponse, InverseKinematics, InverseKinematicsResponse,ForwardKinematics, GetArmAngles, ObserveEnv, ArmAnglesSrv, AlignGripper,MoveGripper, PickObj, MoveArmStraight, ObjDistanceSrv
+from robot_lib.srv import MoveArm, MoveArmResponse, InverseKinematics, InverseKinematicsResponse,ForwardKinematics, GetArmAngles, ObserveEnv, ArmAnglesSrv, AlignGripper,MoveGripper, PickObj, MoveArmStraight, ObjDistanceSrv,MoveFrwd
 from sensor_msgs.msg import Range
 
 import constants as Constant
@@ -45,6 +45,8 @@ class ArmControl:
         self.loadObj = rospy.Service('/' + Constant.ROBOT_NAME + '/arm/pick', PickObj, self.pickObj)
 
         self.objDistance = rospy.Subscriber('/' + Constant.ROBOT_NAME + '/object/distance', Range, self.objDistanceCallback)
+        
+        self.moveFwd = rospy.ServiceProxy('/' + Constant.ROBOT_NAME + '/object_pick/move_fwd', MoveFrwd)
 
 
     def pubArmAngles(self, message):
@@ -68,7 +70,7 @@ class ArmControl:
         if self.isPositionReachable(request):
             desiredPose = Point(request.x,request.y,request.z)
             finalArmAngles = self.changeArmPosition(desiredPose)
-            # print(finalArmAngles)
+            print(finalArmAngles)
             if request.slow:
                 if finalArmAngles is not None:
                     steps = self.getSteps(finalArmAngles)
@@ -209,11 +211,14 @@ class ArmControl:
                 else:
                     self.toggleGripper('release')
 
-            if not self.moveArmStraightSrv(True).reached:
-                print("Maximum arm extension reached")
-                self.moveArmStraightSrv(False)      # First retract arm
-                # self.moveFwd(self.currentDistance)    # move the vehicle fwd by given distance
-                print("Maximum arm extension reached: ", self.currentDistance)
-                return
+            if self.currentDistance > 0.1:
+                self.moveFwd(self.currentDistance)    # move the vehicle fwd by given distance
+
+            else:
+                if not self.moveArmStraightSrv(True).reached:
+                    print("Maximum arm extension reached")
+                    self.moveArmStraightSrv(False)      # First retract arm
+                    self.moveFwd(self.currentDistance)    # move the vehicle fwd by given distance
+                    print("Maximum arm extension reached: ", self.currentDistance)
 
         

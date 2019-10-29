@@ -57,6 +57,8 @@ class ScanEnvironment:
         curAng = armAngles.armBase_armBaseTop
 
         detObjLoc = []
+        angles = []
+        distances = []
 
         lastDetLoc = Constant.CAMERA_HEIGHT/2
         lastDetAng = -190
@@ -82,14 +84,12 @@ class ScanEnvironment:
                 dist = self.currentDistance
                 if len(detObjLoc) > 0:
                     if curAng - detObjLoc[-1][-1] > 10:
-                        detObjLoc.append((ext_lib.degToRad(self.fixAngleAxis(curAng)), self.getStraightLineDist(dist, armAngles), curAng))
+                        angles.append(round(ext_lib.degToRad(self.fixAngleAxis(curAng)), 3))
+                        distances.append(round(self.getStraightLineDist(dist, armAngles), 3))
                 else:
-                    detObjLoc.append((round(ext_lib.degToRad(self.fixAngleAxis(curAng)), 3), round(self.getStraightLineDist(dist, armAngles), 3), curAng))
+                    angles.append(round(ext_lib.degToRad(self.fixAngleAxis(curAng)), 3))
+                    distances.append(round(self.getStraightLineDist(dist, armAngles), 3))
 
-
-                print(detObjLoc)
-                # time.sleep(speed*2)
-                # raw_input("Append")
             else:
                 armAngles.armBase_armBaseTop = curAng
                 print("Current angle: ", curAng-5)
@@ -110,7 +110,7 @@ class ScanEnvironment:
             self.armAnglesCmdPub.publish(armAngles)
             time.sleep(speed)
 
-        return detObjLoc
+        return [angles, distances]
         # if len(detObjLoc) > 0:
         #     self.pickObject(detObjLoc)
 

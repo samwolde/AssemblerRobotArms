@@ -1,4 +1,4 @@
 float32[] angle
 float32[] distance
 ---
-bool success
+geometry_msgs/Point[] world_coordinates

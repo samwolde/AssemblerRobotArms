@@ -46,22 +46,24 @@
 			</inertial>
 			<visual name="box-2_vis">
 				<geometry>
-					<box>
-						<size>0.25 0.25 0.25</size>
-					</box>
+					<cylinder>
+						<radius>0.125</radius>
+						<length>0.125</length>
+					</cylinder>
 				</geometry>
 				<material>
-					<ambient>0 0 1 1</ambient>
-					<diffuse>0 0 1 1</diffuse>
-					<specular>0 0 1 1</specular>
+					<ambient>1 0 0 1</ambient>
+					<diffuse>1 0 0 1</diffuse>
+					<specular>1 0 0 1</specular>
 					<emissive>0.1 0.1 0.1 1</emissive>
 				</material>
 			</visual>
 			<collision name="box-2_col">
 				<geometry>
-					<box>
-						<size>0.25 0.25 0.25</size>
-					</box>
+					<cylinder>
+						<radius>0.125</radius>
+						<length>0.125</length>
+					</cylinder>
 				</geometry>
 			</collision>
 		</link>
@@ -82,9 +84,9 @@
 					</box>
 				</geometry>
 				<material>
-					<ambient>0.26 0.84 0.96 1</ambient>
-					<diffuse>0.26 0.84 0.96 1</diffuse>
-					<specular>0.26 0.84 0.96 1</specular>
+					<ambient>1 0 0 1</ambient>
+					<diffuse>1 0 0 1</diffuse>
+					<specular>1 0 0 1</specular>
 					<emissive>0.1 0.1 0.1 1</emissive>
 				</material>
 			</visual>
@@ -113,9 +115,9 @@
 					</box>
 				</geometry>
 				<material>
-					<ambient>0.26 0.84 0.96 1</ambient>
-					<diffuse>0.26 0.84 0.96 1</diffuse>
-					<specular>0.26 0.84 0.96 1</specular>
+					<ambient>1 0 0 1</ambient>
+					<diffuse>1 0 0 1</diffuse>
+					<specular>1 0 0 1</specular>
 					<emissive>0.1 0.1 0.1 1</emissive>
 				</material>
 			</visual>
@@ -139,24 +141,22 @@
 			</inertial>
 			<visual name="box-5_vis">
 				<geometry>
-					<cylinder>
-						<radius>0.125</radius>
-						<length>0.125</length>
-					</cylinder>
+					<box>
+						<size>0.25 0.25 0.25</size>
+					</box>
 				</geometry>
 				<material>
-					<ambient>0.26 0.84 0.96 1</ambient>
-					<diffuse>0.26 0.84 0.96 1</diffuse>
-					<specular>0.26 0.84 0.96 1</specular>
+					<ambient>1 0 0 1</ambient>
+					<diffuse>1 0 0 1</diffuse>
+					<specular>1 0 0 1</specular>
 					<emissive>0.1 0.1 0.1 1</emissive>
 				</material>
 			</visual>
 			<collision name="box-5_col">
 				<geometry>
-					<cylinder>
-						<radius>0.125</radius>
-						<length>0.125</length>
-					</cylinder>
+					<box>
+						<size>0.25 0.25 0.25</size>
+					</box>
 				</geometry>
 			</collision>
 		</link>
@@ -172,22 +172,24 @@
 			</inertial>
 			<visual name="box-6_vis">
 				<geometry>
-					<box>
-						<size>0.25 0.25 0.25</size>
-					</box>
+					<cylinder>
+						<radius>0.125</radius>
+						<length>0.125</length>
+					</cylinder>
 				</geometry>
 				<material>
-					<ambient>0 0 1 1</ambient>
-					<diffuse>0 0 1 1</diffuse>
-					<specular>0 0 1 1</specular>
+					<ambient>1 0 0 1</ambient>
+					<diffuse>1 0 0 1</diffuse>
+					<specular>1 0 0 1</specular>
 					<emissive>0.1 0.1 0.1 1</emissive>
 				</material>
 			</visual>
 			<collision name="box-6_col">
 				<geometry>
-					<box>
-						<size>0.25 0.25 0.25</size>
-					</box>
+					<cylinder>
+						<radius>0.125</radius>
+						<length>0.125</length>
+					</cylinder>
 				</geometry>
 			</collision>
 		</link>
@@ -203,24 +205,22 @@
 			</inertial>
 			<visual name="box-7_vis">
 				<geometry>
-					<cylinder>
-						<radius>0.125</radius>
-						<length>0.125</length>
-					</cylinder>
+					<box>
+						<size>0.25 0.25 0.25</size>
+					</box>
 				</geometry>
 				<material>
-					<ambient>0 0 1 1</ambient>
-					<diffuse>0 0 1 1</diffuse>
-					<specular>0 0 1 1</specular>
+					<ambient>1 0 0 1</ambient>
+					<diffuse>1 0 0 1</diffuse>
+					<specular>1 0 0 1</specular>
 					<emissive>0.1 0.1 0.1 1</emissive>
 				</material>
 			</visual>
 			<collision name="box-7_col">
 				<geometry>
-					<cylinder>
-						<radius>0.125</radius>
-						<length>0.125</length>
-					</cylinder>
+					<box>
+						<size>0.25 0.25 0.25</size>
+					</box>
 				</geometry>
 			</collision>
 		</link>
@@ -236,22 +236,24 @@
 			</inertial>
 			<visual name="box-8_vis">
 				<geometry>
-					<box>
-						<size>0.25 0.25 0.25</size>
-					</box>
+					<cylinder>
+						<radius>0.125</radius>
+						<length>0.125</length>
+					</cylinder>
 				</geometry>
 				<material>
-					<ambient>0.96 0.94 0.26 1</ambient>
-					<diffuse>0.96 0.94 0.26 1</diffuse>
-					<specular>0.96 0.94 0.26 1</specular>
+					<ambient>1 0 0 1</ambient>
+					<diffuse>1 0 0 1</diffuse>
+					<specular>1 0 0 1</specular>
 					<emissive>0.1 0.1 0.1 1</emissive>
 				</material>
 			</visual>
 			<collision name="box-8_col">
 				<geometry>
-					<box>
-						<size>0.25 0.25 0.25</size>
-					</box>
+					<cylinder>
+						<radius>0.125</radius>
+						<length>0.125</length>
+					</cylinder>
 				</geometry>
 			</collision>
 		</link>
@@ -272,9 +274,9 @@
 					</box>
 				</geometry>
 				<material>
-					<ambient>0.96 0.94 0.26 1</ambient>
-					<diffuse>0.96 0.94 0.26 1</diffuse>
-					<specular>0.96 0.94 0.26 1</specular>
+					<ambient>1 0 0 1</ambient>
+					<diffuse>1 0 0 1</diffuse>
+					<specular>1 0 0 1</specular>
 					<emissive>0.1 0.1 0.1 1</emissive>
 				</material>
 			</visual>
@@ -298,24 +300,22 @@
 			</inertial>
 			<visual name="box-10_vis">
 				<geometry>
-					<cylinder>
-						<radius>0.125</radius>
-						<length>0.125</length>
-					</cylinder>
+					<box>
+						<size>0.25 0.25 0.25</size>
+					</box>
 				</geometry>
 				<material>
-					<ambient>0.26 0.84 0.96 1</ambient>
-					<diffuse>0.26 0.84 0.96 1</diffuse>
-					<specular>0.26 0.84 0.96 1</specular>
+					<ambient>1 0 0 1</ambient>
+					<diffuse>1 0 0 1</diffuse>
+					<specular>1 0 0 1</specular>
 					<emissive>0.1 0.1 0.1 1</emissive>
 				</material>
 			</visual>
 			<collision name="box-10_col">
 				<geometry>
-					<cylinder>
-						<radius>0.125</radius>
-						<length>0.125</length>
-					</cylinder>
+					<box>
+						<size>0.25 0.25 0.25</size>
+					</box>
 				</geometry>
 			</collision>
 		</link>
@@ -331,10 +331,9 @@
 			</inertial>
 			<visual name="box-11_vis">
 				<geometry>
-					<cylinder>
-						<radius>0.125</radius>
-						<length>0.125</length>
-					</cylinder>
+					<box>
+						<size>0.25 0.25 0.25</size>
+					</box>
 				</geometry>
 				<material>
 					<ambient>1 0 0 1</ambient>
@@ -345,10 +344,9 @@
 			</visual>
 			<collision name="box-11_col">
 				<geometry>
-					<cylinder>
-						<radius>0.125</radius>
-						<length>0.125</length>
-					</cylinder>
+					<box>
+						<size>0.25 0.25 0.25</size>
+					</box>
 				</geometry>
 			</collision>
 		</link>
@@ -364,22 +362,24 @@
 			</inertial>
 			<visual name="box-12_vis">
 				<geometry>
-					<box>
-						<size>0.25 0.25 0.25</size>
-					</box>
+					<cylinder>
+						<radius>0.125</radius>
+						<length>0.125</length>
+					</cylinder>
 				</geometry>
 				<material>
-					<ambient>0 0 1 1</ambient>
-					<diffuse>0 0 1 1</diffuse>
-					<specular>0 0 1 1</specular>
+					<ambient>1 0 0 1</ambient>
+					<diffuse>1 0 0 1</diffuse>
+					<specular>1 0 0 1</specular>
 					<emissive>0.1 0.1 0.1 1</emissive>
 				</material>
 			</visual>
 			<collision name="box-12_col">
 				<geometry>
-					<box>
-						<size>0.25 0.25 0.25</size>
-					</box>
+					<cylinder>
+						<radius>0.125</radius>
+						<length>0.125</length>
+					</cylinder>
 				</geometry>
 			</collision>
 		</link>
@@ -401,9 +401,9 @@
 					</cylinder>
 				</geometry>
 				<material>
-					<ambient>0.96 0.26 0.90 1</ambient>
-					<diffuse>0.96 0.26 0.90 1</diffuse>
-					<specular>0.96 0.26 0.90 1</specular>
+					<ambient>1 0 0 1</ambient>
+					<diffuse>1 0 0 1</diffuse>
+					<specular>1 0 0 1</specular>
 					<emissive>0.1 0.1 0.1 1</emissive>
 				</material>
 			</visual>
@@ -428,24 +428,22 @@
 			</inertial>
 			<visual name="box-14_vis">
 				<geometry>
-					<cylinder>
-						<radius>0.125</radius>
-						<length>0.125</length>
-					</cylinder>
+					<box>
+						<size>0.25 0.25 0.25</size>
+					</box>
 				</geometry>
 				<material>
-					<ambient>0 1 0 1</ambient>
-					<diffuse>0 1 0 1</diffuse>
-					<specular>0 1 0 1</specular>
+					<ambient>1 0 0 1</ambient>
+					<diffuse>1 0 0 1</diffuse>
+					<specular>1 0 0 1</specular>
 					<emissive>0.1 0.1 0.1 1</emissive>
 				</material>
 			</visual>
 			<collision name="box-14_col">
 				<geometry>
-					<cylinder>
-						<radius>0.125</radius>
-						<length>0.125</length>
-					</cylinder>
+					<box>
+						<size>0.25 0.25 0.25</size>
+					</box>
 				</geometry>
 			</collision>
 		</link>
@@ -461,10 +459,9 @@
 			</inertial>
 			<visual name="box-15_vis">
 				<geometry>
-					<cylinder>
-						<radius>0.125</radius>
-						<length>0.125</length>
-					</cylinder>
+					<box>
+						<size>0.25 0.25 0.25</size>
+					</box>
 				</geometry>
 				<material>
 					<ambient>1 0 0 1</ambient>
@@ -475,10 +472,9 @@
 			</visual>
 			<collision name="box-15_col">
 				<geometry>
-					<cylinder>
-						<radius>0.125</radius>
-						<length>0.125</length>
-					</cylinder>
+					<box>
+						<size>0.25 0.25 0.25</size>
+					</box>
 				</geometry>
 			</collision>
 		</link>

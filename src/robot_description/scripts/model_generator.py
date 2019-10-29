@@ -218,8 +218,8 @@ wheel_ctrl = Plugin("wheel_ctr","libwheel_plugin.so",
     "odometrySubTopic":"odom",
     #Tweak the below parameteres if the turning angle overshoots.
     #Or the car is slowly turning.
-    "kp":4,                   #Increase kp if car turn rate is slow, decrease if turning angle overshoots too often
-    "ki":4,
+    "kp":5,                   #Increase kp if car turn rate is slow, decrease if turning angle overshoots too often
+    "ki":5,
     "kd":2,
     "dt":0.01,
     # turns within goal_radian +- turn_accuracy, higher accuracy higher turning time
@@ -398,14 +398,11 @@ joint_sup2_axel,susp_4,wheel_4,joint_sup4_body,joint_sup4_axel,
 wheel_axel_1, joint_axel1_wheel, wheel_axel_2,joint_axel2_wheel,wheel_axel_3,joint_axel3_wheel,wheel_axel_4,joint_axel4_wheel,
 susp_3,wheel_3,joint_sup3_body,joint_sup3_axel,
 # Arm links and joints
-# armBaseLink, bodyLink_armBase, armBaseTopLink, armBase_armBaseTop, arm1Link, armBaseTop_arm1, arm2Link, arm1_arm2,  
+armBaseLink, bodyLink_armBase, armBaseTopLink, armBase_armBaseTop, arm1Link, armBaseTop_arm1, arm2Link, arm1_arm2,  
 wheel_ctrl, skid_steer_ctrl,
 # Gripper links and joints
 palm, palm_joint, finger_one, finger_one_joint, finger_two, finger_two_joint, camera_link, camera_link_joint, objDistanceSensor_link, objDistanceSensor_link_joint,
-#finger_three, finger_three_joint, 
-# finger_four, finger_four_joint, 
 finger_one_tip, finger_one_tip_joint, finger_two_tip, finger_two_tip_joint, 
-# finger_three_tip, finger_three_tip_joint, finger_four_tip, finger_four_tip_joint, 
 gripper_plugin, 
 arm_control_plugin,
 ir_sensor_link,ir_joint,ir_sensor_ctrl

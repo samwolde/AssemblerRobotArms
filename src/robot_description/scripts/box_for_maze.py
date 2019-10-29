@@ -20,7 +20,8 @@ class BoxCreator:
         for l in locations:
             pose_body = Pose(Location(l[0], l[1], 0), Orientation(0, 0, 0))
             r = rand.randint(0,1)
-            c = rand.randint(0,len(Prop.colors)-1)
+            # c = rand.randint(0,len(Prop.colors)-1)
+            c=0
             # 0.1 0.1 0.1 1
             material = Material({
                 "a":Prop.colors[c],
