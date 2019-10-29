@@ -229,6 +229,13 @@ class CylindericalLinkWithSensor(CylindericalLink):
         self.sensor = Sensor(name)
         self.appendChild(self.sensor)
 
+class RectangularLinkWithSensor(RectangularLink):
+
+    def __init__(self, name, pose:Pose,mass,size, inertial):
+        super().__init__(name, pose, mass, size, inertial)
+        self.sensor = Sensor(name)
+        self.appendChild(self.sensor)
+
 class Sensor(DOM.Element):
     
     def __init__(self, name):

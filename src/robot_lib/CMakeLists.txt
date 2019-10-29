@@ -67,11 +67,22 @@ add_service_files(
    MoveFrwd.srv
    PickObject.srv
    GoTo.srv
+   GoToPlanned.srv
    MinTour.srv
    Steering.srv
    Sensor.srv
    MoveArm.srv
    MoveGripper.srv
+   GetArmAngles.srv
+   InverseKinematics.srv
+   ForwardKinematics.srv
+   ObserveEnv.srv
+   ArmAnglesSrv.srv
+   AlignGripper.srv
+   MoveArmStraight.srv
+   PickObj.srv
+   ObjDistanceSrv.srv
+   BeginWork.srv
 )
 
 ## Generate actions in the 'action' folder

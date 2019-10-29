@@ -275,7 +275,7 @@ arm_base_top_inertial   = math_helper(Orientation(0, 0, 0)).inertial_cylinderica
 # Arm Base
 # ----------------------------------------------
 # Position
-armBasePos = Pose(Location(body_link.loc.x, body_link.loc.y + height/2 - ARM_BASE_RADIUS, body_link.loc.z + depth/2), Orientation(0, 0, 0))
+armBasePos = Pose(Location(body_link.loc.x, body_link.loc.y - height/2 + ARM_BASE_RADIUS, body_link.loc.z + depth/2), Orientation(0, 0, 0))
 
 # Link
 armBaseLink = CylindericalLink('arm_base', armBasePos, ARM_BASE_LENGTH, arm_base_mass, ARM_BASE_RADIUS, arm_base_inertial)
@@ -338,41 +338,55 @@ arm_control_plugin = Plugin("arm_controller","libarm_controller.so", {})
 
 #Gripper 
 
-palm_radius     = width/20
+palm_width      = width/20
 finger_radius   = width/80
-palm_length     = width/20
-finger_length   = width/6
-palm_mass       = default_mass/30
-finger_mass     = default_mass/40
-palm_inertial   = math_helper(Orientation(0, 0, 0)).inertial_cylinderical(palm_mass, palm_length, palm_radius)
-finger_inertial = math_helper(Orientation(0, 0, 0)).inertial_cylinderical(finger_mass, finger_length, finger_radius)
+palm_length     = width/5
+palm_size       = (palm_length, palm_width, palm_width)
+camera_link_size = (palm_width, palm_width, palm_width)
+finger_length   = width/8
+finger_width    = width/20
+finger_size     = (finger_width, finger_width, finger_length) 
+palm_mass       = default_mass/60
+finger_mass     = default_mass/60
+camera_link_mass = default_mass/100
+palm_inertial   = math_helper(Orientation(0, 0, 0)).inertial_rectangular(palm_mass, palm_length, palm_width, palm_width)
+camera_link_inertial   = math_helper(Orientation(0, 0, 0)).inertial_rectangular(camera_link_mass, palm_width, palm_width, palm_width)
+finger_inertial = math_helper(Orientation(0, 0, 0)).inertial_rectangular(finger_mass, finger_width, finger_width, finger_length)
 
 
-palm_pos = Pose(Location(arm2Pos.loc.x, arm2Pos.loc.y, arm2Pos.loc.z + ARM_2_LENGTH/2 + palm_length/2), Orientation(0,0,0))
+palm_pos = Pose(Location(arm2Pos.loc.x, arm2Pos.loc.y, arm2Pos.loc.z + ARM_2_LENGTH/2 + palm_width/2), Orientation(0,0,0))
 
-palm = CylindericalLink("palm", Pose( Location( palm_pos.loc.x, palm_pos.loc.y, palm_pos.loc.z ), Orientation( palm_pos.orie.x, palm_pos.orie.y, palm_pos.orie.z)), palm_length, palm_mass, palm_radius, palm_inertial )
+palm = RectangularLink("palm", Pose( Location( palm_pos.loc.x, palm_pos.loc.y, palm_pos.loc.z ), Orientation( palm_pos.orie.x, palm_pos.orie.y, palm_pos.orie.z)), palm_mass, palm_size, palm_inertial)
+camera_link = RectangularLink("camera_link", Pose( Location( palm_pos.loc.x, palm_pos.loc.y + palm_width, palm_pos.loc.z), Orientation( palm_pos.orie.x, -math.pi/2, palm_pos.orie.z)), camera_link_mass, camera_link_size, camera_link_inertial)
+objDistanceSensor_link = RectangularLink("objDistanceSensor_link", Pose( Location( palm_pos.loc.x, palm_pos.loc.y + palm_width, palm_pos.loc.z), Orientation( palm_pos.orie.x, -math.pi/2, palm_pos.orie.z)), camera_link_mass, camera_link_size, camera_link_inertial)
 
-finger_one      = CylindericalLink("finger_one",    Pose( Location(palm_pos.loc.x, palm_pos.loc.y+(palm_radius/2), palm_pos.loc.z+(palm_length/2)+(finger_length/2)), Orientation(palm_pos.orie.x, palm_pos.orie.y, palm_pos.orie.z)), finger_length, finger_mass, finger_radius, finger_inertial)
-finger_two      = CylindericalLink("finger_two",    Pose( Location(palm_pos.loc.x, palm_pos.loc.y-(palm_radius/2), palm_pos.loc.z+(palm_length/2)+(finger_length/2)), Orientation(palm_pos.orie.x, palm_pos.orie.y, palm_pos.orie.z)), finger_length, finger_mass, finger_radius, finger_inertial)
-finger_three    = CylindericalLink("finger_three",  Pose( Location(palm_pos.loc.x+(palm_radius/2), palm_pos.loc.y, palm_pos.loc.z+(palm_length/2)+(finger_length/2)), Orientation(palm_pos.orie.x, palm_pos.orie.y, palm_pos.orie.z)), finger_length, finger_mass, finger_radius, finger_inertial)
-finger_four     = CylindericalLink("finger_four",   Pose( Location(palm_pos.loc.x-(palm_radius/2), palm_pos.loc.y, palm_pos.loc.z+(palm_length/2)+(finger_length/2)), Orientation(palm_pos.orie.x, palm_pos.orie.y, palm_pos.orie.z)), finger_length, finger_mass, finger_radius, finger_inertial)
+finger_one      = RectangularLinkWithSensor("finger_one",    Pose( Location(palm_pos.loc.x + palm_length/2, palm_pos.loc.y, palm_pos.loc.z+(palm_width/2)+(0.4*finger_length)), Orientation(palm_pos.orie.x, palm_pos.orie.y, palm_pos.orie.z)), finger_mass, finger_size, finger_inertial)
+finger_two      = RectangularLinkWithSensor("finger_two",    Pose( Location(palm_pos.loc.x - palm_length/2, palm_pos.loc.y, palm_pos.loc.z+(palm_width/2)+(0.4*finger_length)), Orientation(palm_pos.orie.x, palm_pos.orie.y, palm_pos.orie.z)), finger_mass, finger_size, finger_inertial)
+#finger_three    = CylindericalLink("finger_three",  Pose( Location(palm_pos.loc.x+(palm_radius/2), palm_pos.loc.y, palm_pos.loc.z+(palm_length/2)+(finger_length/2)), Orientation(palm_pos.orie.x, palm_pos.orie.y, palm_pos.orie.z)), finger_length, finger_mass, finger_radius, finger_inertial)
+#finger_four     = CylindericalLink("finger_four",   Pose( Location(palm_pos.loc.x-(palm_radius/2), palm_pos.loc.y, palm_pos.loc.z+(palm_length/2)+(finger_length/2)), Orientation(palm_pos.orie.x, palm_pos.orie.y, palm_pos.orie.z)), finger_length, finger_mass, finger_radius, finger_inertial)
 
-finger_one_tip  = CylindericalLinkWithSensor("finger_one_tip",   Pose( Location(palm_pos.loc.x, palm_pos.loc.y+(palm_radius/2), palm_pos.loc.z+(palm_length/2)+((3*finger_length)/2)), Orientation(palm_pos.orie.x, palm_pos.orie.y, palm_pos.orie.z)), finger_length, finger_mass, finger_radius, finger_inertial)
-finger_two_tip  = CylindericalLinkWithSensor("finger_two_tip",   Pose( Location(palm_pos.loc.x, palm_pos.loc.y-(palm_radius/2), palm_pos.loc.z+(palm_length/2)+((3*finger_length)/2)), Orientation(palm_pos.orie.x, palm_pos.orie.y, palm_pos.orie.z)), finger_length, finger_mass, finger_radius, finger_inertial)
-finger_three_tip= CylindericalLinkWithSensor("finger_three_tip", Pose( Location(palm_pos.loc.x+(palm_radius/2), palm_pos.loc.y, palm_pos.loc.z+(palm_length/2)+((3*finger_length)/2)), Orientation(palm_pos.orie.x, palm_pos.orie.y, palm_pos.orie.z)), finger_length, finger_mass, finger_radius, finger_inertial)
-finger_four_tip = CylindericalLinkWithSensor("finger_four_tip",  Pose( Location(palm_pos.loc.x-(palm_radius/2), palm_pos.loc.y, palm_pos.loc.z+(palm_length/2)+((3*finger_length)/2)), Orientation(palm_pos.orie.x, palm_pos.orie.y, palm_pos.orie.z)), finger_length, finger_mass, finger_radius, finger_inertial)
+#bodyLink_armBase = Joint('bodyLink_armBase', 'fixed', Pose(), armBaseLink.name, body_link.name)
 
-palm_joint  = RevoluteJoint("palm_joint", Pose( Location(0, 0, -(palm_length/2)), Orientation(palm_pos.orie.x, palm_pos.orie.y, palm_pos.orie.z)), "palm", arm2Link.name, PI, -PI, Orientation(0, 0, 1))
 
-finger_one_joint    = RevoluteJoint("finger_one_joint",     Pose( Location(0, 0, -(finger_length/2)), Orientation(palm_pos.orie.x, palm_pos.orie.y, palm_pos.orie.z)), "finger_one",   "palm",  0,     PI/4, Orientation(1, 0, 0))
-finger_two_joint    = RevoluteJoint("finger_two_joint",     Pose( Location(0, 0, -(finger_length/2)), Orientation(palm_pos.orie.x, palm_pos.orie.y, palm_pos.orie.z)), "finger_two",   "palm", -PI/4,  0,    Orientation(1, 0, 0))
-finger_three_joint  = RevoluteJoint("finger_three_joint",   Pose( Location(0, 0, -(finger_length/2)), Orientation(palm_pos.orie.x, palm_pos.orie.y, palm_pos.orie.z)), "finger_three", "palm",  PI/4,  0,    Orientation(0, 1, 0))
-finger_four_joint   = RevoluteJoint("finger_four_joint",    Pose( Location(0, 0, -(finger_length/2)), Orientation(palm_pos.orie.x, palm_pos.orie.y, palm_pos.orie.z)), "finger_four",  "palm",  0,    -PI/4, Orientation(0, 1, 0))
+finger_one_tip  = RectangularLinkWithSensor("finger_one_tip",   Pose( Location(palm_pos.loc.x - finger_width/2 + palm_length/2, palm_pos.loc.y, palm_pos.loc.z + 1.5*finger_length), Orientation(0,-0.5,0)), finger_mass, finger_size, finger_inertial)
+finger_two_tip  = RectangularLinkWithSensor("finger_two_tip",   Pose( Location(palm_pos.loc.x + finger_width/2 - palm_length/2, palm_pos.loc.y, palm_pos.loc.z + 1.5*finger_length), Orientation(0,0.5,0)), finger_mass, finger_size, finger_inertial)
+#finger_three_tip= CylindericalLinkWithSensor("finger_three_tip", Pose( Location(palm_pos.loc.x+(palm_radius/2), palm_pos.loc.y, palm_pos.loc.z+(palm_length/2)+((3*finger_length)/2)), Orientation(palm_pos.orie.x, palm_pos.orie.y, palm_pos.orie.z)), finger_length, finger_mass, finger_radius, finger_inertial)
+#finger_four_tip = CylindericalLinkWithSensor("finger_four_tip",  Pose( Location(palm_pos.loc.x-(palm_radius/2), palm_pos.loc.y, palm_pos.loc.z+(palm_length/2)+((3*finger_length)/2)), Orientation(palm_pos.orie.x, palm_pos.orie.y, palm_pos.orie.z)), finger_length, finger_mass, finger_radius, finger_inertial)
 
-finger_one_tip_joint    = RevoluteJoint("finger_one_tip_joint",   Pose( Location(0, 0, -(finger_length/2)), Orientation(palm_pos.orie.x, palm_pos.orie.y, palm_pos.orie.z)), "finger_one_tip",   "finger_one",  -PI/2, 0,    Orientation(1, 0, 0))
-finger_two_tip_joint    = RevoluteJoint("finger_two_tip_joint",   Pose( Location(0, 0, -(finger_length/2)), Orientation(palm_pos.orie.x, palm_pos.orie.y, palm_pos.orie.z)), "finger_two_tip",   "finger_two",   0,    PI/2, Orientation(1, 0, 0))
-finger_three_tip_joint  = RevoluteJoint("finger_three_tip_joint", Pose( Location(0, 0, -(finger_length/2)), Orientation(palm_pos.orie.x, palm_pos.orie.y, palm_pos.orie.z)), "finger_three_tip", "finger_three", 0,   -PI/2, Orientation(0, 1, 0))
-finger_four_tip_joint   = RevoluteJoint("finger_four_tip_joint",  Pose( Location(0, 0, -(finger_length/2)), Orientation(palm_pos.orie.x, palm_pos.orie.y, palm_pos.orie.z)), "finger_four_tip",  "finger_four",  PI/2, 0,    Orientation(0, 1, 0))
+palm_joint  = RevoluteJoint("palm_joint", Pose( Location(0, 0, 0), Orientation(palm_pos.orie.x, palm_pos.orie.y, palm_pos.orie.z)), "palm", arm2Link.name, PI, -PI, Orientation(1, 0, 0))
+
+camera_link_joint = Joint("camera_link_joint", 'fixed',  Pose( Location(0, 0, 0), Orientation(0,0,0)), "palm",   "camera_link")
+objDistanceSensor_link_joint = Joint("objDistanceSensor_link_joint", 'fixed',  Pose( Location(0, 0, 0), Orientation(0,0,0)), "palm", objDistanceSensor_link.name)
+ 
+finger_one_joint    = RevoluteJoint("finger_one_joint",     Pose( Location(0, 0, -(finger_length/2)), Orientation(palm_pos.orie.x, palm_pos.orie.y, palm_pos.orie.z)), "finger_one",   "palm",  0,     PI/4, Orientation(0, 1, 0))
+finger_two_joint    = RevoluteJoint("finger_two_joint",     Pose( Location(0, 0, -(finger_length/2)), Orientation(palm_pos.orie.x, palm_pos.orie.y, palm_pos.orie.z)), "finger_two",   "palm", -PI/4,  0,    Orientation(0, 1, 0))
+#finger_three_joint  = RevoluteJoint("finger_three_joint",   Pose( Location(0, 0, -(finger_length/2)), Orientation(palm_pos.orie.x, palm_pos.orie.y, palm_pos.orie.z)), "finger_three", "palm",  PI/4,  0,    Orientation(0, 1, 0))
+#finger_four_joint   = RevoluteJoint("finger_four_joint",    Pose( Location(0, 0, -(finger_length/2)), Orientation(palm_pos.orie.x, palm_pos.orie.y, palm_pos.orie.z)), "finger_four",  "palm",  0,    -PI/4, Orientation(0, 1, 0))
+
+finger_one_tip_joint    = Joint("finger_one_tip_joint", 'fixed',  Pose( Location(0, 0, -(0.4*finger_length)), Orientation(0,0,0)), "finger_one_tip",   "finger_one")
+finger_two_tip_joint    = Joint("finger_two_tip_joint", 'fixed',   Pose( Location(0, 0, -(0.4*finger_length)), Orientation(0,0,0)), "finger_two_tip",   "finger_two")
+#finger_three_tip_joint  = RevoluteJoint("finger_three_tip_joint", Pose( Location(0, 0, -(finger_length/2)), Orientation(palm_pos.orie.x, palm_pos.orie.y, palm_pos.orie.z)), "finger_three_tip", "finger_three", 0,   -PI/2, Orientation(0, 1, 0))
+#finger_four_tip_joint   = RevoluteJoint("finger_four_tip_joint",  Pose( Location(0, 0, -(finger_length/2)), Orientation(palm_pos.orie.x, palm_pos.orie.y, palm_pos.orie.z)), "finger_four_tip",  "finger_four",  PI/2, 0,    Orientation(0, 1, 0))
 
 gripper_plugin = Plugin("gripper_plugin", "libgripper_plugin.so", {})
 
@@ -387,10 +401,13 @@ susp_3,wheel_3,joint_sup3_body,joint_sup3_axel,
 # armBaseLink, bodyLink_armBase, armBaseTopLink, armBase_armBaseTop, arm1Link, armBaseTop_arm1, arm2Link, arm1_arm2,  
 wheel_ctrl, skid_steer_ctrl,
 # Gripper links and joints
-# palm, palm_joint, finger_one, finger_one_joint, finger_two, finger_two_joint, finger_three, finger_three_joint, 
-# finger_four, finger_four_joint, finger_one_tip, finger_one_tip_joint, finger_two_tip, finger_two_tip_joint, 
+palm, palm_joint, finger_one, finger_one_joint, finger_two, finger_two_joint, camera_link, camera_link_joint, objDistanceSensor_link, objDistanceSensor_link_joint,
+#finger_three, finger_three_joint, 
+# finger_four, finger_four_joint, 
+finger_one_tip, finger_one_tip_joint, finger_two_tip, finger_two_tip_joint, 
 # finger_three_tip, finger_three_tip_joint, finger_four_tip, finger_four_tip_joint, 
-# gripper_plugin, arm_control_plugin,
+gripper_plugin, 
+arm_control_plugin,
 ir_sensor_link,ir_joint,ir_sensor_ctrl
 ]
 links_joints.extend(short_sensors_joints)

@@ -1,217 +1,152 @@
 #!/usr/bin/env python
 import rospy
 
-from std_msgs.msg import String
 from robot_lib.msg import GripperAngles
-from robot_lib.srv import MoveGripper
+from geometry_msgs.msg import Vector3
+from std_msgs.msg import String, Bool
+
+from robot_lib.srv import MoveArm, MoveArmResponse, MoveGripper, MoveGripperResponse
+
+import constants as Constant
 import math
-import re
+import time
 
-class GripperController:
-
-    class __impl:
-        def __init__(self):
-            self.cur_status = "Closed"
-            self.fingers_to_move = []
-            self.desired_angles = GripperAngles()
-
-            self.col_sub = rospy.Subscriber("/robot/gripper/collision", String, self.collision)
-            self.pub = rospy.Publisher("/robot/gripper/move_fingers", GripperAngles, queue_size=10)
-
-        def set_desired_angles(self, angles):
-            self.desired_angles = angles
-
-        def get_desired_angles(self):
-            return self.desired_angles
-
-        def open(self):
-
-            if self.cur_status == "Open":
-                return
-            elif self.cur_status == "Closed":
-                self.fingers_to_move.append("finger_one")
-                self.fingers_to_move.append("finger_two")
-                self.fingers_to_move.append("finger_three")
-                self.fingers_to_move.append("finger_four")
-                self.move_finger()
-
-            elif self.cur_status == "Holding":
-                self.fingers_to_move.append("finger_one_tip")
-                self.fingers_to_move.append("finger_two_tip")
-                self.fingers_to_move.append("finger_three_tip")
-                self.fingers_to_move.append("finger_four_tip")
-                self.move_finger_tip(90)  # ???
-
-            self.cur_status = "Open"
-
-        def close(self):
-
-            if self.cur_status == "Closed":
-                return
-            else:  # Open
-                self.fingers_to_move.append("finger_one")
-                self.fingers_to_move.append("finger_two")
-                self.fingers_to_move.append("finger_three")
-                self.fingers_to_move.append("finger_four")
-                self.move_finger(-45)
-                self.cur_status = "Closed"
-
-        def catch(self):
-
-            self.fingers_to_move.append("finger_one_tip")
-            self.fingers_to_move.append("finger_two_tip")
-            self.fingers_to_move.append("finger_three_tip")
-            self.fingers_to_move.append("finger_four_tip")
-            self.move_finger_tip(-90)
-            self.cur_status = "Holding"
-
-        def collision(self, msg):
-
-            match = re.search('data: "robot(.*)robot::', str(msg))
-            if match:
-
-                match1 = re.search('::(.*)::', match.group(1))
-                if match1:
-
-                    if match1.group(1) in self.fingers_to_move:
-                        self.fingers_to_move.remove(match1.group(1))
-                        
-
-        def move_finger(self, deg=45):
-
-            j = 0
-            if deg > 0:
-
-                while len(self.fingers_to_move) != 0 and j < deg:
-
-                    for i in self.fingers_to_move:
-                        self.finger_helper(i, 1)
-
-                    self.publish
-                    j += 1
-
-            else:
-
-                while len(self.fingers_to_move) != 0 and j > deg:
-
-                    for i in self.fingers_to_move:
-                        self.finger_helper(i, -1)
-
-                    self.publish
-                    j -= 1
-
-            self.clear_list
-
-        def finger_helper(self, i, x):
-            if i == "finger_one":
-                self.desired_angles.palm_finger1 -= x
-            elif i == "finger_two":
-                self.desired_angles.palm_finger2 += x
-            elif i == "finger_three":
-                self.desired_angles.palm_finger3 += x
-            elif i == "finger_four":
-                self.desired_angles.palm_finger4 -= x
-
-        def move_finger_tip(self, deg=90):
-
-            j = 0
-
-            if deg > 0:
-
-                while len(self.fingers_to_move) != 0 and j < deg:
-
-                    for i in self.fingers_to_move:
-                        self.finger_tip_helper(i, 1)
-
-                    self.publish
-                    j += 1
-
-            else:
-
-                while len(self.fingers_to_move) != 0 and j > deg:
-
-                    for i in self.fingers_to_move:
-                        self.finger_tip_helper(i, -1)
-
-                    self.publish
-                    j -= 1
-
-            self.clear_list
-
-        def finger_tip_helper(self, i, x):
-            if i == "finger_one_tip":
-                self.desired_angles.finger1_tip -= x
-                if self.desired_angles.finger1_tip == 0:
-                    self.fingers_to_move.remove("finger_one_tip")
-            elif i == "finger_two_tip":
-                self.desired_angles.finger2_tip += x
-                if self.desired_angles.finger2_tip == 0:
-                    self.fingers_to_move.remove("finger_two_tip")
-            elif i == "finger_three_tip":
-                self.desired_angles.finger3_tip += x
-                if self.desired_angles.finger3_tip == 0:
-                    self.fingers_to_move.remove("finger_three_tip")
-            elif i == "finger_four_tip":
-                self.desired_angles.finger4_tip -= x
-                if self.desired_angles.finger4_tip == 0:
-                    self.fingers_to_move.remove("finger_four_tip")
-
-        def speed(deg):
-            pass
-
-        @property
-        def publish(self):
-            self.pub.publish(self.desired_angles)
-            rospy.sleep(0.1)
-
-        @property
-        def clear_list(self):
-            while len(self.fingers_to_move) > 0:
-                self.fingers_to_move.pop()
+'''
+fingerLB - max = 90 and min = 0 (neg) --> increase - open
+fingerLF - max = 90 and min = 0 (pos) --> increase - close
+fingerRB - max = 90 and min = 0 (pos) --> increase - open
+fingerRF - max = 90 and min = 0 (neg) --> increase - close
+'''
 
 
-    __instance = None
+class GripperCollision:
+    def __init__(self):
+        self.base = False
+        self.finger1B = False
+        self.finger1F = False
+        self.finger2B = False
+        self.finger2F = False
+
+    def reset(self):
+        self.base = False
+        self.finger1B = False
+        self.finger1F = False
+        self.finger2B = False
+        self.finger2F = False
+
+    def checkBackFingerCol(self):
+        return self.finger1B and self.finger2B
+
+    def checkFrontFingerCol(self):
+        return self.finger1F and self.finger2F
+
+
+class GripperControl:
+    angles = None
 
     def __init__(self):
+        self.gripperCollision = GripperCollision()
+        
+        self.gripperToggle = rospy.Service('/' + Constant.ROBOT_NAME + '/gripper/toggle', MoveGripper, self.toggleGrip)
 
-        if GripperController.__instance is None:
-            GripperController.__instance = GripperController.__impl()
+        self.collisionCheckPub = rospy.Publisher('/' + Constant.ROBOT_NAME + '/gripper/collision/check', Bool, queue_size=10)
+        self.gripperColSub = rospy.Subscriber('/'+ Constant.ROBOT_NAME + '/gripper/collision', String, self.checkCollision)
+        self.moveFingersPub = rospy.Publisher('/' + Constant.ROBOT_NAME + '/gripper/move_fingers', GripperAngles, queue_size=10)
 
-        self.__dict__['_GripperController__instance'] = GripperController.__instance
+        self.default()
 
-    def __getattr__(self, attr):
-        return getattr(self.__instance, attr)
+    def grip(self):
+        self.angles.palm_finger1 -= 1
+        self.angles.palm_finger2 += 1
 
-    def __setattr__(self, attr, value):
-        return setattr(self.__instance, attr, value)
+        return self.angles
 
-def main():
-    global pub
-    rospy.init_node("gripper_controller")
-    
-    service = rospy.Service('/robot/gripper/move_fingers', MoveGripper, move_gripper)
-    rospy.spin()
+    def release(self):
+        self.angles.palm_finger1 += 1
+        self.angles.palm_finger2 -= 1
 
-def move_gripper(request):
+        return self.angles
 
-    gripper_cnt = GripperController()
-    action = request.action
-    print(action)
+    def belowLimit(self):
+        return self.angles.palm_finger1 < -5 or self.angles.palm_finger2 > 5
 
-    if action == "open":
-        gripper_cnt.open()
-    elif action == "catch":
-        gripper_cnt.catch()
-    elif action == "close":
-        gripper_cnt.close()
-    else:
+    def beyondLimit(self):
+        return self.angles.palm_finger1 > 30 or self.angles.palm_finger2 < -30
+
+    def default(self):
+        self.angles = GripperAngles(30, -30)
+        self.gripperCollision.reset()
+
+    def radToDeg(self, rad):
+        return rad * 180 / math.pi
+
+    def checkCollision(self, col):
+        cols = col.data.split("=")
+        # print(col)
+        for i in range(len(cols)):
+            if len(cols[i]) <= 0:
+                continue
+            else:
+                objs = cols[i].split("-")
+                if not objs[0].startswith(Constant.ROBOT_NAME):
+                    if "finger_one" in objs[1]:
+                        self.gripperCollision.finger1B = True
+
+                    elif "finger_two" in objs[1]:
+                        self.gripperCollision.finger2B = True
+
+                    elif "finger_one_tip" in objs[1]:
+                        self.gripperCollision.finger1F = True
+
+                    elif "finger_two_tip" in objs[1]:
+                        self.gripperCollision.finger2F = True
+
+        if self.gripperCollision.finger1B or self.gripperCollision.finger2B:
+            self.collisionCheckPub.publish(True)
+        
+        else:        
+            self.collisionCheckPub.publish(False)
+
+    def toggleGrip(self, grip):
+        innerGripped = 0
+        outerGripped = 0
+        self.gripperCollision.reset()
+
+        if grip.action == 'catch':
+            while True:
+                self.moveFingersPub.publish(self.grip())
+                time.sleep(0.03)
+                if not self.gripperCollision.checkBackFingerCol() and self.belowLimit():
+                    return False
+
+                if self.gripperCollision.checkBackFingerCol() or self.gripperCollision.checkFrontFingerCol():
+                    if innerGripped > 6:
+                        break
+
+                    innerGripped += 1
+
+            print "Gripped"
+            return True
+
+        else:
+            print("Release called")
+            while not self.beyondLimit():
+                self.moveFingersPub.publish(self.release())
+                time.sleep(0.05)
+
+            return True
+
         return False
-
-    return True
- 
-
-if __name__=='__main__':
-    main()
+        
 
 
+# def main():
+#     gripperControl = GripperControl()
 
+#     rospy.init_node('gripper_controller')    
+#     print("Gripper control initiated")
+#     rospy.spin()
+    
+
+# if __name__=='__main__':
+#     main()

@@ -17,30 +17,15 @@
 #include "geometry_msgs/Pose2D.h"   
 #include <robot_lib/ArmAngles.h>                       // to get desired position command
 #include "turtlesim/Pose.h"
-#include <robot_lib/GetArmAngles.h>
 
 namespace gazebo
 {
-class ArmController : public ModelPlugin
+class SonarController : public ModelPlugin
 {
-// robot_lib::GetArmAngles::Request &req, robot_lib::GetArmAngles::Response &res
-public: 
-  bool getArmAngles(robot_lib::GetArmAngles::Request &req, robot_lib::GetArmAngles::Response &res){
-    robot_lib::ArmAngles angles;
-    angles.armBase_armBaseTop = radToDeg(this->model->GetJoint("armBase_armBaseTop")->Position(0));
-    angles.armBaseTop_arm1 = radToDeg(this->model->GetJoint("armBaseTop_arm1")->Position(0));
-    angles.arm1_arm2 = radToDeg(this->model->GetJoint("arm1_arm2")->Position(0));
-    angles.arm2_gripper = radToDeg(this->model->GetJoint("arm2_gripper")->Position(0));
-
-    res.angles = angles;
-
-    return true;
-  }
-
 public:
   void Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
   {
-    std::cout << "Arm Plugin started" << std::endl;
+    std::cout << "Sonar Plugin started" << std::endl;
 
     // Safety check
     if (_model->GetJointCount() == 0)
@@ -56,23 +41,10 @@ public:
     this->pid = common::PID(5, 0, 0);
     this->jointController = this->model->GetJointController();
 
+    this->SetPid("sonarBase_sonarMount", 1, 0, 1);
 
-    // this->SetPid("armBase_armBaseTarmControl.changeArmPosition(desiredPose)op", 0.4, 0.2, 0.4);
-    // this->SetPid("armBaseTop_arm1", 1, 0, 1.2);
-    // this->SetPid("arm1_arm2", 1, 0, 1.5);
-    // this->SetPid("palm_joint", 1, 0, 0.5);
-
-    this->SetPid("armBase_armBaseTop", 50, 0.2, 1.2);
-    this->SetPid("armBaseTop_arm1", 90, 10, 1.2);
-    this->SetPid("arm1_arm2", 90, 10, 1.5);
-    this->SetPid("palm_joint", 10, 0.1, 0.5);
-
-    // default arm position
-    this->SetAngle("armBase_armBaseTop", 0, false);
-    this->SetAngle("armBaseTop_arm1", 20, false);
-    this->SetAngle("arm1_arm2", 45, false);
-    this->SetAngle("palm_joint", 45, false);
-    
+    // default sonar position
+    // this->SetAngle("body_sonarMount", 0);
     // Create the node
     this->node = transport::NodePtr(new transport::Node());
     #if GAZEBO_MAJOR_VERSION < 8
@@ -93,22 +65,20 @@ public:
     // the Gazebo node
     this->rosNode.reset(new ros::NodeHandle("gazebo_client"));
 
-    // this->rosNode->advertiseService("/wheely/arm/get_arm_angles", &ArmController::getArmAngles, this);
-    
     // Create a named topic, and subscribe to it.
     ros::SubscribeOptions so =
-        ros::SubscribeOptions::create<robot_lib::ArmAngles>(
-            "/wheely/arm/angles_cmd",
+        ros::SubscribeOptions::create<std_msgs::Float32>(
+            // "/wheely/arm/angles_cmd",
+            // "/" + this->model->GetName() + "/sonar/angle_cmd",
+            "/robot/sonar/angle_cmd",
             1,
-            boost::bind(&ArmController::OnRosJointCmd, this, _1),
+            boost::bind(&SonarController::OnSonarCmd, this, _1),
             ros::VoidPtr(), &this->rosQueue);
 
     this->rosSub = this->rosNode->subscribe(so);
-
     
     // Spin up the queue helper thread.
-    this->rosQueueThread = std::thread(std::bind(&ArmController::QueueThread, this));
-
+    this->rosQueueThread = std::thread(std::bind(&SonarController::QueueThread, this));
   }
 
   // Called by the world update start event
@@ -118,52 +88,34 @@ public:
     if(updateNum < 4000){
       this->jointController->Update();
     } else{
-      this->model->GetJoint("armBase_armBaseTop")->SetParam("fmax", 0, 0);
-      this->model->GetJoint("armBaseTop_arm1")->SetParam("fmax", 0, 0);
-      this->model->GetJoint("arm1_arm2")->SetParam("fmax", 0, 0);
-      this->model->GetJoint("palm_joint")->SetParam("fmax", 0, 0);
+      this->model->GetJoint("sonarBase_sonarMount")->SetParam("fmax", 0, 0);
     }
 
     updateNum++;
   }
 
-
-private:
-  float radToDeg(float rad){
-    return rad * 180/3.14;
-  }
-
-private:
-  float degToRad(float deg){
-    return deg * 3.14/180;
-  }
-
 public:
-  void OnRosJointCmd(const robot_lib::ArmAngles::ConstPtr &msg)
+  void OnSonarCmd(const std_msgs::Float32::ConstPtr &msg)
   {
-    // std::cout << "ArmBase - ArmBaseTop Angle: " << msg->armBase_armBaseTop << std::endl;   
-    this->SetAngle("armBase_armBaseTop", msg->armBase_armBaseTop, false);
-    this->SetAngle("armBaseTop_arm1", msg->armBaseTop_arm1, false);
-    this->SetAngle("arm1_arm2", msg->arm1_arm2, false);
-    this->SetAngle("palm_joint", msg->arm2_gripper, false);
-    // this->getArmAngles();
+    this->SetAngle("sonarBase_sonarMount", msg->data);
   }
 
 private:
-  void SetAngle(std::string joint_name, float degree, bool smallDegree=true)
+  void SetAngle(std::string joint_name, float degree)
   {
-    if (smallDegree == true && !(degree >= -90 && degree <= 90)){
-      return;
-    }
-
     float rad = 3.14 * degree / 180;
     std::string name = this->model->GetJoint(joint_name)->GetScopedName();
-    std::cout << "Angle: " << degree << std::endl;   
 
     this->jointController->SetPositionTarget(name, rad);
     this->jointController->Update();
     
     updateNum = 0;
+  }
+
+private:
+  void SetVelocity(std::string joint_name, float velocity)
+  {
+    this->model->GetJoint(joint_name)->SetVelocity(0, velocity);    
   }
 
 private:
@@ -226,5 +178,5 @@ private:
 };
 
 // Register this plugin with the simulator
-GZ_REGISTER_MODEL_PLUGIN(ArmController)
+GZ_REGISTER_MODEL_PLUGIN(SonarController)
 } // namespace gazebo

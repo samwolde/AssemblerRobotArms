@@ -22,7 +22,8 @@
     </node>    
     <node name="IK" pkg="robot_gazebo" type="arm_control.py" output="screen" />
 
-    <node name="gripper_controller" pkg="robot_gazebo" type="gripper_control.py" output="screen" />
+    <!-- <node name="gripper_controller" pkg="robot_gazebo" type="gripper_control.py" output="screen" /> -->
+    
     <node name="nav" pkg="robot_lib" type="nav" output="screen" />
     <node name="rviz" pkg="rviz" type="rviz" output="screen" />
     <node name="Slam" pkg="robot_planner" type="Slam" output="screen" >
