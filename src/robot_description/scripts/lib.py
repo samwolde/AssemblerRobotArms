@@ -117,9 +117,9 @@ class RectangularLink(Link):
 
     def __init__(self, name, pose:Pose, mass,size, inertial):
         super().__init__(name,pose, mass, inertial)
-        self.col_vis = RectangularColVis(name, size)
-        self.appendChild(self.col_vis.col_vis[0])
-        self.appendChild(self.col_vis.col_vis[1])
+        self.vis_col = RectangularColVis(name, size)
+        self.appendChild(self.vis_col.vis_col[0])
+        self.appendChild(self.vis_col.vis_col[1])
 
 
 #Create A cylinderical link.
@@ -127,9 +127,9 @@ class CylindericalLink(Link):
 
     def __init__(self, name, pose:Pose,leng,mass,rad, inertial):
         super().__init__(name,pose, mass, inertial)
-        self.col_vis = CylinderColVis(name, rad,leng)
-        self.appendChild(self.col_vis.col_vis[0])
-        self.appendChild(self.col_vis.col_vis[1])
+        self.vis_col = CylinderColVis(name, rad,leng)
+        self.appendChild(self.vis_col.vis_col[0])
+        self.appendChild(self.vis_col.vis_col[1])
 
 class Plugin(DOM.Element):
     def __init__(self, name:str, filename:str,parameters:dict):
@@ -175,8 +175,8 @@ class _Sensor(DOM.Element):
     Infrared sensor
 '''
 class IRSensor(_Sensor):
-    def __init__(self, name:str, hr:dict, vert:dict,range_:dict,pose:Pose, plugin:Plugin):
-        super().__init__(name,"ray", 50,"true", pose, plugin)
+    def __init__(self, name:str,hr:dict, vert:dict,range_:dict,pose:Pose, plugin:Plugin, visualize:str="false"):
+        super().__init__(name,"ray", 50,visualize, pose, plugin)
         sdf_doc = Sdf.createSdfDoc()
 
         ray  = sdf_doc.createElement("ray")
@@ -184,21 +184,35 @@ class IRSensor(_Sensor):
         hor = sdf_doc.createElement("horizontal")
         ver = sdf_doc.createElement("vertical")
         range_el = sdf_doc.createElement("range")
-
+        noise = sdf_doc.createElement("noise")
+        n_type = sdf_doc.createElement("type")
+        n_mean = sdf_doc.createElement("mean")
+        n_stddev = sdf_doc.createElement("stddev")
+        n_type.appendChild(sdf_doc.createTextNode("gaussian"))
+        n_mean.appendChild(sdf_doc.createTextNode("0.0"))
+        n_stddev.appendChild(sdf_doc.createTextNode("0.01"))
+        noise.appendChild(n_type)
+        noise.appendChild(n_mean)
+        noise.appendChild(n_stddev)
+        
         scan.appendChild(hor)
-        scan.appendChild(ver)
+        if ( vert != None):
+            scan.appendChild(ver)
 
         ray.appendChild(scan)
         ray.appendChild(range_el)
+        ray.appendChild(noise)
+
         self.appendChild(ray)
         for h in hr:
             t = sdf_doc.createElement(h)
             t.appendChild(sdf_doc.createTextNode(str(hr[h])))            
             hor.appendChild(t)
-        for v in vert:
-            t = sdf_doc.createElement(v)
-            t.appendChild(sdf_doc.createTextNode(str(vert[v])))
-            ver.appendChild(t)
+        if vert != None:
+            for v in vert:
+                t = sdf_doc.createElement(v)
+                t.appendChild(sdf_doc.createTextNode(str(vert[v])))
+                ver.appendChild(t)
         for r in range_:
             t = sdf_doc.createElement(r)
             t.appendChild(sdf_doc.createTextNode(str(range_[r])))
@@ -212,6 +226,13 @@ class CylindericalLinkWithSensor(CylindericalLink):
 
     def __init__(self, name, pose:Pose,leng,mass,rad, inertial):
         super().__init__(name, pose, leng, mass, rad, inertial)
+        self.sensor = Sensor(name)
+        self.appendChild(self.sensor)
+
+class RectangularLinkWithSensor(RectangularLink):
+
+    def __init__(self, name, pose:Pose,mass,size, inertial):
+        super().__init__(name, pose, mass, size, inertial)
         self.sensor = Sensor(name)
         self.appendChild(self.sensor)
 
@@ -280,7 +301,7 @@ class CylinderColVis():
         col.appendChild(geo)
         vis.appendChild(geo2)
 
-        self.col_vis = [vis, col]
+        self.vis_col = [vis, col]
 
 '''
     Create A rectangular Collision and Visual xml tags
@@ -310,8 +331,24 @@ class RectangularColVis():
         geo2 = geo.cloneNode(True)
         vis.appendChild(geo)
         col.appendChild(geo2)
-        self.col_vis = [vis, col]
+        self.vis_col = [vis, col]
 
+class Material(DOM.Element):
+    def __init__(self,vals:dict):
+        super().__init__("material")
+        sdf = Sdf.createSdfDoc()
+        
+        props = {
+            "a"  : sdf.createElement("ambient"),
+            "d"  : sdf.createElement("diffuse"),
+            "s" : sdf.createElement("specular"),
+            "e" : sdf.createElement("emissive")
+        }
+
+        for p in vals.keys():
+            text = str(vals[p][0]) +" "+ str(vals[p][1]) +" "+ str(vals[p][2]) +" "+ str(vals[p][3]) 
+            props[p].appendChild(sdf.createTextNode(text))
+            self.appendChild(props[p])   
 
 class Inertial(DOM.Element):
     def __init__(self, mass, inertial):
@@ -339,7 +376,6 @@ class Inertial(DOM.Element):
         self.appendChild(self.mass)
 
 #Generic Joint 
-#TODO:
 class Joint(DOM.Element):
     def __init__(self,name:str, type:str,  pose:Pose, child:str, parent:str):
         super().__init__("joint")
@@ -362,7 +398,19 @@ class Joint(DOM.Element):
         self.setAttributeNode(sdf_doc.createAttribute("type"))
         self.setAttribute("type",type)
         self.setAttribute("name",name)
+    def addOde(self):
+        sdf_doc = Sdf.createSdfDoc()
+        physics = sdf_doc.createElement("physics")
+        ode = sdf_doc.createElement("ode")
+        cfm = sdf_doc.createElement("cfm_damping")
+        imp = sdf_doc.createElement("implicit_spring_damper")
+        physics.appendChild(ode)
+        ode.appendChild(cfm)
+        ode.appendChild(imp)
 
+        cfm.appendChild(sdf_doc.createTextNode("1"))
+        imp.appendChild(sdf_doc.createTextNode("1"))
+        self.appendChild(physics)
 class RevoluteJoint(Joint):
     def __init__(self, name:str, pose:Pose,child:str, parent:str, upper, lower, axis_orie:Orientation):
         super().__init__(name,"revolute", pose, child, parent)
