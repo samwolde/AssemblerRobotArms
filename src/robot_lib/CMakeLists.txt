@@ -55,8 +55,6 @@ add_message_files(
   FILES
   ArmAngles.msg
   GripperAngles.msg
-  Wheely_contour_info.msg
-  Detected_objs_info.msg
 #   Message1.msg
 #   Message2.msg
 )
@@ -64,22 +62,17 @@ add_message_files(
 ## Generate services in the 'srv' folder
 add_service_files(
    FILES
-   GoTo.srv
-   GoToPlanned.srv
-   MinTour.srv
-   Steering.srv
-   MoveArm.srv
-   MoveGripper.srv
+   AlignGripper.srv
+   ArmAnglesSrv.srv
+   ForwardKinematics.srv
    GetArmAngles.srv
    InverseKinematics.srv
-   ForwardKinematics.srv
-   ObserveEnv.srv
-   ArmAnglesSrv.srv
-   AlignGripper.srv
+   MoveArm.srv
    MoveArmStraight.srv
-   PickObj.srv
+   MoveGripper.srv
    ObjDistanceSrv.srv
-   BeginWork.srv
+   ObserveEnv.srv   
+   PickObj.srv
 )
 
 ## Generate actions in the 'action' folder
@@ -96,9 +89,9 @@ generate_messages(
   geometry_msgs
 )
 
-add_executable(nav src/nav_main.cpp src/nav.cpp)
-target_link_libraries(nav ${catkin_LIBRARIES} ${GAZEBO_LIBRARIES} ${roscpp_LIBRARIES})
-add_dependencies(nav robot_lib_gencpp)
+# add_executable(nav src/nav_main.cpp src/nav.cpp)
+# target_link_libraries(nav ${catkin_LIBRARIES} ${GAZEBO_LIBRARIES} ${roscpp_LIBRARIES})
+# add_dependencies(nav robot_lib_gencpp)
 
 
 ################################################
@@ -131,9 +124,9 @@ add_dependencies(nav robot_lib_gencpp)
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
-#  INCLUDE_DIRS include
-#  LIBRARIES robot_lib
-CATKIN_DEPENDS roscpp std_msgs message_runtime
+#   INCLUDE_DIRS include/${PROJECT_NAME}
+#  LIBRARIES ObjectPick
+CATKIN_DEPENDS roscpp std_msgs message_runtime geometry_msgs
 #  DEPENDS system_lib
 
 )

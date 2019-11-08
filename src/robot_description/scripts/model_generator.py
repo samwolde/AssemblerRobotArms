@@ -264,7 +264,7 @@ ARM_BASE_TOP_LENGTH = width/10
 ARM_BASE_TOP_RADIUS = width/30
 
 arm_mass            = default_mass/10
-arm_base_mass       = default_mass/10
+arm_base_mass       = default_mass*1000/10
 arm_base_top_mass   = default_mass/20
 
 arm_inertial            = math_helper(Orientation(0, 0, 0)).inertial_cylinderical(arm_mass, ARM_1_LENGTH, ARM_RADIUS)
@@ -275,7 +275,7 @@ arm_base_top_inertial   = math_helper(Orientation(0, 0, 0)).inertial_cylinderica
 # Arm Base
 # ----------------------------------------------
 # Position
-armBasePos = Pose(Location(body_link.loc.x, body_link.loc.y - height/2 + ARM_BASE_RADIUS, body_link.loc.z + depth/2), Orientation(0, 0, 0))
+armBasePos = Pose(Location(0, 0, ARM_BASE_LENGTH/2), Orientation(0, 0, 0))
 
 # Link
 armBaseLink = CylindericalLink('arm_base', armBasePos, ARM_BASE_LENGTH, arm_base_mass, ARM_BASE_RADIUS, arm_base_inertial)
@@ -393,13 +393,14 @@ gripper_plugin = Plugin("gripper_plugin", "libgripper_plugin.so", {})
 #Build The model
 sdf = Sdf.createSdfDoc()
 root = Sdf.getRootElement()
-links_joints = [body_link,susp_1, wheel_1, joint_sup1_body,joint_sup1_axel,susp_2,wheel_2,joint_sup2_body,
-joint_sup2_axel,susp_4,wheel_4,joint_sup4_body,joint_sup4_axel,
-wheel_axel_1, joint_axel1_wheel, wheel_axel_2,joint_axel2_wheel,wheel_axel_3,joint_axel3_wheel,wheel_axel_4,joint_axel4_wheel,
-susp_3,wheel_3,joint_sup3_body,joint_sup3_axel,
+links_joints = [
+# body_link,susp_1, wheel_1, joint_sup1_body,joint_sup1_axel,susp_2,wheel_2,joint_sup2_body,
+# joint_sup2_axel,susp_4,wheel_4,joint_sup4_body,joint_sup4_axel,
+# wheel_axel_1, joint_axel1_wheel, wheel_axel_2,joint_axel2_wheel,wheel_axel_3,joint_axel3_wheel,wheel_axel_4,joint_axel4_wheel,
+# susp_3,wheel_3,joint_sup3_body,joint_sup3_axel,
 # Arm links and joints
 armBaseLink, bodyLink_armBase, armBaseTopLink, armBase_armBaseTop, arm1Link, armBaseTop_arm1, arm2Link, arm1_arm2,  
-wheel_ctrl, skid_steer_ctrl,
+# wheel_ctrl, skid_steer_ctrl,
 # Gripper links and joints
 palm, palm_joint, finger_one, finger_one_joint, finger_two, finger_two_joint, camera_link, camera_link_joint, objDistanceSensor_link, objDistanceSensor_link_joint,
 #finger_three, finger_three_joint, 
@@ -408,11 +409,11 @@ finger_one_tip, finger_one_tip_joint, finger_two_tip, finger_two_tip_joint,
 # finger_three_tip, finger_three_tip_joint, finger_four_tip, finger_four_tip_joint, 
 gripper_plugin, 
 arm_control_plugin,
-ir_sensor_link,ir_joint,ir_sensor_ctrl
+# ir_sensor_link,ir_joint,ir_sensor_ctrl
 ]
-links_joints.extend(short_sensors_joints)
+# links_joints.extend(short_sensors_joints)
 
-model = Model("wheely",links_joints)
+model = Model("RobotArm",links_joints)
 
 #Append to root element and create sdf File.
 root.appendChild(model)
